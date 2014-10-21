@@ -5,6 +5,42 @@ go.app = function() {
     var ChoiceState = vumigo.states.ChoiceState;
     var EndState = vumigo.states.EndState;
 
+
+    // Application flow overview
+    // -------------------------
+
+    // state_start
+    // This will be a switching state, using the following logic:
+    //   - Registered user:
+    //     - 'STOP' > state_opt_out? (opt user out - send message confirming opt-out?)
+    //     - 'any other'
+    //       - Finished receiving msgs > state_finished_msgs (sms to inform they've received all messages)
+    //       - Unfinished msg stream > state_unfinished_msgs (sms to inform they'll receive scheduled msg and how to opt out)
+    //   - Unregistered user:
+    //     - 'MMC' > state_language (send language choice message, register them)
+    //     - 'any other' > state_how_to_register (send sms telling them how to register)
+
+    // state_language
+    // Choice state
+    // 1. Xhosa
+    // 2. Zulu
+    // 3. Sotho
+    // 4. Afrikaans
+    // 5. English
+
+    // state_opt_out
+    // "~~ You have opted out"
+
+    // state_finished_msgs
+    // "~~ You received all messages"
+
+    // state_unfinished_msgs
+    // "~~ You'll receive messages, or sms stop"
+
+    // state_how_to_register
+    // "~~ SMS MMC to ### to register"
+
+
     var GoApp = App.extend(function(self) {
         App.call(self, 'states:start');
 
