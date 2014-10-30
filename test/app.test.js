@@ -62,7 +62,7 @@ describe("app", function() {
                         .setup.user.addr('082333')
                         .input('STOP')
                         .check.interaction({
-                            state: 'states_opt_out',
+                            state: 'states_unsubscribe',
                             reply:
                                 "You have been unsubscribed."
                         })
@@ -76,7 +76,7 @@ describe("app", function() {
                         .setup.user.addr('082111')
                         .input('BLOCK myself')
                         .check.interaction({
-                            state: 'states_opt_out',
+                            state: 'states_unsubscribe',
                             reply:
                                 "You have been unsubscribed."
                         })
