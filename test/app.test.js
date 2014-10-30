@@ -23,8 +23,9 @@ describe("app", function() {
                     control: {
                         username: "test_user",
                         api_key: "test_key",
-                        url: "http://qa-usaid-mmc.za.prk-host.net/api/v1/"
+                        url: "http://fixture/subscription/api/v1/"
                     }
+
                 })
                 .setup(function(api) {
                     fixtures().forEach(api.http.fixtures.add);
@@ -35,8 +36,9 @@ describe("app", function() {
                     // unregistered user
                     api.contacts.add({
                         msisdn: '+082111',
-                        extra: {
-                        }
+                        extra: {},
+                        key: "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+                        user_account: "4a11907a-4cc4-415a-9011-58251e15e2b4"
                     });
                 })
                 .setup(function(api) {
@@ -46,7 +48,9 @@ describe("app", function() {
                         extra: {
                             is_registered: 'true',
                             finished_messages: 'true'
-                        }
+                        },
+                        key: "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+                        user_account: "4a11907a-4cc4-415a-9011-58251e15e2b4"
                     });
                 })
                 .setup(function(api) {
@@ -55,7 +59,9 @@ describe("app", function() {
                         msisdn: '+082444',
                         extra: {
                             is_registered: 'true'
-                        }
+                        },
+                        key: "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+                        user_account: "4a11907a-4cc4-415a-9011-58251e15e2b4"
                     });
                 });
         });
@@ -67,7 +73,7 @@ describe("app", function() {
                         .setup.user.addr('082333')
                         .input('STOP')
                         .check.interaction({
-                            state: 'states_opt_out',
+                            state: 'states_unsubscribe',
                             reply:
                                 "You have been unsubscribed."
                         })
@@ -81,7 +87,7 @@ describe("app", function() {
                         .setup.user.addr('082111')
                         .input('BLOCK myself')
                         .check.interaction({
-                            state: 'states_opt_out',
+                            state: 'states_unsubscribe',
                             reply:
                                 "You have been unsubscribed."
                         })
