@@ -68,6 +68,19 @@ go.app = function() {
                 });
         },
 
+        subscription_subscribe: function(contact, im) {
+            var payload = {
+              contact_key: contact.key,
+              lang: 'en',
+              message_set: "/subscription/api/v1/message_set/12/",
+              next_sequence_number: 1,
+              schedule: "/subscription/api/v1/periodic_task/1/",
+              to_addr: contact.msisdn,
+              user_account: contact.user_account
+            };
+            return go.utils.control_api_call("post", payload, 'subscription/', im);
+        },
+
         "commas": "commas"
 
     };
@@ -149,8 +162,11 @@ go.app = function() {
         });
 
         self.states.add('states_register_english', function(name) {
-            // subscribe user to english message set
-            return self.states.create('states_language');
+            return go.utils
+                .subscription_subscribe(self.contact, self.im)
+                .then(function() {
+                    return self.states.create('states_language');
+                });
         });
 
         self.states.add('states_language', function(name) {
@@ -168,8 +184,13 @@ go.app = function() {
                 ],
 
                 next: function(choice) {
+                    self.contact.extra.language_choice = choice.value;
+
                     return self.im.user
                         .set_lang(choice.value)
+                        .then(function() {
+                            return self.im.contacts.save(self.contact);
+                        })
                         .then(function() {
                             return 'states_update_language';
                         });

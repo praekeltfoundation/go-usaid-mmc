@@ -6,6 +6,6 @@
     "control": {
         "username": "test_user",
         "api_key": "test_key",
-        "url": "http://qa-usaid-mmc.za.prk-host.net/api/v1/"
+        "url": "http://mmc.qa.praekelt.com/subscription/api/v1/"
     }
 }
