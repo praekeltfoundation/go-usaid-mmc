@@ -44,6 +44,24 @@ go.app = function() {
             }
         },
 
+        subscription_completed: function(contact, im) {
+            var payload = {
+                to_addr: contact.msisdn
+            };
+            return go.utils
+                .control_api_call("get", payload, 'subscription/', im)
+                .then(function(json_result) {
+                    var parsed_data = JSON.parse(json_result.data);
+                    var all_completed = true;
+                    for (i=0; i<parsed_data.objects.length; i++) {
+                        if (parsed_data.objects[i].completed === false) {
+                            all_completed = false;
+                        }
+                    }
+                    return all_completed;
+                });
+        },
+
         subscription_unsubscribe_all: function(contact, im) {
             var payload = {
                 to_addr: contact.msisdn
@@ -154,11 +172,15 @@ go.app = function() {
 
             // user is registered
             } else if (self.contact.extra.is_registered === 'true') {
-                if (self.contact.extra.finished_messages === 'true') {  // make this happen
-                    return self.states.create('states_finished_messages');
-                } else {
-                    return self.states.create('states_unfinished_messages');
-                }
+                return go.utils
+                    .subscription_completed(self.contact, self.im)
+                    .then(function(messages_completed) {
+                        if (messages_completed === true) {
+                            return self.states.create('states_finished_messages');
+                        } else {
+                            return self.states.create('states_unfinished_messages');
+                        }
+                    });
             }
         });
 

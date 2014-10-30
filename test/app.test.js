@@ -28,7 +28,10 @@ describe("app", function() {
 
                 })
                 .setup(function(api) {
-                    fixtures().forEach(api.http.fixtures.add);
+                    fixtures().forEach(function(d) {
+                        d.repeatable = true;
+                        api.http.fixtures.add(d);
+                    });
                 })
 
                 // Set up contacts
@@ -46,8 +49,7 @@ describe("app", function() {
                     api.contacts.add({
                         msisdn: '+082333',
                         extra: {
-                            is_registered: 'true',
-                            finished_messages: 'true'
+                            is_registered: 'true'
                         },
                         key: "63ee4fa9-6888-4f0c-065a-939dc2473a99",
                         user_account: "4a11907a-4cc4-415a-9011-58251e15e2b4"
