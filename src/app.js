@@ -53,12 +53,15 @@ go.app = function() {
                 .then(function(json_result) {
                     // make all subscriptions inactive
                     var update = JSON.parse(json_result.data);
-                    if (update.active === true) {
-                        update.active = false;
-                        payload = {
-                            objects: update
-                        };
-                        return go.utils.control_api_call("put", payload, 'subscription/', im);
+                    var clean = true;
+                    for (i=0;i<update.objects.length;i++) {
+                        if (update.objects[i].active === true){
+                            update.objects[i].active = false;
+                            clean = false;
+                        }
+                    }
+                    if (!clean) {
+                        return go.utils.control_api_call("put", update, 'subscription/', im);
                     } else {
                         return Q();
                     }
