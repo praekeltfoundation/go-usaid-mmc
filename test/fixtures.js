@@ -28,7 +28,7 @@ module.exports = function() {
             "created_at": "2014-10-30T11:34:15.213552",
             "id": 1,
             "lang": "en",
-            "message_set": "/subscription/api/v1/message_set/1/2",
+            "message_set": "/subscription/api/v1/message_set/12/",
             "next_sequence_number": 1,
             "process_status": 0,
             "resource_uri": "/subscription/api/v1/subscription/1/",
