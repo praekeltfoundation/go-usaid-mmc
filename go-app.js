@@ -12,6 +12,83 @@ go.app = function() {
     var Choice = vumigo.states.Choice;
     var ChoiceState = vumigo.states.ChoiceState;
     var EndState = vumigo.states.EndState;
+    var HttpApi = vumigo.http.api.HttpApi;
+
+    go.utils = {
+
+        opt_out: function(im, contact) {
+            return im.api_request('optout.optout', {
+                address_type: "msisdn",
+                address_value: contact.msisdn,
+                message_id: im.msg.message_id
+            });
+        },
+
+        control_api_call: function (method, payload, endpoint, im) {
+            var http = new HttpApi(im, {
+              headers: {
+                'Content-Type': ['application/json'],
+                'Authorization': ['ApiKey ' + im.config.control.username + ':' + im.config.control.api_key]
+              }
+            });
+            switch (method) {
+              case "post":
+                return http.post(im.config.control.url + endpoint, {
+                    data: JSON.stringify(payload)
+                  });
+              case "get":
+                return http.get(im.config.control.url + endpoint, {
+                    params: payload
+                  });
+              case "put":
+                return http.put(im.config.control.url + endpoint, {
+                    data: JSON.stringify(payload)
+                  });
+              case "delete":
+                return http.delete(im.config.control.url + endpoint);
+            }
+        },
+
+        subscription_subscribe: function(contact, im) {
+            var payload = {
+              contact_key: contact.key,
+              lang: 'en',
+              message_set: "/subscription/api/v1/message_set/12/",
+              next_sequence_number: 1,
+              schedule: "/subscription/api/v1/periodic_task/1/",
+              to_addr: contact.msisdn,
+              user_account: contact.user_account
+            };
+            return go.utils.control_api_call("post", payload, 'subscription/', im);
+        },
+
+        // subscription_unsubscribe_all: function(contact, im) {
+        //     var payload = {
+        //         to_addr: contact.msisdn
+        //     };
+        //     return go.utils
+        //         .control_api_call("get", payload, 'subscription/', im)
+        //         .then(function(json_result) {
+        //             // make all subscriptions inactive
+        //             var update = JSON.parse(json_result.data);
+        //             if (update.length > 0) {
+        //                 for (var i=0; i<update.length; i++) {
+        //                     update[i].active = false;
+        //                 }
+        //                 payload = {
+        //                     objects: update
+        //                 };
+        //                 return go.utils.control_api_call("put", payload, 'subscription/', im);
+        //             } else {
+        //                 return Q();
+        //             }
+
+        //         });
+        // },
+
+        "commas": "commas"
+
+    };
 
 
     var GoApp = App.extend(function(self) {
@@ -90,8 +167,11 @@ go.app = function() {
         });
 
         self.states.add('states_register_english', function(name) {
-            // subscribe user to english message set
-            return self.states.create('states_language');
+            return go.utils
+                .subscription_subscribe(self.contact, self.im)
+                .then(function() {
+                    return self.states.create('states_language');
+                });
         });
 
         self.states.add('states_language', function(name) {
@@ -109,8 +189,13 @@ go.app = function() {
                 ],
 
                 next: function(choice) {
+                    self.contact.extra.language_choice = choice.value;
+
                     return self.im.user
                         .set_lang(choice.value)
+                        .then(function() {
+                            return self.im.contacts.save(self.contact);
+                        })
                         .then(function() {
                             return 'states_update_language';
                         });

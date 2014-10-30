@@ -19,7 +19,13 @@ describe("app", function() {
                     name: 'usaid_mmc',
                     env: 'test',
                     metric_store: 'usaid_mmc_test',
-                    channel: "555"
+                    channel: "555",
+                    control: {
+                        username: "test_user",
+                        api_key: "test_key",
+                        url: "http://fixture/subscription/api/v1/"
+                    }
+
                 })
                 .setup(function(api) {
                     fixtures().forEach(api.http.fixtures.add);
@@ -30,8 +36,9 @@ describe("app", function() {
                     // unregistered user
                     api.contacts.add({
                         msisdn: '+082111',
-                        extra: {
-                        }
+                        extra: {},
+                        key: "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+                        user_account: "4a11907a-4cc4-415a-9011-58251e15e2b4"
                     });
                 })
                 .setup(function(api) {
@@ -41,7 +48,9 @@ describe("app", function() {
                         extra: {
                             is_registered: 'true',
                             finished_messages: 'true'
-                        }
+                        },
+                        key: "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+                        user_account: "4a11907a-4cc4-415a-9011-58251e15e2b4"
                     });
                 })
                 .setup(function(api) {
@@ -50,7 +59,9 @@ describe("app", function() {
                         msisdn: '+082444',
                         extra: {
                             is_registered: 'true'
-                        }
+                        },
+                        key: "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+                        user_account: "4a11907a-4cc4-415a-9011-58251e15e2b4"
                     });
                 });
         });
