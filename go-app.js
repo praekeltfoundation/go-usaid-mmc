@@ -8,11 +8,13 @@ go;
 go.app = function() {
     var vumigo = require('vumigo_v02');
     var _ = require('lodash');
+    var Q = require('q');
     var App = vumigo.App;
     var Choice = vumigo.states.Choice;
     var ChoiceState = vumigo.states.ChoiceState;
     var EndState = vumigo.states.EndState;
     var HttpApi = vumigo.http.api.HttpApi;
+
 
     go.utils = {
 
@@ -49,6 +51,31 @@ go.app = function() {
             }
         },
 
+        subscription_unsubscribe_all: function(contact, im) {
+            var payload = {
+                to_addr: contact.msisdn
+            };
+            return go.utils
+                .control_api_call("get", payload, 'subscription/', im)
+                .then(function(json_result) {
+                    // make all subscriptions inactive
+                    var update = JSON.parse(json_result.data);
+                    var clean = true;
+                    for (i=0;i<update.objects.length;i++) {
+                        if (update.objects[i].active === true){
+                            update.objects[i].active = false;
+                            clean = false;
+                        }
+                    }
+                    if (!clean) {
+                        return go.utils.control_api_call("put", update, 'subscription/', im);
+                    } else {
+                        return Q();
+                    }
+
+                });
+        },
+
         subscription_subscribe: function(contact, im) {
             var payload = {
               contact_key: contact.key,
@@ -61,30 +88,6 @@ go.app = function() {
             };
             return go.utils.control_api_call("post", payload, 'subscription/', im);
         },
-
-        // subscription_unsubscribe_all: function(contact, im) {
-        //     var payload = {
-        //         to_addr: contact.msisdn
-        //     };
-        //     return go.utils
-        //         .control_api_call("get", payload, 'subscription/', im)
-        //         .then(function(json_result) {
-        //             // make all subscriptions inactive
-        //             var update = JSON.parse(json_result.data);
-        //             if (update.length > 0) {
-        //                 for (var i=0; i<update.length; i++) {
-        //                     update[i].active = false;
-        //                 }
-        //                 payload = {
-        //                     objects: update
-        //                 };
-        //                 return go.utils.control_api_call("put", payload, 'subscription/', im);
-        //             } else {
-        //                 return Q();
-        //             }
-
-        //         });
-        // },
 
         "commas": "commas"
 
@@ -261,7 +264,15 @@ go.app = function() {
 
         self.states.add('states_opt_out', function(name) {
             // run opt-out calls
-            return self.states.create('states_unsubscribe');
+            // return go.utils
+            //     .opt_out(self.im, self.contact)
+            //     .then(function() {
+            return go.utils
+                .subscription_unsubscribe_all(self.contact, self.im)
+                .then(function() {
+                    return self.states.create('states_unsubscribe');
+                });
+                // });
         });
 
         self.states.add('states_unsubscribe', function(name) {
