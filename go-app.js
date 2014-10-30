@@ -60,10 +60,8 @@ go.app = function() {
                 .then(function(json_result) {
                     // make all subscriptions inactive
                     var update = JSON.parse(json_result.data);
-                    if (update.length > 0) {
-                        for (var i=0; i<update.length; i++) {
-                            update[i].active = false;
-                        }
+                    if (update.active === true) {
+                        update.active = false;
                         payload = {
                             objects: update
                         };
