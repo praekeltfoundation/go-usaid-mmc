@@ -2,5 +2,10 @@
     "name": "usaid_mmc_qa",
     "env": "qa",
     "metric_store": "usaid_mmc_qa",
-    "channel": "777"
+    "channel": "777",
+    "control": {
+        "username": "test_user",
+        "api_key": "test_key",
+        "url": "http://qa-usaid-mmc.za.prk-host.net/api/v1/"
+    }
 }

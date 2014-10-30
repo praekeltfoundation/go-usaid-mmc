@@ -7,6 +7,70 @@ go.app = function() {
     var EndState = vumigo.states.EndState;
 
 
+    go.utils = {
+
+        opt_out: function(im, contact) {
+            return im.api_request('optout.optout', {
+                address_type: "msisdn",
+                address_value: contact.msisdn,
+                message_id: im.msg.message_id
+            });
+        },
+
+        control_api_call: function (method, payload, endpoint, im) {
+            var http = new HttpApi(im, {
+              headers: {
+                'Content-Type': ['application/json'],
+                'Authorization': ['ApiKey ' + im.config.control.username + ':' + im.config.control.api_key]
+              }
+            });
+            switch (method) {
+              case "post":
+                return http.post(im.config.control.url + endpoint, {
+                    data: JSON.stringify(payload)
+                  });
+              case "get":
+                return http.get(im.config.control.url + endpoint, {
+                    params: payload
+                  });
+              case "put":
+                return http.put(im.config.control.url + endpoint, {
+                    data: JSON.stringify(payload)
+                  });
+              case "delete":
+                return http.delete(im.config.control.url + endpoint);
+            }
+        },
+
+        subscription_unsubscribe_all: function(contact, im) {
+            var payload = {
+                to_addr: contact.msisdn
+            };
+            return go.utils
+                .control_api_call("get", payload, 'subscription/', im)
+                .then(function(json_result) {
+                    // make all subscriptions inactive
+                    var update = JSON.parse(json_result.data);
+                    if (update.length > 0) {
+                        for (var i=0; i<update.length; i++) {
+                            update[i].active = false;
+                        }
+                        payload = {
+                            objects: update
+                        };
+                        return go.utils.control_api_call("put", payload, 'subscription/', im);
+                    } else {
+                        return Q();
+                    }
+
+                });
+        },
+
+        "commas": "commas"
+
+    };
+
+
     var GoApp = App.extend(function(self) {
         App.call(self, 'states_start');
         var $ = self.$;
@@ -170,12 +234,12 @@ go.app = function() {
 
                 events: {
                     'state:enter': function() {
-                        // return go.utils
-                        //     .opt_out(self.im, self.contact)  // make this work
-                        //     .then(function() {
-                        //         return go.utils
-                        //             .subscription_unsubscribe_all(self.contact, self.im, opts);  // make this work
-                        //     });
+                        return go.utils
+                            .opt_out(self.im, self.contact)
+                            .then(function() {
+                                return go.utils
+                                    .subscription_unsubscribe_all(self.contact, self.im);
+                            });
                     }
                 }
             });
