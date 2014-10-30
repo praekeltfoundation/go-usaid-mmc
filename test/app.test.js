@@ -19,7 +19,13 @@ describe("app", function() {
                     name: 'usaid_mmc',
                     env: 'test',
                     metric_store: 'usaid_mmc_test',
-                    channel: "555"
+                    channel: "555",
+                    control: {
+                        username: "test_user",
+                        api_key: "test_key",
+                        url: "http://fixture/subscription/api/v1/"
+                    }
+
                 })
                 .setup(function(api) {
                     fixtures().forEach(api.http.fixtures.add);
