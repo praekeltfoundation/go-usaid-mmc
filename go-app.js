@@ -74,7 +74,7 @@ go.app = function() {
             } else if (_.isUndefined(self.contact.extra.is_registered) ||
                             self.contact.extra.is_registered === 'false') {
                 if (first_word === "MMC") {
-                    return self.states.create('states_language');
+                    return self.states.create('states_register_english');
                 } else {
                     return self.states.create('states_how_to_register');
                 }
@@ -89,6 +89,10 @@ go.app = function() {
             }
         });
 
+        self.states.add('states_register_english', function(name) {
+            // subscribe user to english message set
+            return self.states.create('states_language');
+        });
 
         self.states.add('states_language', function(name) {
             return new ChoiceState(name, {
@@ -108,7 +112,7 @@ go.app = function() {
                     return self.im.user
                         .set_lang(choice.value)
                         .then(function() {
-                            return 'states_start';
+                            return 'states_update_language';
                         });
                 },
 
@@ -120,13 +124,15 @@ go.app = function() {
                             .set_lang('en')
                             .then(function() {
                                 return self.im.contacts.save(self.contact);
-                            })
-                            .then(function() {
-                                // subscribe to english message set
                             });
                     }
                 }
             });
+        });
+
+        self.states.add('states_update_language', function(name) {
+            // update subscription to language of choice
+            return self.states.create('states_start');
         });
 
         self.states.add('states_how_to_register', function(name) {
@@ -169,22 +175,16 @@ go.app = function() {
         });
 
         self.states.add('states_opt_out', function(name) {
+            // run opt-out calls
+            return self.states.create('states_unsubscribe');
+        });
+
+        self.states.add('states_unsubscribe', function(name) {
             return new EndState(name, {
                 text:
                     $("You have been unsubscribed."),
 
-                next: 'states_start',
-
-                events: {
-                    'state:enter': function() {
-                        // return go.utils
-                        //     .opt_out(self.im, self.contact)  // make this work
-                        //     .then(function() {
-                        //         return go.utils
-                        //             .subscription_unsubscribe_all(self.contact, self.im, opts);  // make this work
-                        //     });
-                    }
-                }
+                next: 'states_start'
             });
         });
 
