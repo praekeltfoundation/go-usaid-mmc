@@ -1,6 +1,9 @@
 var vumigo = require('vumigo_v02');
 var fixtures = require('./fixtures');
 var AppTester = vumigo.AppTester;
+var assert = require('assert');
+var messagestore = require('./optoutstore');
+var DummyOptoutResource = messagestore.DummyOptoutResource;
 
 
 describe("app", function() {
@@ -65,6 +68,10 @@ describe("app", function() {
                         key: "63ee4fa9-6888-4f0c-065a-939dc2473a99",
                         user_account: "4a11907a-4cc4-415a-9011-58251e15e2b4"
                     });
+                })
+                .setup(function(api) {
+                    api.resources.add(new DummyOptoutResource());
+                    api.resources.attach(api);
                 });
         });
 
@@ -78,6 +85,10 @@ describe("app", function() {
                             state: 'states_unsubscribe',
                             reply:
                                 "You have been unsubscribed."
+                        })
+                        .check(function(api) {
+                            var optouts = api.optout.optout_store;
+                            assert.equal(optouts.length, 2);
                         })
                         .run();
                  });

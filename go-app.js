@@ -286,15 +286,15 @@ go.app = function() {
 
         self.states.add('states_opt_out', function(name) {
             // run opt-out calls
-            // return go.utils
-            //     .opt_out(self.im, self.contact)
-            //     .then(function() {
             return go.utils
-                .subscription_unsubscribe_all(self.contact, self.im)
+                .opt_out(self.im, self.contact)
                 .then(function() {
-                    return self.states.create('states_unsubscribe');
+                    return go.utils
+                        .subscription_unsubscribe_all(self.contact, self.im)
+                        .then(function() {
+                            return self.states.create('states_unsubscribe');
+                        });
                 });
-                // });
         });
 
         self.states.add('states_unsubscribe', function(name) {
