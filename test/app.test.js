@@ -185,6 +185,23 @@ describe("app", function() {
             });
 
             describe("when the user is registered", function() {
+                describe("if they are responding to language choice", function() {
+                    it("should update them to language", function() {
+                        return tester
+                            .setup.user.addr('082111')
+                            .inputs('MMC', '1')
+                            .check.interaction({
+                                state: 'states_update_language_success',
+                                reply:
+                                    "You will receive messages in your chosen language from tomorrow. " +
+                                    "Thanks for using the MMC info service.",
+                            })
+                            .check.user.properties({lang: 'xh'})
+                            .run();
+                    });
+                });
+
+
                 describe("if they have received all messages", function() {
                     it("should tell them they've received all messages", function() {
                         return tester
