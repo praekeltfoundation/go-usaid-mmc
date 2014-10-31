@@ -87,6 +87,32 @@ go.app = function() {
                 });
         },
 
+        subscription_set_language: function(contact, im, lang) {
+            var payload = {
+                to_addr: contact.msisdn
+            };
+            return go.utils
+                .control_api_call("get", payload, 'subscription/', im)
+                .then(function(json_result) {
+                    // make all subscriptions inactive
+                    var update = JSON.parse(json_result.data);
+                    var clean = true;
+                    for (i=0;i<update.objects.length;i++) {
+                        if (update.objects[i].lang !== lang){
+                            update.objects[i].lang = lang;
+                            clean = false;
+                        }
+                    }
+                    if (!clean) {
+                        return go.utils.control_api_call("put", update, 'subscription/', im);
+                    } else {
+                        return Q();
+                    }
+
+                });
+        },
+
+
         subscription_subscribe: function(contact, im) {
             var payload = {
               contact_key: contact.key,
@@ -235,7 +261,22 @@ go.app = function() {
 
         self.states.add('states_update_language', function(name) {
             // update subscription to language of choice
-            return self.states.create('states_start');
+            return go.utils
+                .subscription_set_language(self.contact, self.im, self.contact.extra.language_choice)
+                .then(function() {
+                     return self.states.create('states_update_language_success');
+                });
+        });
+
+
+        self.states.add('states_update_language_success', function(name) {
+            return new EndState(name, {
+                text:
+                    $("You will receive messages in your chosen language from tomorrow. " +
+                      "Thanks for using the MMC info service."),
+
+                next: 'states_start'
+            });
         });
 
         self.states.add('states_how_to_register', function(name) {
