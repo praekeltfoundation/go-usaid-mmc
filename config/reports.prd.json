@@ -1,0 +1,56 @@
+{
+    "layout": [
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Total Unique Users",
+            "target": {
+                "metric_type": "account",
+                "store": "usaid_mmc_prd",
+                "name": "sum.unique_users",
+                "aggregator": "last"
+                }
+        },
+
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Total Registered Users",
+            "target": {
+                "metric_type": "account",
+                "store": "usaid_mmc_prd",
+                "name": "sum.registrations",
+                "aggregator": "last"
+                }
+        },
+
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Total Opt-outs",
+            "target": {
+                "metric_type": "account",
+                "store": "usaid_mmc_prd",
+                "name": "sum.optouts",
+                "aggregator": "last"
+                }
+        },
+
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Total Completed Message Sets",
+            "target": {
+                "metric_type": "account",
+                "store": "usaid_mmc_prd",
+                "name": "sum.finished_messages",
+                "aggregator": "last"
+                }
+        },
+
+        "new_row"
+
+        // SMS sending metrics here
+
+    ]
+}
