@@ -36,6 +36,9 @@ describe("app", function() {
                         api.http.fixtures.add(d);
                     });
                 })
+                .setup(function(api) {
+                    api.metrics.stores = {'usaid_mmc_test': {}};
+                })
 
                 // Set up contacts
                 .setup(function(api) {
@@ -236,6 +239,50 @@ describe("app", function() {
             });
         });
 
+
+        // METRICS
+        describe("testing metrics", function() {
+
+            describe("when a new user logs on", function() {
+                it("should increase the number of unique users", function() {
+                    return tester
+                        .setup.user.addr('082555')
+                        .inputs('log on')
+                        .check(function(api) {
+                            var metrics = api.metrics.stores.usaid_mmc_test;
+                            assert.deepEqual(metrics['sum.unique_users'].values, [1]);
+                        })
+                        .run();
+                });
+            });
+
+            describe("when an unregistered user sends in MMC", function() {
+                it("should increase the number of registered users", function() {
+                    return tester
+                        .setup.user.addr('082111')
+                        .inputs('mmc')
+                        .check(function(api) {
+                            var metrics = api.metrics.stores.usaid_mmc_test;
+                            assert.deepEqual(metrics['sum.registrations'].values, [1]);
+                        })
+                        .run();
+                });
+            });
+
+            describe("when a user sends in STOP", function() {
+                it("should increase the number of opted out users", function() {
+                    return tester
+                        .setup.user.addr('082333')
+                        .inputs('stop')
+                        .check(function(api) {
+                            var metrics = api.metrics.stores.usaid_mmc_test;
+                            assert.deepEqual(metrics['sum.optouts'].values, [1]);
+                        })
+                        .run();
+                });
+            });
+
+        });
 
     });
 });

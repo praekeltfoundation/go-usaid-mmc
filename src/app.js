@@ -2,6 +2,7 @@ go.app = function() {
     var vumigo = require('vumigo_v02');
     var _ = require('lodash');
     var Q = require('q');
+    var MetricsHelper = require('go-jsbox-metrics-helper');
     var App = vumigo.App;
     var Choice = vumigo.states.Choice;
     var ChoiceState = vumigo.states.ChoiceState;
@@ -136,41 +137,30 @@ go.app = function() {
         var $ = self.$;
 
         self.init = function() {
-            // self.env = self.im.config.env;
-            // self.metric_prefix = [self.env, self.im.config.name].join('.');
-            // self.store_name = [self.env, self.im.config.name].join('.');
 
-            // self.im.on('session:new', function(e) {
-            //     self.contact.extra.ussd_sessions = go.utils.incr_user_extra(
-            //         self.contact.extra.ussd_sessions, 1);
-            //     self.contact.extra.metric_sum_sessions = go.utils.incr_user_extra(self.contact.extra.metric_sum_sessions, 1);
+            // Use the metrics helper to add the required metrics
+            mh = new MetricsHelper(self.im);
+            mh
+                // Total unique users
+                .add.total_unique_users('sum.unique_users')
 
-            //     return Q.all([
-            //         self.im.contacts.save(self.contact),
-            //         self.im.metrics.fire.inc([self.env, 'sum.sessions'].join('.'), 1),
-            //         self.fire_incomplete(e.im.state.name, -1)
-            //     ]);
-            // });
+                // Total registrations
+                .add.total_state_actions(
+                    {
+                        state: 'states_language',
+                        action: 'enter'
+                    },
+                    'sum.registrations'
+                )
 
-            // self.im.on('session:close', function(e) {
-            //     return Q.all([
-            //         self.fire_incomplete(e.im.state.name, 1),
-            //         self.dial_back(e)
-            //     ]);
-            // });
-
-            // self.im.user.on('user:new', function(e) {
-            //     return Q.all([
-            //         go.utils.fire_users_metrics(self.im, self.store_name, self.env, self.metric_prefix),
-            //         // TODO re-evaluate the use of this metric
-            //         // self.fire_incomplete('states_start', 1)
-            //     ]);
-            // });
-
-            // self.im.on('state:enter', function(e) {
-            //     self.contact.extra.last_stage = e.state.name;
-            //     return self.im.contacts.save(self.contact);
-            // });
+                // Total opt outs
+                .add.total_state_actions(
+                    {
+                        state: 'states_unsubscribe',
+                        action: 'enter'
+                    },
+                    'sum.optouts'
+                );
 
             return self.im.contacts
                 .for_user()
