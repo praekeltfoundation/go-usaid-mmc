@@ -3,7 +3,7 @@
         {
             "type": "diamondash.widgets.lvalue.LValueWidget",
             "time_range": "30d",
-            "name": "Total Unique Users",
+            "name": "Total Unique Users (30d)",
             "target": {
                 "metric_type": "account",
                 "store": "usaid_mmc_prd",
@@ -15,7 +15,7 @@
         {
             "type": "diamondash.widgets.lvalue.LValueWidget",
             "time_range": "30d",
-            "name": "Total Registered Users",
+            "name": "Total Registered Users (30d)",
             "target": {
                 "metric_type": "account",
                 "store": "usaid_mmc_prd",
@@ -27,7 +27,7 @@
         {
             "type": "diamondash.widgets.lvalue.LValueWidget",
             "time_range": "30d",
-            "name": "Total Opt-outs",
+            "name": "Total Opt-outs (30d)",
             "target": {
                 "metric_type": "account",
                 "store": "usaid_mmc_prd",
@@ -39,7 +39,7 @@
         {
             "type": "diamondash.widgets.lvalue.LValueWidget",
             "time_range": "30d",
-            "name": "Total Completed Message Sets",
+            "name": "Total Completed Message Sets (30d)",
             "target": {
                 "metric_type": "account",
                 "store": "usaid_mmc_prd",
@@ -48,9 +48,27 @@
                 }
         },
 
-        "new_row"
+        "new_row",
 
-        // SMS sending metrics here
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Messages Sent (30d)",
+            "target": {
+                "metric_type": "conversation",
+                "name": "messages_sent"
+            }
+        },
+
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "1d",
+            "name": "Messages Received (30d)",
+            "target": {
+                "metric_type": "conversation",
+                "name": "messages_received"
+            }
+        }
 
     ]
 }
