@@ -1,0 +1,67 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2014-11-03 10:26:+0000\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+
+#: go-app.js:231
+msgid ""
+"You're registered for messages about your circumcision! Reply with the "
+"number of your chosen language:"
+msgstr ""
+
+#: go-app.js:235
+msgid "Xhosa"
+msgstr ""
+
+#: go-app.js:236
+msgid "Zulu"
+msgstr ""
+
+#: go-app.js:237
+msgid "Sotho"
+msgstr ""
+
+#: go-app.js:238
+msgid "English"
+msgstr ""
+
+#: go-app.js:239
+msgid "Afrikaans"
+msgstr ""
+
+#: go-app.js:282
+msgid ""
+"You will receive messages in your chosen language from tomorrow. Thanks for "
+"using the MMC info service."
+msgstr ""
+
+#: go-app.js:292
+msgid ""
+"Welcome to the Medical Male Circumcision (MMC) info service. To get FREE "
+"info on how to look after your circumcision wound please SMS 'MMC' to "
+"{{SMS_number}}."
+msgstr ""
+
+#: go-app.js:306
+msgid ""
+"You have finished your set of SMSs and your circumcision wound should be "
+"healed. If not, please visit your local clinic. Thanks for using the MMC "
+"info service."
+msgstr ""
+
+#: go-app.js:317
+msgid ""
+"MMC info: U r registered to receive SMSs about ur circumcision. To opt out "
+"SMS 'STOP' to {{SMS_number}}. If u have concerns with ur wound please visit "
+"ur local clinic."
+msgstr ""
+
+#: go-app.js:344
+msgid "You have been unsubscribed."
+msgstr ""
