@@ -1,0 +1,74 @@
+{
+    "layout": [
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Total Unique Users (30d)",
+            "target": {
+                "metric_type": "account",
+                "store": "usaid_mmc_prd",
+                "name": "sum.unique_users",
+                "aggregator": "last"
+                }
+        },
+
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Total Registered Users (30d)",
+            "target": {
+                "metric_type": "account",
+                "store": "usaid_mmc_prd",
+                "name": "sum.registrations",
+                "aggregator": "last"
+                }
+        },
+
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Total Opt-outs (30d)",
+            "target": {
+                "metric_type": "account",
+                "store": "usaid_mmc_prd",
+                "name": "sum.optouts",
+                "aggregator": "last"
+                }
+        },
+
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Total Completed Message Sets (30d)",
+            "target": {
+                "metric_type": "account",
+                "store": "usaid_mmc_prd",
+                "name": "sum.finished_messages",
+                "aggregator": "last"
+                }
+        },
+
+        "new_row",
+
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Messages Sent (30d)",
+            "target": {
+                "metric_type": "conversation",
+                "name": "messages_sent"
+            }
+        },
+
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "1d",
+            "name": "Messages Received (30d)",
+            "target": {
+                "metric_type": "conversation",
+                "name": "messages_received"
+            }
+        }
+
+    ]
+}
