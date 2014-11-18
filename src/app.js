@@ -262,7 +262,7 @@ go.app = function() {
         self.states.add('states_update_language_success', function(name) {
             return new EndState(name, {
                 text:
-                    $("You will receive messages in your chosen language from tomorrow. " +
+                    $("You will receive messages in your chosen language shortly. " +
                       "Thanks for using the MMC info service."),
 
                 next: 'states_start'
