@@ -196,7 +196,7 @@ describe("app", function() {
                             .check.interaction({
                                 state: 'states_update_language_success',
                                 reply:
-                                    "You will receive messages in your chosen language from tomorrow. " +
+                                    "You will receive messages in your chosen language shortly. " +
                                     "Thanks for using the MMC info service.",
                             })
                             .check.user.properties({lang: 'xh'})
