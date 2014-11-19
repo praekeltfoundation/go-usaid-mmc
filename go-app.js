@@ -27,7 +27,7 @@ go.app = function() {
             });
         },
 
-        control_api_call: function (method, payload, endpoint, im) {
+        control_api_call: function (method, params, payload, endpoint, im) {
             var http = new HttpApi(im, {
               headers: {
                 'Content-Type': ['application/json'],
@@ -41,10 +41,11 @@ go.app = function() {
                   });
               case "get":
                 return http.get(im.config.control.url + endpoint, {
-                    params: payload
+                    params: params
                   });
               case "put":
                 return http.put(im.config.control.url + endpoint, {
+                    params: params,
                     data: JSON.stringify(payload)
                   });
               case "delete":
@@ -53,11 +54,11 @@ go.app = function() {
         },
 
         subscription_completed: function(contact, im) {
-            var payload = {
+            var params = {
                 to_addr: contact.msisdn
             };
             return go.utils
-                .control_api_call("get", payload, 'subscription/', im)
+                .control_api_call("get", params, null, 'subscription/', im)
                 .then(function(json_result) {
                     var parsed_data = JSON.parse(json_result.data);
                     var all_completed = true;
@@ -71,11 +72,11 @@ go.app = function() {
         },
 
         subscription_unsubscribe_all: function(contact, im) {
-            var payload = {
+            var params = {
                 to_addr: contact.msisdn
             };
             return go.utils
-                .control_api_call("get", payload, 'subscription/', im)
+                .control_api_call("get", params, null, 'subscription/', im)
                 .then(function(json_result) {
                     // make all subscriptions inactive
                     var update = JSON.parse(json_result.data);
@@ -87,7 +88,7 @@ go.app = function() {
                         }
                     }
                     if (!clean) {
-                        return go.utils.control_api_call("put", update, 'subscription/', im);
+                        return go.utils.control_api_call("put", params, update, 'subscription/', im);
                     } else {
                         return Q();
                     }
@@ -96,11 +97,11 @@ go.app = function() {
         },
 
         subscription_set_language: function(contact, im, lang) {
-            var payload = {
+            var params = {
                 to_addr: contact.msisdn
             };
             return go.utils
-                .control_api_call("get", payload, 'subscription/', im)
+                .control_api_call("get", params, null, 'subscription/', im)
                 .then(function(json_result) {
                     // make all subscriptions inactive
                     var update = JSON.parse(json_result.data);
@@ -112,7 +113,7 @@ go.app = function() {
                         }
                     }
                     if (!clean) {
-                        return go.utils.control_api_call("put", update, 'subscription/', im);
+                        return go.utils.control_api_call("put", params, update, 'subscription/', im);
                     } else {
                         return Q();
                     }
@@ -131,7 +132,7 @@ go.app = function() {
               to_addr: contact.msisdn,
               user_account: contact.user_account
             };
-            return go.utils.control_api_call("post", payload, 'subscription/', im);
+            return go.utils.control_api_call("post", null, payload, 'subscription/', im);
         },
 
         "commas": "commas"

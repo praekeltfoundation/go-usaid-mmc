@@ -155,6 +155,9 @@ module.exports = function() {
     {
         "request": {
           "method": "PUT",
+          "params": {
+            "to_addr": "+082111"
+          },
           'headers': {
                 'Authorization': ['ApiKey test_user:test_key'],
                 'Content-Type': ['application/json']
@@ -205,6 +208,9 @@ module.exports = function() {
     {
         "request": {
           "method": "PUT",
+          "params": {
+            "to_addr": "+082333"
+          },
           'headers': {
                 'Authorization': ['ApiKey test_user:test_key'],
                 'Content-Type': ['application/json']
@@ -254,6 +260,9 @@ module.exports = function() {
     {
         "request": {
           "method": "PUT",
+          "params": {
+            "to_addr": "+082111"
+          },
           'headers': {
                 'Authorization': ['ApiKey test_user:test_key'],
                 'Content-Type': ['application/json']
