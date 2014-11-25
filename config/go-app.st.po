@@ -1,0 +1,74 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2014-11-25 11:47:+0000\n"
+"Project-Id-Version: MMC\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2014-11-25 14:27+0200\n"
+"Last-Translator: \n"
+"X-Generator: Poedit 1.6.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: st\n"
+
+#: go-app.js:250
+msgid "Xhosa"
+msgstr ""
+
+#: go-app.js:251
+msgid "Zulu"
+msgstr ""
+
+#: go-app.js:252
+msgid "Sotho"
+msgstr ""
+
+#: go-app.js:253
+msgid "Afrikaans"
+msgstr ""
+
+#: go-app.js:295
+msgid ""
+"The wound will heal in 6 weeks. Do not have sex for 6 weeks to prevent "
+"infecting or damaging the wound. Avoid smoking, alcohol and drugs.  Keep "
+"your penis upright for 7 – 10 days, until the swelling goes down. Wear clean "
+"underwear every day. Briefs, not boxers. Don’t worry if some blood stains "
+"the bandage. If blood soaks the bandage, go to the clinic immediately. "
+"Brothers for Life"
+msgstr ""
+"Leqeba le tla fola diveke tse 6. Se etse thabalano ka 6 diveke leqeba le se "
+"tshwaetswe kapa ho thonkgelwa. Qoba ho tsuba, tahi le dithethefatsi. Boloka "
+"molamu o peraletse ka 7-10 matsatsi, ho ruruha ho fele. Apara diaparo "
+"hlwekile ka hare kamehla. Marikgwana eseng a malelele. Se tswenyehe ka madi "
+"maseleng. Madi maseleng leba tleliniking kapele.  Brothers for Life"
+
+#: go-app.js:309
+msgid ""
+"Welcome to the Medical Male Circumcision (MMC) info service. To get FREE "
+"info on how to look after your circumcision wound please SMS 'MMC' to "
+"{{SMS_number}}."
+msgstr ""
+
+#: go-app.js:323
+msgid ""
+"You have finished your set of SMSs and your circumcision wound should be "
+"healed. If not, please visit your local clinic. Thanks for using the MMC "
+"info service."
+msgstr ""
+"O qetile sete ya hao ya diSMS tsa lebollo mme qeba la hao le fodile.Ha ho se "
+"jwalo,thusa o etele tleleniki ya hao ya lehae.Diteboho ka ho sebedisa tsebo "
+"ya MMC."
+
+#: go-app.js:334
+msgid ""
+"MMC info: U r registered to receive SMSs about ur circumcision. To opt out "
+"SMS 'STOP' to {{SMS_number}}. If u have concerns with ur wound please visit "
+"ur local clinic."
+msgstr ""
+"Tsebiso ya MMC: Ngodisitswe ho fumana SMSs ka lebollo. Tlohela SMS 'STOP' ho "
+"{{SMS_number}}. Haeba o tletleba ka leqeba etela tleliniki ya lehae hle."
+
+#: go-app.js:361
+msgid "You have been unsubscribed."
+msgstr ""

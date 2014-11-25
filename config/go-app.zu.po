@@ -1,0 +1,76 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2014-11-25 11:47:+0000\n"
+"Project-Id-Version: \n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2014-11-25 14:24+0200\n"
+"Last-Translator: \n"
+"X-Generator: Poedit 1.6.4\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: zu_ZA\n"
+
+#: go-app.js:250
+msgid "Xhosa"
+msgstr ""
+
+#: go-app.js:251
+msgid "Zulu"
+msgstr ""
+
+#: go-app.js:252
+msgid "Sotho"
+msgstr ""
+
+#: go-app.js:253
+msgid "Afrikaans"
+msgstr ""
+
+#: go-app.js:295
+msgid ""
+"The wound will heal in 6 weeks. Do not have sex for 6 weeks to prevent "
+"infecting or damaging the wound. Avoid smoking, alcohol and drugs.  Keep "
+"your penis upright for 7 – 10 days, until the swelling goes down. Wear clean "
+"underwear every day. Briefs, not boxers. Don’t worry if some blood stains "
+"the bandage. If blood soaks the bandage, go to the clinic immediately. "
+"Brothers for Life"
+msgstr ""
+"Inxeba lizophola emavikini angu-6. Ungayi ocansini amaviki angu-6 ukuze "
+"inxeba lingabhibhi noma lonakale. Gwema ukubhema, utshwala nama-drugs.  "
+"Gcina umpipi wakho uqondile izinsuku ezingu-7 – 10, kuze kubohle "
+"ukuvuvukala. Gqoka i-anda ehlanzekile nsuku zonke. Ezi-briefs, hiyinot "
+"boxers. Ungakhathazeki uma ibhandishi liba namabala egazi. Uma igazi "
+"limanzisa ibhandishi, yiya eklinikhi ngokushesha. Brothers for Life"
+
+#: go-app.js:309
+msgid ""
+"Welcome to the Medical Male Circumcision (MMC) info service. To get FREE "
+"info on how to look after your circumcision wound please SMS 'MMC' to "
+"{{SMS_number}}."
+msgstr ""
+
+#: go-app.js:323
+msgid ""
+"You have finished your set of SMSs and your circumcision wound should be "
+"healed. If not, please visit your local clinic. Thanks for using the MMC "
+"info service."
+msgstr ""
+"Uyiqedile isethi yama-SMS, kumelwe ukuba inxeba lokusoka lipholile. Uma "
+"lingakapholi, yiya eklinikhi yangakini. Siyabonga ngokusebenzis'isevisi "
+"yolwazi ye-MMC."
+
+#: go-app.js:334
+msgid ""
+"MMC info: U r registered to receive SMSs about ur circumcision. To opt out "
+"SMS 'STOP' to {{SMS_number}}. If u have concerns with ur wound please visit "
+"ur local clinic."
+msgstr ""
+"Ulwazi lwe-MMC: Ubhaliselw'ukuthola ama-SMS  ngokusoka kwakho. Ukuz'uphume, "
+"SMSa u-'STOP' ku-{{SMS_number}}. Um'ukhathazekile ngenxeba lakho, "
+"yiy'eklinikhi yangakini."
+
+#: go-app.js:361
+msgid "You have been unsubscribed."
+msgstr ""
