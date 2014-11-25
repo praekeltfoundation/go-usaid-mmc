@@ -43,6 +43,10 @@ go.app = function() {
                 return http.get(im.config.control.url + endpoint, {
                     params: params
                   });
+              case "patch":
+                return http.patch(im.config.control.url + endpoint, {
+                    data: JSON.stringify(payload)
+                  });
               case "put":
                 return http.put(im.config.control.url + endpoint, {
                     params: params,
@@ -88,7 +92,7 @@ go.app = function() {
                         }
                     }
                     if (!clean) {
-                        return go.utils.control_api_call("put", params, update, 'subscription/', im);
+                        return go.utils.control_api_call("patch", {}, update, 'subscription/', im);
                     } else {
                         return Q();
                     }
@@ -113,7 +117,7 @@ go.app = function() {
                         }
                     }
                     if (!clean) {
-                        return go.utils.control_api_call("put", params, update, 'subscription/', im);
+                        return go.utils.control_api_call("patch", {}, update, 'subscription/', im);
                     } else {
                         return Q();
                     }

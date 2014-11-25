@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/praekelt/go-usaid-mmc",
   "dependencies": {
-    "vumigo_v02": "~0.2",
+    "vumigo_v02": "~0.2.10",
     "q": "~0.9",
     "lodash": "~2.4.1",
     "moment": "~2.5.1",
