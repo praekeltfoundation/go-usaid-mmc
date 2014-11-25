@@ -36,6 +36,10 @@ go.app = function() {
                 return http.get(im.config.control.url + endpoint, {
                     params: params
                   });
+              case "patch":
+                return http.patch(im.config.control.url + endpoint, {
+                    data: JSON.stringify(payload)
+                  });
               case "put":
                 return http.put(im.config.control.url + endpoint, {
                     params: params,
@@ -81,7 +85,7 @@ go.app = function() {
                         }
                     }
                     if (!clean) {
-                        return go.utils.control_api_call("put", params, update, 'subscription/', im);
+                        return go.utils.control_api_call("patch", {}, update, 'subscription/', im);
                     } else {
                         return Q();
                     }
@@ -99,14 +103,28 @@ go.app = function() {
                     // make all subscriptions inactive
                     var update = JSON.parse(json_result.data);
                     var clean = true;
-                    for (i=0;i<update.objects.length;i++) {
-                        if (update.objects[i].lang !== lang){
-                            update.objects[i].lang = lang;
+                    var patch_url;
+
+                    if (update.objects.length === 1) {
+                        if (update.objects[0].lang !== lang) {
+                            patch_url = 'subscription/' + update.objects[0].id;
                             clean = false;
+                            update = {
+                                "lang": lang
+                            };
+                        }
+                    } else if (update.objects.length >= 1) {
+                        for (i=0; i<update.objects.length; i++) {
+                            if (update.objects[i].lang !== lang){
+                                update.objects[i].lang = lang;
+                                clean = false;
+                                patch_url = 'subscription/';
+                            }
                         }
                     }
+
                     if (!clean) {
-                        return go.utils.control_api_call("put", params, update, 'subscription/', im);
+                        return go.utils.control_api_call("patch", {}, update, patch_url, im);
                     } else {
                         return Q();
                     }

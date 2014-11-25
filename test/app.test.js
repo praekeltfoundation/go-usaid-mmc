@@ -51,6 +51,15 @@ describe("app", function() {
                     });
                 })
                 .setup(function(api) {
+                    // unregistered user
+                    api.contacts.add({
+                        msisdn: '+082222',
+                        extra: {},
+                        key: "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+                        user_account: "4a11907a-4cc4-415a-9011-58251e15e2b4"
+                    });
+                })
+                .setup(function(api) {
                     // registered user message stream complete
                     api.contacts.add({
                         msisdn: '+082333',
@@ -189,19 +198,39 @@ describe("app", function() {
 
             describe("when the user is registered", function() {
                 describe("if they are responding to language choice", function() {
-                    it("should update them to language", function() {
-                        return tester
-                            .setup.user.addr('082111')
-                            .inputs('MMC', '1')
-                            .check.interaction({
-                                state: 'states_update_language_success',
-                                reply:
-                                    "You will receive messages in your chosen language shortly. " +
-                                    "Thanks for using the MMC info service.",
-                            })
-                            .check.user.properties({lang: 'xh'})
-                            .run();
+
+                    describe("if they only have one subscription", function() {
+                        it("should update them to language", function() {
+                            return tester
+                                .setup.user.addr('082111')
+                                .inputs('MMC', '1')
+                                .check.interaction({
+                                    state: 'states_update_language_success',
+                                    reply:
+                                        "You will receive messages in your chosen language shortly. " +
+                                        "Thanks for using the MMC info service.",
+                                })
+                                .check.user.properties({lang: 'xh'})
+                                .run();
+                        });
                     });
+
+                    describe("if they have more than one subscription", function() {
+                        it("should update all subscriptions to language", function() {
+                            return tester
+                                .setup.user.addr('082222')
+                                .inputs('MMC', '2')
+                                .check.interaction({
+                                    state: 'states_update_language_success',
+                                    reply:
+                                        "You will receive messages in your chosen language shortly. " +
+                                        "Thanks for using the MMC info service.",
+                                })
+                                .check.user.properties({lang: 'zu'})
+                                .run();
+                        });
+                    });
+
                 });
 
 
