@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2014-11-03 10:26:+0000\n"
+"POT-Creation-Date: 2014-11-25 11:47:+0000\n"
 "Project-Id-Version: PACKAGE VERSION\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -9,59 +9,53 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 
-#: go-app.js:231
-msgid ""
-"You're registered for messages about your circumcision! Reply with the "
-"number of your chosen language:"
-msgstr ""
-
-#: go-app.js:235
+#: go-app.js:250
 msgid "Xhosa"
 msgstr ""
 
-#: go-app.js:236
+#: go-app.js:251
 msgid "Zulu"
 msgstr ""
 
-#: go-app.js:237
+#: go-app.js:252
 msgid "Sotho"
 msgstr ""
 
-#: go-app.js:238
-msgid "English"
-msgstr ""
-
-#: go-app.js:239
+#: go-app.js:253
 msgid "Afrikaans"
 msgstr ""
 
-#: go-app.js:282
+#: go-app.js:295
 msgid ""
-"You will receive messages in your chosen language from tomorrow. Thanks for "
-"using the MMC info service."
+"The wound will heal in 6 weeks. Do not have sex for 6 weeks to prevent "
+"infecting or damaging the wound. Avoid smoking, alcohol and drugs.  Keep "
+"your penis upright for 7 – 10 days, until the swelling goes down. Wear "
+"clean underwear every day. Briefs, not boxers. Don’t worry if some blood "
+"stains the bandage. If blood soaks the bandage, go to the clinic "
+"immediately. Brothers for Life"
 msgstr ""
 
-#: go-app.js:292
+#: go-app.js:309
 msgid ""
 "Welcome to the Medical Male Circumcision (MMC) info service. To get FREE "
 "info on how to look after your circumcision wound please SMS 'MMC' to "
 "{{SMS_number}}."
 msgstr ""
 
-#: go-app.js:306
+#: go-app.js:323
 msgid ""
 "You have finished your set of SMSs and your circumcision wound should be "
 "healed. If not, please visit your local clinic. Thanks for using the MMC "
 "info service."
 msgstr ""
 
-#: go-app.js:317
+#: go-app.js:334
 msgid ""
 "MMC info: U r registered to receive SMSs about ur circumcision. To opt out "
 "SMS 'STOP' to {{SMS_number}}. If u have concerns with ur wound please visit "
 "ur local clinic."
 msgstr ""
 
-#: go-app.js:344
+#: go-app.js:361
 msgid "You have been unsubscribed."
 msgstr ""

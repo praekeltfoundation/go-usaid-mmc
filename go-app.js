@@ -139,13 +139,12 @@ go.app = function() {
                 });
         },
 
-
         subscription_subscribe: function(contact, im) {
             var payload = {
               contact_key: contact.key,
               lang: 'en',
               message_set: "/subscription/api/v1/message_set/12/",
-              next_sequence_number: 1,
+              next_sequence_number: 2,
               schedule: "/subscription/api/v1/periodic_task/1/",
               to_addr: contact.msisdn,
               user_account: contact.user_account
@@ -237,14 +236,20 @@ go.app = function() {
         self.states.add('states_language', function(name) {
             return new ChoiceState(name, {
                 question:
-                    $("You're registered for messages about your circumcision! Reply with " +
-                    "the number of your chosen language:"),
+                    "You're registered for messages about your circumcision! " +
+                    "The wound will heal in 6 weeks. Do not have sex for 6 weeks to " +
+                    "prevent infecting or damaging the wound. Avoid smoking, alcohol " +
+                    "and drugs. Keep your penis upright for 7 – 10 days, until the " +
+                    "swelling goes down. Wear clean underwear every day. Briefs, not " +
+                    "boxers. Don’t worry if some blood stains the bandage. If blood " +
+                    "soaks the bandage, go to the clinic immediately. Brothers for Life. " +
+                    "If you'd like messages in another language, reply with the " +
+                    "number of your language",
 
                 choices: [
                     new Choice('xh', $("Xhosa")),
                     new Choice('zu', $("Zulu")),
                     new Choice('st', $("Sotho")),
-                    new Choice('en', $("English")),
                     new Choice('af', $("Afrikaans")),
                 ],
 
@@ -284,12 +289,15 @@ go.app = function() {
                 });
         });
 
-
         self.states.add('states_update_language_success', function(name) {
             return new EndState(name, {
                 text:
-                    $("You will receive messages in your chosen language shortly. " +
-                      "Thanks for using the MMC info service."),
+                    $("The wound will heal in 6 weeks. Do not have sex for 6 weeks to " +
+                      "prevent infecting or damaging the wound. Avoid smoking, alcohol " +
+                      "and drugs.  Keep your penis upright for 7 – 10 days, until the " +
+                      "swelling goes down. Wear clean underwear every day. Briefs, not " +
+                      "boxers. Don’t worry if some blood stains the bandage. If blood " +
+                      "soaks the bandage, go to the clinic immediately. Brothers for Life"),
 
                 next: 'states_start'
             });
