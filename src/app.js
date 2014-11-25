@@ -137,7 +137,7 @@ go.app = function() {
               contact_key: contact.key,
               lang: 'en',
               message_set: "/subscription/api/v1/message_set/12/",
-              next_sequence_number: 1,
+              next_sequence_number: 2,
               schedule: "/subscription/api/v1/periodic_task/1/",
               to_addr: contact.msisdn,
               user_account: contact.user_account
