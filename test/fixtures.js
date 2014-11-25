@@ -42,6 +42,45 @@ module.exports = function() {
 
     {
         "request": {
+          "method": "POST",
+          'headers': {
+                'Authorization': ['ApiKey test_user:test_key'],
+                'Content-Type': ['application/json']
+            },
+          "url": "http://fixture/subscription/api/v1/subscription/",
+          "data": {
+            "contact_key": "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+            "lang": "en",
+            "message_set": "/subscription/api/v1/message_set/12/",
+            "next_sequence_number": 1,
+            "schedule": "/subscription/api/v1/periodic_task/1/",
+            "to_addr": "+082222",
+            "user_account": "4a11907a-4cc4-415a-9011-58251e15e2b4"
+          }
+        },
+        "response": {
+          "code": 201,
+          "data": {
+            "active": true,
+            "completed": false,
+            "contact_key": "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+            "created_at": "2014-10-30T11:34:15.213552",
+            "id": 1,
+            "lang": "en",
+            "message_set": "/subscription/api/v1/message_set/12/",
+            "next_sequence_number": 1,
+            "process_status": 0,
+            "resource_uri": "/subscription/api/v1/subscription/1/",
+            "schedule": "/subscription/api/v1/periodic_task/1/",
+            "to_addr": "+082222",
+            "updated_at": "2014-10-30T11:34:15.213601",
+            "user_account": "4a11907a-4cc4-415a-9011-58251e15e2b4"
+          }
+        }
+    },
+
+    {
+        "request": {
           "method": "GET",
           'headers': {
                 'Authorization': ['ApiKey test_user:test_key'],
@@ -70,6 +109,60 @@ module.exports = function() {
                     "resource_uri": "/subscription/api/v1/subscription/1/",
                     "schedule": "/subscription/api/v1/periodic_task/1/",
                     "to_addr": "+082111",
+                    "updated_at": "2014-10-30T11:34:15.213601",
+                    "user_account": "4a11907a-4cc4-415a-9011-58251e15e2b4"
+                }
+             ]
+          }
+        }
+    },
+
+    {
+        "request": {
+          "method": "GET",
+          'headers': {
+                'Authorization': ['ApiKey test_user:test_key'],
+                'Content-Type': ['application/json']
+            },
+          "url": "http://fixture/subscription/api/v1/subscription/",
+          "params": {
+            "to_addr": "+082222"
+          }
+        },
+        "response": {
+          "code": 201,
+          "data": {
+            "objects":
+              [
+                {
+                    "active": true,
+                    "completed": false,
+                    "contact_key": "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+                    "created_at": "2014-10-30T11:34:15.213552",
+                    "id": 1,
+                    "lang": "en",
+                    "message_set": "/subscription/api/v1/message_set/12/",
+                    "next_sequence_number": 1,
+                    "process_status": 0,
+                    "resource_uri": "/subscription/api/v1/subscription/1/",
+                    "schedule": "/subscription/api/v1/periodic_task/1/",
+                    "to_addr": "+082222",
+                    "updated_at": "2014-10-30T11:34:15.213601",
+                    "user_account": "4a11907a-4cc4-415a-9011-58251e15e2b4"
+                },
+                {
+                    "active": false,
+                    "completed": true,
+                    "contact_key": "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+                    "created_at": "2014-10-30T11:34:15.213552",
+                    "id": 2,
+                    "lang": "en",
+                    "message_set": "/subscription/api/v1/message_set/12/",
+                    "next_sequence_number": 1,
+                    "process_status": 1,
+                    "resource_uri": "/subscription/api/v1/subscription/1/",
+                    "schedule": "/subscription/api/v1/periodic_task/1/",
+                    "to_addr": "+082222",
                     "updated_at": "2014-10-30T11:34:15.213601",
                     "user_account": "4a11907a-4cc4-415a-9011-58251e15e2b4"
                 }
@@ -251,6 +344,44 @@ module.exports = function() {
           }
         }
     },
+
+    {
+        "request": {
+            "method": "PATCH",
+            'headers': {
+                'Authorization': ['ApiKey test_user:test_key'],
+                'Content-Type': ['application/json']
+            },
+            "url": "http://fixture/subscription/api/v1/subscription/1",
+            "data": {
+                "lang": "xh"
+            }
+        },
+        "response": {
+            "code": 201,
+            "data": {
+                "objects": [
+                    {
+                        "active": true,
+                        "completed": false,
+                        "contact_key": "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+                        "created_at": "2014-10-30T11:34:15.213552",
+                        "id": 1,
+                        "lang": "xh",
+                        "message_set": "/subscription/api/v1/message_set/12/",
+                        "next_sequence_number": 1,
+                        "process_status": 0,
+                        "resource_uri": "/subscription/api/v1/subscription/1/",
+                        "schedule": "/subscription/api/v1/periodic_task/1/",
+                        "to_addr": "+082111",
+                        "updated_at": "2014-10-30T11:34:15.213601",
+                        "user_account": "4a11907a-4cc4-415a-9011-58251e15e2b4"
+                    }
+                ]
+            }
+        }
+    },
+
     {
         "request": {
           "method": "PATCH",
@@ -267,13 +398,29 @@ module.exports = function() {
                     "contact_key": "63ee4fa9-6888-4f0c-065a-939dc2473a99",
                     "created_at": "2014-10-30T11:34:15.213552",
                     "id": 1,
-                    "lang": "xh",
+                    "lang": "zu",
                     "message_set": "/subscription/api/v1/message_set/12/",
                     "next_sequence_number": 1,
                     "process_status": 0,
                     "resource_uri": "/subscription/api/v1/subscription/1/",
                     "schedule": "/subscription/api/v1/periodic_task/1/",
-                    "to_addr": "+082111",
+                    "to_addr": "+082222",
+                    "updated_at": "2014-10-30T11:34:15.213601",
+                    "user_account": "4a11907a-4cc4-415a-9011-58251e15e2b4"
+                },
+                {
+                    "active": false,
+                    "completed": true,
+                    "contact_key": "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+                    "created_at": "2014-10-30T11:34:15.213552",
+                    "id": 2,
+                    "lang": "zu",
+                    "message_set": "/subscription/api/v1/message_set/12/",
+                    "next_sequence_number": 1,
+                    "process_status": 1,
+                    "resource_uri": "/subscription/api/v1/subscription/1/",
+                    "schedule": "/subscription/api/v1/periodic_task/1/",
+                    "to_addr": "+082222",
                     "updated_at": "2014-10-30T11:34:15.213601",
                     "user_account": "4a11907a-4cc4-415a-9011-58251e15e2b4"
                 }
@@ -283,20 +430,40 @@ module.exports = function() {
         "response": {
           "code": 201,
           "data": {
-            "active": true,
-            "completed": false,
-            "contact_key": "63ee4fa9-6888-4f0c-065a-939dc2473a99",
-            "created_at": "2014-10-30T11:34:15.213552",
-            "id": 1,
-            "lang": "xh",
-            "message_set": "/subscription/api/v1/message_set/12/",
-            "next_sequence_number": 1,
-            "process_status": 0,
-            "resource_uri": "/subscription/api/v1/subscription/1/",
-            "schedule": "/subscription/api/v1/periodic_task/1/",
-            "to_addr": "+082111",
-            "updated_at": "2014-10-30T11:34:15.213601",
-            "user_account": "4a11907a-4cc4-415a-9011-58251e15e2b4"
+            "objects": [
+                {
+                    "active": true,
+                    "completed": false,
+                    "contact_key": "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+                    "created_at": "2014-10-30T11:34:15.213552",
+                    "id": 1,
+                    "lang": "zu",
+                    "message_set": "/subscription/api/v1/message_set/12/",
+                    "next_sequence_number": 1,
+                    "process_status": 0,
+                    "resource_uri": "/subscription/api/v1/subscription/1/",
+                    "schedule": "/subscription/api/v1/periodic_task/1/",
+                    "to_addr": "+082111",
+                    "updated_at": "2014-10-30T11:34:15.213601",
+                    "user_account": "4a11907a-4cc4-415a-9011-58251e15e2b4"
+                },
+                {
+                    "active": false,
+                    "completed": true,
+                    "contact_key": "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+                    "created_at": "2014-10-30T11:34:15.213552",
+                    "id": 2,
+                    "lang": "zu",
+                    "message_set": "/subscription/api/v1/message_set/12/",
+                    "next_sequence_number": 1,
+                    "process_status": 1,
+                    "resource_uri": "/subscription/api/v1/subscription/1/",
+                    "schedule": "/subscription/api/v1/periodic_task/1/",
+                    "to_addr": "+082111",
+                    "updated_at": "2014-10-30T11:34:15.213601",
+                    "user_account": "4a11907a-4cc4-415a-9011-58251e15e2b4"
+                }
+            ]
           }
         }
     },
