@@ -239,9 +239,9 @@ go.app = function() {
                     "You're registered for messages about your circumcision! " +
                     "The wound will heal in 6 weeks. Do not have sex for 6 weeks to " +
                     "prevent infecting or damaging the wound. Avoid smoking, alcohol " +
-                    "and drugs. Keep your penis upright for 7 – 10 days, until the " +
+                    "and drugs. Keep your penis upright for 7 - 10 days, until the " +
                     "swelling goes down. Wear clean underwear every day. Briefs, not " +
-                    "boxers. Don’t worry if some blood stains the bandage. If blood " +
+                    "boxers. Don't worry if some blood stains the bandage. If blood " +
                     "soaks the bandage, go to the clinic immediately. Brothers for Life. " +
                     "If you'd like messages in another language, reply with the " +
                     "number of your language",
@@ -294,9 +294,9 @@ go.app = function() {
                 text:
                     $("The wound will heal in 6 weeks. Do not have sex for 6 weeks to " +
                       "prevent infecting or damaging the wound. Avoid smoking, alcohol " +
-                      "and drugs.  Keep your penis upright for 7 – 10 days, until the " +
+                      "and drugs.  Keep your penis upright for 7 - 10 days, until the " +
                       "swelling goes down. Wear clean underwear every day. Briefs, not " +
-                      "boxers. Don’t worry if some blood stains the bandage. If blood " +
+                      "boxers. Don't worry if some blood stains the bandage. If blood " +
                       "soaks the bandage, go to the clinic immediately. Brothers for Life"),
 
                 next: 'states_start'
