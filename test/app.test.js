@@ -121,6 +121,27 @@ describe("app", function() {
             });
         });
 
+        describe("when a user is opted-out", function() {
+            describe("and sends START", function() {
+                it("should opt them in", function() {
+                    return tester
+                        .setup.user.addr('27002')
+                        .input('START')
+                        .check.interaction({
+                            state: 'states_optedin',
+                            reply:
+                                "You are now able to resubscribe. "+
+                                "Please SMS 'MMC' to 555 to continue"
+                        })
+                        .check(function(api) {
+                            var optouts = api.optout.optout_store;
+                            assert.equal(optouts.length, 0);
+                        })
+                        .run();
+                 });
+            });
+        });
+
         describe("when a user sends in MMC", function() {
             describe("when the user is unregistered", function() {
                 it("should register them, ask for their language choice", function() {

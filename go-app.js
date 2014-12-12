@@ -27,6 +27,20 @@ go.app = function() {
             });
         },
 
+        opted_out: function(im, contact) {
+            return im.api_request('optout.status', {
+                address_type: "msisdn",
+                address_value: contact.msisdn
+            });
+        },
+
+        opt_in: function(im, contact) {
+            return im.api_request('optout.cancel_optout', {
+                address_type: "msisdn",
+                address_value: contact.msisdn
+            });
+        },
+
         control_api_call: function (method, params, payload, endpoint, im) {
             var http = new HttpApi(im, {
               headers: {
@@ -202,6 +216,10 @@ go.app = function() {
             if (first_word === "STOP" || first_word === "BLOCK") {
                 return self.states.create('states_opt_out');
 
+            // always subscribe on start or unblock
+            } else if (first_word === "START" || first_word === "UNBLOCK") {
+                return self.states.create('states_opt_in');
+
             // user isn't registered
             } else if (_.isUndefined(self.contact.extra.is_registered) ||
                             self.contact.extra.is_registered === 'false') {
@@ -359,6 +377,27 @@ go.app = function() {
             return new EndState(name, {
                 text:
                     $("You have been unsubscribed."),
+
+                next: 'states_start'
+            });
+        });
+
+        self.states.add('states_opt_in', function(name) {
+            // run opt-in calls
+            return go.utils
+                .opt_in(self.im, self.contact)
+                .then(function() {
+                    return self.states.create('states_optedin');
+                });
+        });
+
+        self.states.add('states_optedin', function(name) {
+            return new EndState(name, {
+                text:
+                    $("You are now able to resubscribe. " +
+                      "Please SMS 'MMC' to {{SMS_number}} to continue").context({
+                        SMS_number: self.im.config.channel
+                    }),
 
                 next: 'states_start'
             });
