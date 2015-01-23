@@ -32,7 +32,7 @@ msgid ""
 "your penis upright for 7 - 10 days, until the swelling goes down. Wear "
 "clean underwear every day. Briefs, not boxers. Don't worry if some blood "
 "stains the bandage. If blood soaks the bandage, go to the clinic "
-"immediately. Brothers for Life"
+"immediately."
 msgstr ""
 
 #: go-app.js:309

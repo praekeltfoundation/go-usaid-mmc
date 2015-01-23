@@ -253,7 +253,7 @@ go.app = function() {
                     "and drugs. Keep your penis upright for 7 - 10 days, until the " +
                     "swelling goes down. Wear clean underwear every day. Briefs, not " +
                     "boxers. Don't worry if some blood stains the bandage. If blood " +
-                    "soaks the bandage, go to the clinic immediately. Brothers for Life. " +
+                    "soaks the bandage, go to the clinic immediately. " +
                     "If you'd like messages in another language, reply with the " +
                     "number of your language",
 
@@ -308,7 +308,7 @@ go.app = function() {
                       "and drugs.  Keep your penis upright for 7 - 10 days, until the " +
                       "swelling goes down. Wear clean underwear every day. Briefs, not " +
                       "boxers. Don't worry if some blood stains the bandage. If blood " +
-                      "soaks the bandage, go to the clinic immediately. Brothers for Life"),
+                      "soaks the bandage, go to the clinic immediately."),
 
                 next: 'states_start'
             });
