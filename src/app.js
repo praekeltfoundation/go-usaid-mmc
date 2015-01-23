@@ -167,6 +167,7 @@ go.app = function() {
     var GoApp = App.extend(function(self) {
         App.call(self, 'states_start');
         var $ = self.$;
+        var interrupt = true;
 
         self.init = function() {
 
@@ -202,15 +203,61 @@ go.app = function() {
         };
 
 
-        self.states.add('states_start', function(name) {
-            var first_word = self.im.msg.content.split(" ")[0].replace(/\W/g, '').toUpperCase();
+        self.get_clean_first_word = function() {
+            return self.im.msg.content
+                .split(" ")[0]          // split off first word
+                .replace(/\W/g, '')     // remove non letters
+                .toUpperCase();         // capitalise
+        };
 
-            // always unsubscribe on stop or block
-            if (first_word === "STOP" || first_word === "BLOCK") {
-                return self.states.create('states_opt_out');
+
+        self.add = function(name, creator) {
+            self.states.add(name, function(name, opts) {
+                var first_word = self.get_clean_first_word();
+
+                // if first word is not BLOCK or STOP, continue as normal
+                // prevent recurring loop with interrupt
+                if (!interrupt ||
+                    !(first_word === 'BLOCK' || first_word === 'STOP')) {
+                    return creator(name, opts);
+                }
+
+                interrupt = false;
+                opts = opts || {};
+                opts.name = name;
+                return self.states.create('states_opt_out', opts);
+            });
+        };
+
+
+        self.states.add('states_opt_out', function(name) {
+            // run opt-out calls
+            return go.utils
+                .opt_out(self.im, self.contact)
+                .then(function() {
+                    return go.utils
+                        .subscription_unsubscribe_all(self.contact, self.im)
+                        .then(function() {
+                            return self.states.create('states_unsubscribe');
+                        });
+                });
+        });
+
+        self.states.add('states_unsubscribe', function(name) {
+            return new EndState(name, {
+                text:
+                    $("You have been unsubscribed."),
+
+                next: 'states_start'
+            });
+        });
+
+
+        self.add('states_start', function(name) {
+            var first_word = self.get_clean_first_word();
 
             // always subscribe on start or unblock
-            } else if (first_word === "START" || first_word === "UNBLOCK") {
+            if (first_word === "START" || first_word === "UNBLOCK") {
                 return self.states.create('states_opt_in');
 
             // user isn't registered
@@ -236,7 +283,7 @@ go.app = function() {
             }
         });
 
-        self.states.add('states_register_english', function(name) {
+        self.add('states_register_english', function(name) {
             return go.utils
                 .subscription_subscribe(self.contact, self.im)
                 .then(function() {
@@ -244,7 +291,7 @@ go.app = function() {
                 });
         });
 
-        self.states.add('states_language', function(name) {
+        self.add('states_language', function(name) {
             return new ChoiceState(name, {
                 question:
                     "You're registered for messages about your circumcision! " +
@@ -291,7 +338,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('states_update_language', function(name) {
+        self.add('states_update_language', function(name) {
             // update subscription to language of choice
             return go.utils
                 .subscription_set_language(self.contact, self.im, self.contact.extra.language_choice)
@@ -300,7 +347,7 @@ go.app = function() {
                 });
         });
 
-        self.states.add('states_update_language_success', function(name) {
+        self.add('states_update_language_success', function(name) {
             return new EndState(name, {
                 text:
                     $("The wound will heal in 6 weeks. Do not have sex for 6 weeks to " +
@@ -314,7 +361,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('states_how_to_register', function(name) {
+        self.add('states_how_to_register', function(name) {
             return new EndState(name, {
                 text:
                     $("Welcome to the Medical Male Circumcision (MMC) info service. To get " +
@@ -328,7 +375,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('states_finished_messages', function(name) {
+        self.add('states_finished_messages', function(name) {
             return new EndState(name, {
                 text:
                     $("You have finished your set of SMSs and your circumcision wound should " +
@@ -339,7 +386,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('states_unfinished_messages', function(name) {
+        self.add('states_unfinished_messages', function(name) {
             return new EndState(name, {
                 text:
                     $("MMC info: U r registered to receive SMSs about ur circumcision. " +
@@ -353,29 +400,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('states_opt_out', function(name) {
-            // run opt-out calls
-            return go.utils
-                .opt_out(self.im, self.contact)
-                .then(function() {
-                    return go.utils
-                        .subscription_unsubscribe_all(self.contact, self.im)
-                        .then(function() {
-                            return self.states.create('states_unsubscribe');
-                        });
-                });
-        });
-
-        self.states.add('states_unsubscribe', function(name) {
-            return new EndState(name, {
-                text:
-                    $("You have been unsubscribed."),
-
-                next: 'states_start'
-            });
-        });
-
-        self.states.add('states_opt_in', function(name) {
+        self.add('states_opt_in', function(name) {
             // run opt-in calls
             return go.utils
                 .opt_in(self.im, self.contact)
@@ -384,7 +409,7 @@ go.app = function() {
                 });
         });
 
-        self.states.add('states_optedin', function(name) {
+        self.add('states_optedin', function(name) {
             return new EndState(name, {
                 text:
                     $("You are now able to resubscribe. " +
