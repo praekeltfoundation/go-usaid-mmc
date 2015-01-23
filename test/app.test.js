@@ -226,6 +226,19 @@ describe("app", function() {
             describe("when the user is registered", function() {
                 describe("if they are responding to language choice", function() {
 
+                    describe("if they enter STOP", function() {
+                        it("should opt them out", function() {
+                            return tester
+                                .setup.user.addr('082111')
+                                .inputs('MMC', 'STOP')
+                                .check.interaction({
+                                    state: 'states_unsubscribe',
+                                    reply: "You have been unsubscribed."
+                                })
+                                .run();
+                        });
+                    });
+
                     describe("if they only have one subscription", function() {
                         it("should update them to language", function() {
                             return tester
