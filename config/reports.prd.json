@@ -44,7 +44,7 @@
                 "metric_type": "account",
                 "store": "usaid_mmc_prd",
                 "name": "sum.finished_messages",
-                "aggregator": "last"
+                "aggregator": "sum"
                 }
         },
 
