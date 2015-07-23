@@ -352,7 +352,7 @@ module.exports = function() {
                 'Authorization': ['ApiKey test_user:test_key'],
                 'Content-Type': ['application/json']
             },
-            "url": "http://fixture/subscription/api/v1/subscription/1",
+            "url": "http://fixture/subscription/api/v1/subscription/1/",
             "data": {
                 "lang": "xh"
             }
