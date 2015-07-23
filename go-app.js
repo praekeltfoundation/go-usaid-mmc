@@ -121,14 +121,13 @@ go.app = function() {
             return go.utils
                 .control_api_call("get", params, null, 'subscription/', im)
                 .then(function(json_result) {
-                    // make all subscriptions inactive
                     var update = JSON.parse(json_result.data);
                     var clean = true;
                     var patch_url;
 
                     if (update.objects.length === 1) {
                         if (update.objects[0].lang !== lang) {
-                            patch_url = 'subscription/' + update.objects[0].id;
+                            patch_url = 'subscription/' + update.objects[0].id + '/';
                             clean = false;
                             update = {
                                 "lang": lang
