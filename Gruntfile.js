@@ -10,17 +10,26 @@ module.exports = function (grunt) {
                 app: [
                     'src/app.js'
                 ],
+                app_ussd: [
+                    'src/ussd/app.js'
+                ],
                 prd: [
                     'src/index.js',
                     '<%= paths.src.app %>',
                     'src/init.js'
+                ],
+                prd_ussd: [
+                    'src/ussd/index.js',
+                    '<%= paths.src.app_ussd %>',
+                    'src/ussd/init.js'
                 ],
                 all: [
                     'src/**/*.js'
                 ]
             },
             dest: {
-                prd: 'go-app.js'
+                prd: 'go-app.js',
+                prd_ussd: 'go-app-ussd.js'
             },
             test: [
                 'test/setup.js',
@@ -43,6 +52,7 @@ module.exports = function (grunt) {
                 files: [
                     '<%= paths.src.all %>',
                     '<%= paths.test %>'
+                    //'<%= paths.test_ussd %>'
                 ],
                 tasks: ['default'],
                 options: {
@@ -63,6 +73,10 @@ module.exports = function (grunt) {
             prd: {
                 src: ['<%= paths.src.prd %>'],
                 dest: '<%= paths.dest.prd %>'
+            },
+            prd_ussd: {
+                src: ['<%= paths.src.prd_ussd %>'],
+                dest: '<%= paths.dest.prd_ussd %>'
             }
         },
 
