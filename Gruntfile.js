@@ -7,16 +7,16 @@ module.exports = function (grunt) {
     grunt.initConfig({
         paths: {
             src: {
-                app: [
-                    'src/app.js'
+                app_sms: [
+                    'src/sms/app.js'
                 ],
                 app_ussd: [
                     'src/ussd/app.js'
                 ],
-                prd: [
-                    'src/index.js',
-                    '<%= paths.src.app %>',
-                    'src/init.js'
+                prd_sms: [
+                    'src/sms/index.js',
+                    '<%= paths.src.app_sms %>',
+                    'src/sms/init.js'
                 ],
                 prd_ussd: [
                     'src/ussd/index.js',
@@ -28,13 +28,18 @@ module.exports = function (grunt) {
                 ]
             },
             dest: {
-                prd: 'go-app.js',
+                prd_sms: 'go-app.js',
                 prd_ussd: 'go-app-ussd.js'
             },
-            test: [
-                'test/setup.js',
-                '<%= paths.src.app %>',
-                'test/**/*.test.js'
+            test_sms: [
+                'test/sms/setup.js',
+                '<%= paths.src.app_sms %>',
+                'test/sms/**/*.test.js'
+            ],
+            test_ussd: [
+                'test/ussd/setup.js',
+                '<%= paths.src.app_ussd %>',
+                'test/ussd/**/*.test.js'
             ]
         },
 
@@ -43,7 +48,8 @@ module.exports = function (grunt) {
             all: [
                 'Gruntfile.js',
                 '<%= paths.src.all %>',
-                '<%= paths.test %>'
+                '<%= paths.test_sms %>',
+                '<%= paths.test_ussd %>'
             ]
         },
 
@@ -51,8 +57,8 @@ module.exports = function (grunt) {
             src: {
                 files: [
                     '<%= paths.src.all %>',
-                    '<%= paths.test %>'
-                    //'<%= paths.test_ussd %>'
+                    '<%= paths.test_sms %>',
+                    '<%= paths.test_ussd %>'
                 ],
                 tasks: ['default'],
                 options: {
@@ -70,9 +76,9 @@ module.exports = function (grunt) {
                     '\n' // Newline between banner and content.
                 ].join('\n')
             },
-            prd: {
-                src: ['<%= paths.src.prd %>'],
-                dest: '<%= paths.dest.prd %>'
+            prd_sms: {
+                src: ['<%= paths.src.prd_sms %>'],
+                dest: '<%= paths.dest.prd_sms %>'
             },
             prd_ussd: {
                 src: ['<%= paths.src.prd_ussd %>'],
@@ -82,7 +88,13 @@ module.exports = function (grunt) {
 
         mochaTest: {
             test: {
-                src: ['<%= paths.test %>'],
+                src: ['<%= paths.test_sms %>'],
+                options: {
+                    reporter: 'spec'
+                }
+            },
+            test_ussd: {
+                src: ['<%= paths.test_ussd %>'],
                 options: {
                     reporter: 'spec'
                 }
