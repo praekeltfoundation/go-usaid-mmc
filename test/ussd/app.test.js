@@ -1,6 +1,7 @@
 var vumigo = require('vumigo_v02');
 var fixtures = require('./fixtures');
 var AppTester = vumigo.AppTester;
+var assert = require('assert');
 
 
 describe("app", function() {
@@ -45,12 +46,15 @@ describe("app", function() {
         });
 
         describe("when the user selects a language", function() {
-            it("should display the main menu", function() {
+            it("should save result to contact and display the main menu", function() {
                 return tester
                     .setup.user.state('states:select_language')
                     .input('1')
                     .check.interaction({
                         state: 'states:main_menu'
+                    })
+                    .check(function(api, im, app) {
+                        assert(app.contact.extra.language_choice == 'en');
                     })
                     .run();
             });
