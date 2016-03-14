@@ -28,7 +28,7 @@ module.exports = function (grunt) {
                 ]
             },
             dest: {
-                prd_sms: 'go-app.js',
+                prd_sms: 'go-app-sms.js',
                 prd_ussd: 'go-app-ussd.js'
             },
             test_sms: [
@@ -87,7 +87,7 @@ module.exports = function (grunt) {
         },
 
         mochaTest: {
-            test: {
+            test_sms: {
                 src: ['<%= paths.test_sms %>'],
                 options: {
                     reporter: 'spec'
