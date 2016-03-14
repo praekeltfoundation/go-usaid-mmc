@@ -52,10 +52,13 @@ go.app = function() {
         self.states.add('states:select_language', function(name){
             return new LanguageChoice(name, {
                 next: function(choice) {
-                    self.contact.extra.lang = choice.value;
-                    return "states:main_menu";
+                    self.contact.extra.language_choice = choice.value;
+                    return self.im.contacts.save(self.contact)
+                        .then(function () {
+                            return "states:main_menu";
+                        });
                 },
-                question: "What language would you like to use?",
+                question: "Welcome to MMC Service. Choose your language:",
                 choices: [
                     new Choice("en", "English"),
                     new Choice("zu", "isiZulu"),

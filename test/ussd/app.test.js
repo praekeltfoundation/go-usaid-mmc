@@ -29,7 +29,7 @@ describe("app", function() {
                     .check.interaction({
                         state: 'states:select_language',
                         reply: [
-                            'What language would you like to use?',
+                            'Welcome to MMC Service. Choose your language:',
                             '1. English',
                             '2. isiZulu',
                             '3. Sesotho',
