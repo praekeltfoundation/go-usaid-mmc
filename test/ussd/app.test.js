@@ -54,7 +54,7 @@ describe("app", function() {
                         state: 'states:main_menu'
                     })
                     .check(function(api, im, app) {
-                        assert(app.contact.extra.language_choice == 'en');
+                        assert.strictEqual(app.contact.extra.language_choice, 'en');
                     })
                     .run();
             });
