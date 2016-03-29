@@ -91,6 +91,22 @@ go.app = function() {
                 ]
             });
         });
+
+        self.states.add('states:healthsites', function(name){
+            return new ChoiceState(name, {
+                question: "Welcome to Healthsites. What type of clinic are you looking for?",
+                choices: [
+                    new Choice("states:end", "Nearest Clinic"),
+                    new Choice("states:end", "MMC Clinic"),
+                    new Choice("states:end", "HCT Clinic")
+                ],
+                next: function(choice) {
+                    return choice.value;
+                }
+            });
+        });
+
+
     });
 
     return {

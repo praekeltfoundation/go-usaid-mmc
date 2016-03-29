@@ -100,5 +100,24 @@ describe("app", function() {
             });
         });
 
+        describe("when user selects 'Get FREE SMSs about your MMC recovery'  on main menu page 1", function() {
+            it("should show the healthsites menu", function() {
+                return tester
+                    .setup.user.state('states:main_menu')
+                    .input('3')
+                    .check.interaction({
+                        state: 'states:healthsites',
+                        reply: [
+                            'Welcome to Healthsites. What type of clinic are you looking for?',
+                            '1. Nearest Clinic',
+                            '2. MMC Clinic',
+                            '3. HCT Clinic'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+
     });
 });
