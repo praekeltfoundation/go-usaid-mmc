@@ -118,6 +118,39 @@ describe("app", function() {
             });
         });
 
+        describe("when user selects '4. Rate your clinic’s MMC service'  on main menu page 1", function() {
+            it("should show the service ratings menu", function() {
+                return tester
+                    .setup.user.state('states:main_menu')
+                    .input('4')
+                    .check.interaction({
+                        state: 'states:service_rating_1',
+                        reply: [
+                            'At which clinic did you get circumcised? Please be specific with the name and ' +
+                            'location. e.g. Peterville Clinic, Rivonia, Johannesburg'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user responds 'I have not been circumcised' in service rating question 2", function() {
+            it("should respond with 'looking for ratings by circumcised men'", function() {
+                return tester
+                    .setup.user.state('states:service_rating_1')
+                    .inputs('User entered location', '3')
+                    .check.interaction({
+                        state: 'states:service_rating_end2',
+                        reply: [
+                            'Thank you for your interest. We are only looking for ratings from men who have had ' +
+                            'their circumcision at a clinic recently.',
+                            '1. Main Menu',
+                            '2. Exit'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
 
     });
 });
