@@ -61,20 +61,44 @@ describe("app", function() {
         });
 
         describe("when the user starts a session after having set a language", function() {
-            it("should show the home menu", function() {
+            it("should show the main menu", function() {
                 return tester
                     .setup.user.lang('en')
                     .start()
                     .check.interaction({
                         state: 'states:main_menu',
                         reply: [
-                            'Hi there! What do you want to do?',
-                            '1. Show this menu again',
-                            '2. Exit'
+                            'Medical Male Circumcision (MMC):',
+                            '1. Find a clinic',
+                            '2. Speak to an expert for FREE',
+                            '3. Get FREE SMSs about your MMC recovery',
+                            '4. Rate your clinic’s MMC service',
+                            '5. Next',
+                            '6. Exit'
                         ].join('\n')
                     })
                     .run();
             });
         });
+
+        describe("when next is selected on main menu page 1", function() {
+            it("should show the main menu page 2", function() {
+                return tester
+                    .setup.user.state('states:main_menu')
+                    .input('5')
+                    .check.interaction({
+                        state: 'states:main_menu_pg2',
+                        reply: [
+                            'Medical Male Circumcision (MMC):',
+                            '1. Join Brothers for Life',
+                            '2. Change Language',
+                            '3. Back',
+                            '4. Exit'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
     });
 });

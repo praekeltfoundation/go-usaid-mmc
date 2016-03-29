@@ -30,10 +30,30 @@ go.app = function() {
 
         self.states.add('states:main_menu', function(name){
             return new ChoiceState(name, {
-                question: 'Hi there! What do you want to do?',
+                question: 'Medical Male Circumcision:',
 
                 choices: [
-                    new Choice('states:start', 'Show this menu again'),
+                    new Choice('states:end', 'Find a clinic'),
+                    new Choice('states:end', 'Speak to an expert for FREE'),
+                    new Choice('states:healthsites', 'Get FREE SMSs about your MMC recovery'),
+                    new Choice('states:end', 'Rate your clinic’s MMC service'),
+                    new Choice('states:main_menu_pg2', 'N'),
+                    new Choice('states:end', 'E')],
+
+                next: function(choice) {
+                    return choice.value;
+                }
+            });
+        });
+
+        self.states.add('states:main_menu_pg2', function(name){
+            return new ChoiceState(name, {
+                question: 'Medical Male Circumcision (MMC):',
+
+                choices: [
+                    new Choice('states:start', 'Join Brothers for Life'),
+                    new Choice('states:select_language', 'Change Language'),
+                    new Choice('states:main_menu', 'Back'),
                     new Choice('states:end', 'Exit')],
 
                 next: function(choice) {
