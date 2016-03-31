@@ -108,6 +108,7 @@ go.app = function() {
         });
 
         self.states.add('states:service_rating_1', function(name){
+            self.im.user.answers = {};
             return new FreeText(name, {
                 question: "At which clinic did you get circumcised? Please be specific with the name and " +
                 "location. e.g. Peterville Clinic, Rivonia, Johannesburg",
@@ -126,6 +127,7 @@ go.app = function() {
                     new Choice("states:service_rating_end2", "I have not been circumcised")
                 ],
                 next: function(choice) {
+                    self.im.user.answers['states:service_rating_2'] = choice.label;
                     return choice.value;
                 }
             });
@@ -143,6 +145,7 @@ go.app = function() {
                     new Choice("states:service_rating_4", "Excellent")
                 ],
                 next: function(choice) {
+                    self.im.user.answers['states:service_rating_3'] = choice.label;
                     return choice.value;
                 }
             });
@@ -158,6 +161,7 @@ go.app = function() {
                     new Choice("states:service_rating_end1", "I didn't know about it")
                 ],
                 next: function(choice) {
+                    self.im.user.answers['states:service_rating_4'] = choice.label;
                     return choice.value;
                 }
             });
@@ -186,6 +190,7 @@ go.app = function() {
                     new Choice("states:end", "Exit")
                 ],
                 next: function(choice) {
+                    //TODO make web request to store results
                     return choice.value;
                 }
             });

@@ -152,5 +152,23 @@ describe("app", function() {
             });
         });
 
+        describe("when user responds 'Yes/No' in service rating question 2", function() {
+            it("should finish the questionnaire and get a Thank you response", function() {
+                return tester
+                    .setup.user.state('states:service_rating_1')
+                    .inputs('User entered location', '1', '5', '1')
+                    .check.interaction({
+                        state: 'states:service_rating_end1',
+                        reply: [
+                            'Thanks for rating your circumcision experience. We appreciate your feedback, it will ' +
+                            'help us improve our MMC service.',
+                            '1. Main Menu',
+                            '2. Exit'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
     });
 });
