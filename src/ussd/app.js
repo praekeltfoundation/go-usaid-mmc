@@ -59,12 +59,17 @@ go.app = function() {
         });
 
         self.states.add('states:select_language', function(name){
+            var language_previously_not_set = self.im.user.lang === null;
             return new LanguageChoice(name, {
                 next: function(choice) {
                     self.contact.extra.language_choice = choice.value;
                     return self.im.contacts.save(self.contact)
                         .then(function () {
-                            return "states:main_menu";
+                            if(language_previously_not_set) {
+                                return "states:main_menu";
+                            }else{
+                                return 'states:language_set';
+                            }
                         });
                 },
                 question: "Welcome to MMC Service. Choose your language:",
@@ -78,6 +83,19 @@ go.app = function() {
                     new Choice("xh", "isiXhosa"),
                     new Choice("ts", "Xitsonga")
                 ]
+            });
+        });
+
+        self.states.add('states:language_set', function(name){
+            return new ChoiceState(name, {
+                question: "Your new language choice has been saved.",
+                choices: [
+                    new Choice("states:main_menu", "Main Menu"),
+                    new Choice("states:end", "Exit")
+                ],
+                next: function(choice) {
+                    return choice.value;
+                }
             });
         });
 
