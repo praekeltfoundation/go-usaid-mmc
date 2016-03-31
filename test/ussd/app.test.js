@@ -60,6 +60,22 @@ describe("app", function() {
             });
         });
 
+        describe("when the user selects a '3. Change Language' from main menu page 2 and selects a new language", function() {
+            it("should save result to contact and notify user of language change", function() {
+                return tester
+                    .setup.user.lang('en')
+                    .setup.user.state('states:main_menu')
+                    .inputs('4', '3', '2')
+                    .check.interaction({
+                        state: 'states:language_set'
+                    })
+                    .check(function(api, im, app) {
+                        assert.strictEqual(app.contact.extra.language_choice, 'zu');
+                    })
+                    .run();
+            });
+        });
+
         describe("when the user starts a session after having set a language", function() {
             it("should show the main menu", function() {
                 return tester
