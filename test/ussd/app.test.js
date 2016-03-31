@@ -169,5 +169,40 @@ describe("app", function() {
             });
         });
 
+        describe("when users chooses '2. Join Brothers for Life' in main menu page 2 and selects '1. Join'", function() {
+            it("should notify user that they shall receive Brothers for Life updates", function() {
+                return tester
+                    .setup.user.state('states:main_menu')
+                    .inputs('4', '2', '1')
+                    .check.interaction({
+                        state: 'states:brothers_for_life:join',
+                        reply: [
+                            'Thank you. You will now receive Brothers for Life updates. You can opt out at any ' +
+                            'point by replying STOP to an SMS you receive.',
+                            '1. Main Menu',
+                            '2. Exit'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when users chooses '2. Join Brothers for Life' in main menu page 2 and selects '2. No thanks'", function() {
+            it("should inform the user how to join Brothers for Life later if they wish.", function() {
+                return tester
+                    .setup.user.state('states:main_menu')
+                    .inputs('4', '2', '2')
+                    .check.interaction({
+                        state: 'states:brothers_for_life:no_join',
+                        reply: [
+                            'You have selected not to receive Brothers for Life updates. You can join any time in ' +
+                            'the future by dialling *120*662#.',
+                            '1. Main Menu',
+                            '2. Exit'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
     });
 });
