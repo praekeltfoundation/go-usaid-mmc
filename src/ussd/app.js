@@ -65,7 +65,8 @@ go.app = function() {
 
         self.states.add('states:end', function(name) {
             return new EndState(name, {
-                text: 'Thanks, cheers!',
+                text: 'Thanks for using the *120*662# MMC service! Dial back anytime to find MMC clinics, sign up ' +
+                'for healing SMSs or find more info about MMC (20c/20sec) Yenzakahle! ',
                 next: 'states:start'
             });
         });
