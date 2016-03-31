@@ -123,7 +123,7 @@ describe("app", function() {
                     .setup.user.state('states:main_menu')
                     .inputs('4', '1')
                     .check.interaction({
-                        state: 'states:service_rating_1',
+                        state: 'states:service_rating:location',
                         reply: [
                             'At which clinic did you get circumcised? Please be specific with the name and ' +
                             'location. e.g. Peterville Clinic, Rivonia, Johannesburg'
@@ -136,10 +136,10 @@ describe("app", function() {
         describe("when user responds 'I have not been circumcised' in service rating question 2", function() {
             it("should respond with 'looking for ratings by circumcised men'", function() {
                 return tester
-                    .setup.user.state('states:service_rating_1')
+                    .setup.user.state('states:service_rating:location')
                     .inputs('User entered location', '3')
                     .check.interaction({
-                        state: 'states:service_rating_end2',
+                        state: 'states:service_rating:end_negative',
                         reply: [
                             'Thank you for your interest. We are only looking for ratings from men who have had ' +
                             'their circumcision at a clinic recently.',
@@ -154,10 +154,10 @@ describe("app", function() {
         describe("when user responds 'Yes/No' in service rating question 2", function() {
             it("should finish the questionnaire and get a Thank you response", function() {
                 return tester
-                    .setup.user.state('states:service_rating_1')
+                    .setup.user.state('states:service_rating:location')
                     .inputs('User entered location', '1', '5', '1')
                     .check.interaction({
-                        state: 'states:service_rating_end1',
+                        state: 'states:service_rating:end_positive',
                         reply: [
                             'Thanks for rating your circumcision experience. We appreciate your feedback, it will ' +
                             'help us improve our MMC service.',
