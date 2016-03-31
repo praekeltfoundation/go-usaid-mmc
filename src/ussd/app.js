@@ -5,6 +5,7 @@ go.app = function() {
     var ChoiceState = vumigo.states.ChoiceState;
     var FreeText = vumigo.states.FreeText;
     var LanguageChoice = vumigo.states.LanguageChoice;
+    var PaginatedChoiceState = vumigo.states.PaginatedChoiceState;
     var EndState = vumigo.states.EndState;
 
     var GoApp = App.extend(function(self) {
@@ -30,33 +31,19 @@ go.app = function() {
         });
 
         self.states.add('states:main_menu', function(name){
-            return new ChoiceState(name, {
-                question: 'Medical Male Circumcision:',
-
+            return new PaginatedChoiceState(name, {
+                question: 'Medical Male Circumcision (MMC):',
+                characters_per_page: 160,
+                options_per_page: null,
                 choices: [
                     new Choice('states:end', 'Find a clinic'),
                     new Choice('states:end', 'Speak to an expert for FREE'),
                     new Choice('states:healthsites', 'Get FREE SMSs about your MMC recovery'),
-                    new Choice('states:service_rating_1', 'Rate your clinic’s MMC service'),
-                    new Choice('states:main_menu_pg2', 'N'),
-                    new Choice('states:end', 'E')],
-
-                next: function(choice) {
-                    return choice.value;
-                }
-            });
-        });
-
-        self.states.add('states:main_menu_pg2', function(name){
-            return new ChoiceState(name, {
-                question: 'Medical Male Circumcision (MMC):',
-
-                choices: [
-                    new Choice('states:start', 'Join Brothers for Life'),
+                    new Choice('states:service_rating_1', 'Rate your clinic\'s MMC service'),
+                    new Choice('states:end', 'Join Brothers for Life'),
                     new Choice('states:select_language', 'Change Language'),
-                    new Choice('states:main_menu', 'Back'),
-                    new Choice('states:end', 'Exit')],
-
+                    new Choice('states:end', 'Exit'),
+                ],
                 next: function(choice) {
                     return choice.value;
                 }
