@@ -165,6 +165,14 @@ describe("app", function() {
                             '2. Exit'
                         ].join('\n')
                     })
+                    .check(function(api, im, app) {
+                        assert.deepEqual(im.user.answers, {
+                            'states:service_rating:location': 'User entered location',
+                            'states:service_rating:would_recommend': 'service_rating:yes_recommend',
+                            'states:service_rating:rating': 'service_rating:excellent',
+                            'states:service_rating:subscribed_to_post_op_sms': 'service_rating:subscribed_helpful'
+                        });
+                    })
                     .run();
             });
         });
