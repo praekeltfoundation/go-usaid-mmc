@@ -40,7 +40,7 @@ go.app = function() {
                     new Choice('states:end', 'Speak to an expert for FREE'),
                     new Choice('states:healthsites', 'Get FREE SMSs about your MMC recovery'),
                     new Choice('states:service_rating_1', 'Rate your clinic\'s MMC service'),
-                    new Choice('states:end', 'Join Brothers for Life'),
+                    new Choice('states:brothers_for_life:start', 'Join Brothers for Life'),
                     new Choice('states:select_language', 'Change Language'),
                     new Choice('states:end', 'Exit'),
                 ],
@@ -183,6 +183,49 @@ go.app = function() {
                 }
             });
         });
+
+        self.states.add('states:brothers_for_life:start', function(name){
+            return new ChoiceState(name, {
+                question: "Join Brothers for Life and we'll send you free SMSs about ur health, upcoming events & " +
+                "services for men. brothersforlife.org T&Cs apply.",
+                choices: [
+                    new Choice("states:brothers_for_life:join", "Join"),
+                    new Choice("states:brothers_for_life:no_join", "No Thanks")
+                ],
+                next: function(choice) {
+                    return choice.value;
+                }
+            });
+        });
+
+        self.states.add('states:brothers_for_life:join', function(name){
+            return new ChoiceState(name, {
+                question: "Thank you. You will now receive Brothers for Life updates. You can opt out at any point " +
+                "by replying STOP to an SMS you receive.",
+                choices: [
+                    new Choice("states:main_menu", "Main Menu"),
+                    new Choice("states:end", "Exit")
+                ],
+                next: function(choice) {
+                    return choice.value;
+                }
+            });
+        });
+
+        self.states.add('states:brothers_for_life:no_join', function(name){
+            return new ChoiceState(name, {
+                question: "You have selected not to receive Brothers for Life updates. You can join any time in the " +
+                "future by dialling *120*662#.",
+                choices: [
+                    new Choice("states:main_menu", "Main Menu"),
+                    new Choice("states:end", "Exit")
+                ],
+                next: function(choice) {
+                    return choice.value;
+                }
+            });
+        });
+
     });
 
     return {
