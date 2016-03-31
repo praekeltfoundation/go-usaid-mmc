@@ -46,7 +46,7 @@ go.app = function() {
                     new Choice('states:end', 'Find a clinic'),
                     new Choice('states:end', 'Speak to an expert for FREE'),
                     new Choice('states:healthsites', 'Get FREE SMSs about your MMC recovery'),
-                    new Choice('states:service_rating_1', 'Rate your clinic\'s MMC service'),
+                    new Choice('states:service_rating:location', 'Rate your clinic\'s MMC service'),
                     new Choice('states:brothers_for_life:start', 'Join Brothers for Life'),
                     new Choice('states:select_language', 'Change Language'),
                     new Choice('states:end', 'Exit'),
@@ -102,67 +102,68 @@ go.app = function() {
             });
         });
 
-        self.states.add('states:service_rating_1', function(name){
+        self.states.add('states:service_rating:location', function(name){
             self.im.user.answers = {};
             return new FreeText(name, {
                 question: "At which clinic did you get circumcised? Please be specific with the name and " +
                 "location. e.g. Peterville Clinic, Rivonia, Johannesburg",
                 next: function(text) {
-                    return 'states:service_rating_2';
+                    return 'states:service_rating:would_recommend';
                 }
             });
         });
 
-        self.states.add('states:service_rating_2', function(name){
+        self.states.add('states:service_rating:would_recommend', function(name){
             return new ChoiceState(name, {
                 question: "Would you recommend a friend to the clinic where you got circumcised?",
                 choices: [
-                    new Choice("states:service_rating_3", "Yes"),
-                    new Choice("states:service_rating_3", "No"),
-                    new Choice("states:service_rating_end2", "I have not been circumcised")
+                    new Choice("service_rating:yes_recommend", "Yes"),
+                    new Choice("service_rating:no_recommend", "No"),
+                    new Choice("service_rating:not_circumcised", "I have not been circumcised")
                 ],
                 next: function(choice) {
-                    self.im.user.answers['states:service_rating_2'] = choice.label;
-                    return choice.value;
+                    if(choice.value === 'service_rating:not_circumcised'){
+                        return 'states:service_rating:end_negative';
+                    }else{
+                        return 'states:service_rating:rating';
+                    }
                 }
             });
         });
 
-        self.states.add('states:service_rating_3', function(name){
+        self.states.add('states:service_rating:rating', function(name){
             return new ChoiceState(name, {
                 question: "How would you rate the attitude of the health care workers at the clinic " +
                 "where you got circumcised?",
                 choices: [
-                    new Choice("states:service_rating_4", "Very Bad"),
-                    new Choice("states:service_rating_4", "Bad"),
-                    new Choice("states:service_rating_4", "OK"),
-                    new Choice("states:service_rating_4", "Good"),
-                    new Choice("states:service_rating_4", "Excellent")
+                    new Choice("service_rating:very_bad", "Very Bad"),
+                    new Choice("service_rating:bad", "Bad"),
+                    new Choice("service_rating:ok", "OK"),
+                    new Choice("service_rating:good", "Good"),
+                    new Choice("service_rating:excellent", "Excellent")
                 ],
                 next: function(choice) {
-                    self.im.user.answers['states:service_rating_3'] = choice.label;
-                    return choice.value;
+                    return 'states:service_rating:subscribed_to_post_op_sms';
                 }
             });
         });
 
-        self.states.add('states:service_rating_4', function(name){
+        self.states.add('states:service_rating:subscribed_to_post_op_sms', function(name){
             return new ChoiceState(name, {
                 question: "Did you subscribe to the post op SMS service?",
                 choices: [
-                    new Choice("states:service_rating_end1", "Yes I found it helpful"),
-                    new Choice("states:service_rating_end1", "Yes but it was not helpful"),
-                    new Choice("states:service_rating_end1", "No I chose not to subscribe"),
-                    new Choice("states:service_rating_end1", "I didn't know about it")
+                    new Choice("service_rating:subscribed_helpful", "Yes I found it helpful"),
+                    new Choice("service_rating:subscribed_not_helpful", "Yes but it was not helpful"),
+                    new Choice("service_rating:not_subscribed", "No I chose not to subscribe"),
+                    new Choice("service_rating:did_not_know", "I didn't know about it")
                 ],
                 next: function(choice) {
-                    self.im.user.answers['states:service_rating_4'] = choice.label;
-                    return choice.value;
+                    return 'states:service_rating:end_positive';
                 }
             });
         });
 
-        self.states.add('states:service_rating_end1', function(name){
+        self.states.add('states:service_rating:end_positive', function(name){
             return new ChoiceState(name, {
                 question: "Thanks for rating your circumcision experience. We appreciate your feedback, it will " +
                 "help us improve our MMC service.",
@@ -176,7 +177,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('states:service_rating_end2', function(name){
+        self.states.add('states:service_rating:end_negative', function(name){
             return new ChoiceState(name, {
                 question: "Thank you for your interest. We are only looking for ratings from men who have " +
                 "had their circumcision at a clinic recently.",

@@ -110,13 +110,16 @@ go.app = function() {
             return new ChoiceState(name, {
                 question: "Would you recommend a friend to the clinic where you got circumcised?",
                 choices: [
-                    new Choice("states:service_rating:rating", "Yes"),
-                    new Choice("states:service_rating:rating", "No"),
-                    new Choice("states:service_rating:end_negative", "I have not been circumcised")
+                    new Choice("service_rating:yes_recommend", "Yes"),
+                    new Choice("service_rating:no_recommend", "No"),
+                    new Choice("service_rating:not_circumcised", "I have not been circumcised")
                 ],
                 next: function(choice) {
-                    self.im.user.answers['states:service_rating:would_recommend'] = choice.label;
-                    return choice.value;
+                    if(choice.value === 'service_rating:not_circumcised'){
+                        return 'states:service_rating:end_negative';
+                    }else{
+                        return 'states:service_rating:rating';
+                    }
                 }
             });
         });
@@ -126,15 +129,14 @@ go.app = function() {
                 question: "How would you rate the attitude of the health care workers at the clinic " +
                 "where you got circumcised?",
                 choices: [
-                    new Choice("states:service_rating:subscribed_to_post_op_sms", "Very Bad"),
-                    new Choice("states:service_rating:subscribed_to_post_op_sms", "Bad"),
-                    new Choice("states:service_rating:subscribed_to_post_op_sms", "OK"),
-                    new Choice("states:service_rating:subscribed_to_post_op_sms", "Good"),
-                    new Choice("states:service_rating:subscribed_to_post_op_sms", "Excellent")
+                    new Choice("service_rating:very_bad", "Very Bad"),
+                    new Choice("service_rating:bad", "Bad"),
+                    new Choice("service_rating:ok", "OK"),
+                    new Choice("service_rating:good", "Good"),
+                    new Choice("service_rating:excellent", "Excellent")
                 ],
                 next: function(choice) {
-                    self.im.user.answers['states:service_rating:rating'] = choice.label;
-                    return choice.value;
+                    return 'states:service_rating:subscribed_to_post_op_sms';
                 }
             });
         });
@@ -143,14 +145,13 @@ go.app = function() {
             return new ChoiceState(name, {
                 question: "Did you subscribe to the post op SMS service?",
                 choices: [
-                    new Choice("states:service_rating:end_positive", "Yes I found it helpful"),
-                    new Choice("states:service_rating:end_positive", "Yes but it was not helpful"),
-                    new Choice("states:service_rating:end_positive", "No I chose not to subscribe"),
-                    new Choice("states:service_rating:end_positive", "I didn't know about it")
+                    new Choice("service_rating:subscribed_helpful", "Yes I found it helpful"),
+                    new Choice("service_rating:subscribed_not_helpful", "Yes but it was not helpful"),
+                    new Choice("service_rating:not_subscribed", "No I chose not to subscribe"),
+                    new Choice("service_rating:did_not_know", "I didn't know about it")
                 ],
                 next: function(choice) {
-                    self.im.user.answers['states:service_rating:subscribed_to_post_op_sms'] = choice.label;
-                    return choice.value;
+                    return 'states:service_rating:end_positive';
                 }
             });
         });
