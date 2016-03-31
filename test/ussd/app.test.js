@@ -72,9 +72,7 @@ describe("app", function() {
                             '1. Find a clinic',
                             '2. Speak to an expert for FREE',
                             '3. Get FREE SMSs about your MMC recovery',
-                            '4. Rate your clinic’s MMC service',
-                            '5. Next',
-                            '6. Exit'
+                            '4. More',
                         ].join('\n')
                     })
                     .run();
@@ -85,15 +83,16 @@ describe("app", function() {
             it("should show the main menu page 2", function() {
                 return tester
                     .setup.user.state('states:main_menu')
-                    .input('5')
+                    .input('4')
                     .check.interaction({
-                        state: 'states:main_menu_pg2',
+                        state: 'states:main_menu',
                         reply: [
                             'Medical Male Circumcision (MMC):',
-                            '1. Join Brothers for Life',
-                            '2. Change Language',
-                            '3. Back',
-                            '4. Exit'
+                            '1. Rate your clinic\'s MMC service',
+                            '2. Join Brothers for Life',
+                            '3. Change Language',
+                            '4. Exit',
+                            '5. Back',
                         ].join('\n')
                     })
                     .run();
@@ -118,11 +117,11 @@ describe("app", function() {
             });
         });
 
-        describe("when user selects '4. Rate your clinic’s MMC service'  on main menu page 1", function() {
+        describe("when user selects '1. Rate your clinic’s MMC service' on main menu page 2", function() {
             it("should show the service ratings menu", function() {
                 return tester
                     .setup.user.state('states:main_menu')
-                    .input('4')
+                    .inputs('4', '1')
                     .check.interaction({
                         state: 'states:service_rating_1',
                         reply: [
