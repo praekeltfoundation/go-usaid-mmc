@@ -10,6 +10,7 @@ go.app = function() {
 
     var GoApp = App.extend(function(self) {
         App.call(self, 'states:start');
+        var $ = self.$;
 
         self.init = function() {
             // Fetch the contact from the contact store that matches the current
@@ -32,23 +33,23 @@ go.app = function() {
 
         self.states.add('states:main_menu', function(name){
             return new PaginatedChoiceState(name, {
-                question: 'Medical Male Circumcision (MMC):',
+                question: $('Medical Male Circumcision (MMC):'),
                 characters_per_page: 160,
                 options_per_page: null,
                 choices: [
-                    new Choice('states:end', 'Find a clinic'),
-                    new Choice('states:end', 'Speak to an expert for FREE'),
+                    new Choice('states:end', $('Find a clinic')),
+                    new Choice('states:end', $('Speak to an expert for FREE')),
                     new Choice(
                         'states:healthsites',
-                        'Get FREE SMSs about your MMC recovery'),
+                        $('Get FREE SMSs about your MMC recovery')),
                     new Choice(
                         'states:service_rating:location',
-                        'Rate your clinic\'s MMC service'),
+                        $('Rate your clinic\'s MMC service')),
                     new Choice(
                         'states:brothers_for_life:start',
-                        'Join Brothers for Life'),
-                    new Choice('states:select_language', 'Change Language'),
-                    new Choice('states:end', 'Exit'),
+                        $('Join Brothers for Life')),
+                    new Choice('states:select_language', $('Change Language')),
+                    new Choice('states:end', $('Exit')),
                 ],
                 next: function(choice) {
                     return choice.value;
@@ -58,11 +59,11 @@ go.app = function() {
 
         self.states.add('states:end', function(name) {
             return new EndState(name, {
-                text: [
+                text: $([
                     'Thanks for using the *120*662# MMC service! Dial back',
                     ' anytime to find MMC clinics, sign up for healing SMSs',
                     ' or find more info about MMC (20c/20sec) Yenzakahle! ',
-                ].join(''),
+                ].join('')),
                 next: 'states:start'
             });
         });
@@ -81,26 +82,26 @@ go.app = function() {
                             }
                         });
                 },
-                question: "Welcome to MMC Service. Choose your language:",
+                question: $("Welcome to MMC Service. Choose your language:"),
                 choices: [
-                    new Choice("en", "English"),
-                    new Choice("zu", "isiZulu"),
-                    new Choice("st", "Sesotho"),
-                    new Choice("ss", "Siswati"),
-                    new Choice("nd", "isiNdebele"),
-                    new Choice("tn", "Setswana"),
-                    new Choice("xh", "isiXhosa"),
-                    new Choice("ts", "Xitsonga")
+                    new Choice("en", $("English")),
+                    new Choice("zu", $("isiZulu")),
+                    new Choice("st", $("Sesotho")),
+                    new Choice("ss", $("Siswati")),
+                    new Choice("nd", $("isiNdebele")),
+                    new Choice("tn", $("Setswana")),
+                    new Choice("xh", $("isiXhosa")),
+                    new Choice("ts", $("Xitsonga")),
                 ]
             });
         });
 
         self.states.add('states:language_set', function(name){
             return new ChoiceState(name, {
-                question: "Your new language choice has been saved.",
+                question: $("Your new language choice has been saved."),
                 choices: [
-                    new Choice("states:main_menu", "Main Menu"),
-                    new Choice("states:end", "Exit")
+                    new Choice("states:main_menu", $("Main Menu")),
+                    new Choice("states:end", $("Exit")),
                 ],
                 next: function(choice) {
                     return choice.value;
@@ -110,14 +111,14 @@ go.app = function() {
 
         self.states.add('states:healthsites', function(name){
             return new ChoiceState(name, {
-                question: [
+                question: $([
                     "Welcome to Healthsites. What type of clinic are you",
                     " looking for?",
-                ].join(""),
+                ].join("")),
                 choices: [
-                    new Choice("states:end", "Nearest Clinic"),
-                    new Choice("states:end", "MMC Clinic"),
-                    new Choice("states:end", "HCT Clinic")
+                    new Choice("states:end", $("Nearest Clinic")),
+                    new Choice("states:end", $("MMC Clinic")),
+                    new Choice("states:end", $("HCT Clinic")),
                 ],
                 next: function(choice) {
                     return choice.value;
@@ -128,11 +129,11 @@ go.app = function() {
         self.states.add('states:service_rating:location', function(name){
             self.im.user.answers = {};
             return new FreeText(name, {
-                question: [
+                question: $([
                     "At which clinic did you get circumcised? Please be",
                     " specific with the name and location. e.g. Peterville",
                     " Clinic, Rivonia, Johannesburg.",
-                ].join(""),
+                ].join("")),
                 next: function(text) {
                     return 'states:service_rating:would_recommend';
                 }
@@ -141,16 +142,16 @@ go.app = function() {
 
         self.states.add('states:service_rating:would_recommend', function(name){
             return new ChoiceState(name, {
-                question: [
+                question: $([
                     "Would you recommend a friend to the clinic where you",
                     " got circumcised?",
-                ].join(""),
+                ].join("")),
                 choices: [
-                    new Choice("service_rating:yes_recommend", "Yes"),
-                    new Choice("service_rating:no_recommend", "No"),
+                    new Choice("service_rating:yes_recommend", $("Yes")),
+                    new Choice("service_rating:no_recommend", $("No")),
                     new Choice(
                         "service_rating:not_circumcised",
-                        "I have not been circumcised")
+                        $("I have not been circumcised"))
                 ],
                 next: function(choice) {
                     if (choice.value === 'service_rating:not_circumcised') {
@@ -164,16 +165,16 @@ go.app = function() {
 
         self.states.add('states:service_rating:rating', function(name){
             return new ChoiceState(name, {
-                question: [
+                question: $([
                     "How would you rate the attitude of the health care",
                     " workers at the clinic where you got circumcised?",
-                ].join(""),
+                ].join("")),
                 choices: [
-                    new Choice("service_rating:very_bad", "Very Bad"),
-                    new Choice("service_rating:bad", "Bad"),
-                    new Choice("service_rating:ok", "OK"),
-                    new Choice("service_rating:good", "Good"),
-                    new Choice("service_rating:excellent", "Excellent")
+                    new Choice("service_rating:very_bad", $("Very Bad")),
+                    new Choice("service_rating:bad", $("Bad")),
+                    new Choice("service_rating:ok", $("OK")),
+                    new Choice("service_rating:good", $("Good")),
+                    new Choice("service_rating:excellent", $("Excellent")),
                 ],
                 next: function(choice) {
                     return 'states:service_rating:subscribed_to_post_op_sms';
@@ -184,20 +185,20 @@ go.app = function() {
         self.states.add('states:service_rating:subscribed_to_post_op_sms',
         function(name){
             return new ChoiceState(name, {
-                question: "Did you subscribe to the post op SMS service?",
+                question: $("Did you subscribe to the post op SMS service?"),
                 choices: [
                     new Choice(
                         "service_rating:subscribed_helpful",
-                        "Yes I found it helpful"),
+                        $("Yes I found it helpful")),
                     new Choice(
                         "service_rating:subscribed_not_helpful",
-                        "Yes but it was not helpful"),
+                        $("Yes but it was not helpful")),
                     new Choice(
                         "service_rating:not_subscribed",
-                        "No I chose not to subscribe"),
+                        $("No I chose not to subscribe")),
                     new Choice(
                         "service_rating:did_not_know",
-                        "I didn't know about it")
+                        $("I didn't know about it")),
                 ],
                 next: function(choice) {
                     return 'states:service_rating:end_positive';
@@ -207,14 +208,14 @@ go.app = function() {
 
         self.states.add('states:service_rating:end_positive', function(name){
             return new ChoiceState(name, {
-                question: [
+                question: $([
                     "Thanks for rating your circumcision experience. We",
                     " appreciate your feedback, it will help us improve our",
                     " MMC service.",
-                ].join(""),
+                ].join("")),
                 choices: [
-                    new Choice("states:main_menu", "Main Menu"),
-                    new Choice("states:end", "Exit")
+                    new Choice("states:main_menu", $("Main Menu")),
+                    new Choice("states:end", $("Exit")),
                 ],
                 next: function(choice) {
                     return choice.value;
@@ -224,14 +225,14 @@ go.app = function() {
 
         self.states.add('states:service_rating:end_negative', function(name){
             return new ChoiceState(name, {
-                question: [
+                question: $([
                     "Thank you for your interest. We are only looking for",
                     " ratings from men who have had their circumcision at a",
                     " clinic recently.",
-                ].join(""),
+                ].join("")),
                 choices: [
-                    new Choice("states:main_menu", "Main Menu"),
-                    new Choice("states:end", "Exit")
+                    new Choice("states:main_menu", $("Main Menu")),
+                    new Choice("states:end", $("Exit")),
                 ],
                 next: function(choice) {
                     //TODO make web request to store results
@@ -242,14 +243,15 @@ go.app = function() {
 
         self.states.add('states:brothers_for_life:start', function(name){
             return new ChoiceState(name, {
-                question: [
+                question: $([
                     "Join Brothers for Life and we'll send you free SMSs",
                     " about ur health, upcoming events & services for men.",
                     " brothersforlife.org T&Cs apply.",
-                ].join(""),
+                ].join("")),
                 choices: [
-                    new Choice("states:brothers_for_life:join", "Join"),
-                    new Choice("states:brothers_for_life:no_join", "No Thanks")
+                    new Choice("states:brothers_for_life:join", $("Join")),
+                    new Choice(
+                        "states:brothers_for_life:no_join", $("No Thanks")),
                 ],
                 next: function(choice) {
                     return choice.value;
@@ -259,14 +261,14 @@ go.app = function() {
 
         self.states.add('states:brothers_for_life:join', function(name){
             return new ChoiceState(name, {
-                question: [
+                question: $([
                     "Thank you. You will now receive Brothers for Life",
                     " updates. You can opt out at any point by replying STOP",
                     " to an SMS you receive.",
-                ].join(""),
+                ].join("")),
                 choices: [
-                    new Choice("states:main_menu", "Main Menu"),
-                    new Choice("states:end", "Exit")
+                    new Choice("states:main_menu", $("Main Menu")),
+                    new Choice("states:end", $("Exit")),
                 ],
                 next: function(choice) {
                     return choice.value;
@@ -276,14 +278,14 @@ go.app = function() {
 
         self.states.add('states:brothers_for_life:no_join', function(name){
             return new ChoiceState(name, {
-                question: [
+                question: $([
                     "You have selected not to receive Brothers for Life",
                     " updates. You can join any time in the future by",
                     " dialling *120*662#.",
-                ].join(""),
+                ].join("")),
                 choices: [
-                    new Choice("states:main_menu", "Main Menu"),
-                    new Choice("states:end", "Exit")
+                    new Choice("states:main_menu", $("Main Menu")),
+                    new Choice("states:end", $("Exit")),
                 ],
                 next: function(choice) {
                     return choice.value;
