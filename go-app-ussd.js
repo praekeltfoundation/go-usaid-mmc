@@ -30,9 +30,9 @@ go.app = function() {
         };
 
         self.states.add('states:start', function(name) {
-            if(!self.im.user.lang){
+            if (!self.im.user.lang) {
                 return self.states.create('states:select_language');
-            }else{
+            } else {
                 return self.states.create('states:main_menu');
             }
         });
@@ -81,9 +81,9 @@ go.app = function() {
                     self.contact.extra.language_choice = choice.value;
                     return self.im.contacts.save(self.contact)
                         .then(function () {
-                            if(language_previously_not_set) {
+                            if (language_previously_not_set) {
                                 return "states:main_menu";
-                            }else{
+                            } else {
                                 return 'states:language_set';
                             }
                         });
@@ -160,9 +160,9 @@ go.app = function() {
                         "I have not been circumcised")
                 ],
                 next: function(choice) {
-                    if(choice.value === 'service_rating:not_circumcised'){
+                    if (choice.value === 'service_rating:not_circumcised') {
                         return 'states:service_rating:end_negative';
-                    }else{
+                    } else {
                         return 'states:service_rating:rating';
                     }
                 }
