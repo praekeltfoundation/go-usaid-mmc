@@ -131,7 +131,7 @@ go.app = function() {
                 question: [
                     "At which clinic did you get circumcised? Please be",
                     " specific with the name and location. e.g. Peterville",
-                    " Clinic, Rivonia, Johannesburg",
+                    " Clinic, Rivonia, Johannesburg.",
                 ].join(""),
                 next: function(text) {
                     return 'states:service_rating:would_recommend';
