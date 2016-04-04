@@ -54,22 +54,191 @@ describe("app", function() {
                         state: 'states:main_menu'
                     })
                     .check(function(api, im, app) {
-                        assert.strictEqual(app.contact.extra.language_choice, 'en');
+                        assert.strictEqual(
+                            app.contact.extra.language_choice, 'en');
+                    })
+                    .run();
+            });
+        });
+
+        describe("when the user changes their language", function() {
+            it("should save the new langauge to the contact and notify the user of the change", function() {
+                return tester
+                    .setup.user.lang('en')
+                    .setup.user.state('states:main_menu')
+                    .inputs('4', '3', '2')
+                    .check.interaction({
+                        state: 'states:language_set',
+                        reply: [
+                            "Your new language choice has been saved.",
+                            "1. Main Menu",
+                            "2. Exit",
+                        ].join("\n"),
+                    })
+                    .check(function(api, im, app) {
+                        assert.strictEqual(
+                            app.contact.extra.language_choice, 'zu');
                     })
                     .run();
             });
         });
 
         describe("when the user starts a session after having set a language", function() {
-            it("should show the home menu", function() {
+            it("should show the main menu", function() {
                 return tester
                     .setup.user.lang('en')
                     .start()
                     .check.interaction({
                         state: 'states:main_menu',
                         reply: [
-                            'Hi there! What do you want to do?',
-                            '1. Show this menu again',
+                            'Medical Male Circumcision (MMC):',
+                            '1. Find a clinic',
+                            '2. Speak to an expert for FREE',
+                            '3. Get FREE SMSs about your MMC recovery',
+                            '4. More',
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when next is selected on main menu page 1", function() {
+            it("should show the main menu page 2", function() {
+                return tester
+                    .setup.user.state('states:main_menu')
+                    .input('4')
+                    .check.interaction({
+                        state: 'states:main_menu',
+                        reply: [
+                            'Medical Male Circumcision (MMC):',
+                            '1. Rate your clinic\'s MMC service',
+                            '2. Join Brothers for Life',
+                            '3. Change Language',
+                            '4. Exit',
+                            '5. Back',
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user selects 'Get FREE SMSs about your MMC recovery'", function() {
+            it("should show the healthsites menu", function() {
+                return tester
+                    .setup.user.state('states:main_menu')
+                    .input('3')
+                    .check.interaction({
+                        state: 'states:healthsites',
+                        reply: [
+                            'Welcome to Healthsites. What type of clinic are'
+                            + ' you looking for?',
+                            '1. Nearest Clinic',
+                            '2. MMC Clinic',
+                            '3. HCT Clinic'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user selects 'Rate your clinic’s MMC service'", function() {
+            it("should show the service ratings menu", function() {
+                return tester
+                    .setup.user.state('states:main_menu')
+                    .inputs('4', '1')
+                    .check.interaction({
+                        state: 'states:service_rating:location',
+                        reply: [
+                            'At which clinic did you get circumcised? Please',
+                            ' be specific with the name and location. e.g.',
+                            ' Peterville Clinic, Rivonia, Johannesburg.'
+                        ].join('')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user responds 'I have not been circumcised' in service rating question 2", function() {
+            it("should respond with 'looking for ratings by circumcised men'", function() {
+                return tester
+                    .setup.user.state('states:service_rating:location')
+                    .inputs('User entered location', '3')
+                    .check.interaction({
+                        state: 'states:service_rating:end_negative',
+                        reply: [
+                            'Thank you for your interest. We are only looking' +
+                            ' for ratings from men who have had' +
+                            ' their circumcision at a clinic recently.',
+                            '1. Main Menu',
+                            '2. Exit'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user responds 'Yes/No' in service rating question 2", function() {
+            it("should finish the questionnaire and get a Thank you response", function() {
+                return tester
+                    .setup.user.state('states:service_rating:location')
+                    .inputs('User entered location', '1', '5', '1')
+                    .check.interaction({
+                        state: 'states:service_rating:end_positive',
+                        reply: [
+                            'Thanks for rating your circumcision experience.' +
+                            ' We appreciate your feedback, it will' +
+                            ' help us improve our MMC service.',
+                            '1. Main Menu',
+                            '2. Exit'
+                        ].join('\n')
+                    })
+                    .check(function(api, im, app) {
+                        assert.deepEqual(im.user.answers, {
+                            'states:service_rating:location':
+                                'User entered location',
+                            'states:service_rating:would_recommend':
+                                'service_rating:yes_recommend',
+                            'states:service_rating:rating':
+                                'service_rating:excellent',
+                            'states:service_rating:subscribed_to_post_op_sms':
+                                'service_rating:subscribed_helpful'
+                        });
+                    })
+                    .run();
+            });
+        });
+
+        describe("when users chooses '2. Join Brothers for Life' in main menu page 2 and selects '1. Join'", function() {
+            it("should notify user that they shall receive Brothers for Life updates", function() {
+                return tester
+                    .setup.user.state('states:main_menu')
+                    .inputs('4', '2', '1')
+                    .check.interaction({
+                        state: 'states:brothers_for_life:join',
+                        reply: [
+                            'Thank you. You will now receive Brothers for' +
+                            ' Life updates. You can opt out at any' +
+                            ' point by replying STOP to an SMS you receive.',
+                            '1. Main Menu',
+                            '2. Exit'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when users chooses '2. Join Brothers for Life' in main menu page 2 and selects '2. No thanks'", function() {
+            it("should inform the user how to join Brothers for Life later if they wish.", function() {
+                return tester
+                    .setup.user.state('states:main_menu')
+                    .inputs('4', '2', '2')
+                    .check.interaction({
+                        state: 'states:brothers_for_life:no_join',
+                        reply: [
+                            'You have selected not to receive Brothers for' +
+                            ' Life updates. You can join any time in' +
+                            ' the future by dialling *120*662#.',
+                            '1. Main Menu',
                             '2. Exit'
                         ].join('\n')
                     })
