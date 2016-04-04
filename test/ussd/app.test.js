@@ -54,23 +54,30 @@ describe("app", function() {
                         state: 'states:main_menu'
                     })
                     .check(function(api, im, app) {
-                        assert.strictEqual(app.contact.extra.language_choice, 'en');
+                        assert.strictEqual(
+                            app.contact.extra.language_choice, 'en');
                     })
                     .run();
             });
         });
 
-        describe("when the user selects a '3. Change Language' from main menu page 2 and selects a new language", function() {
-            it("should save result to contact and notify user of language change", function() {
+        describe("when the user changes their language", function() {
+            it("should save the new langauge to the contact and notify the user of the change", function() {
                 return tester
                     .setup.user.lang('en')
                     .setup.user.state('states:main_menu')
                     .inputs('4', '3', '2')
                     .check.interaction({
-                        state: 'states:language_set'
+                        state: 'states:language_set',
+                        reply: [
+                            "Your new language choice has been saved.",
+                            "1. Main Menu",
+                            "2. Exit",
+                        ].join("\n"),
                     })
                     .check(function(api, im, app) {
-                        assert.strictEqual(app.contact.extra.language_choice, 'zu');
+                        assert.strictEqual(
+                            app.contact.extra.language_choice, 'zu');
                     })
                     .run();
             });
@@ -115,7 +122,7 @@ describe("app", function() {
             });
         });
 
-        describe("when user selects 'Get FREE SMSs about your MMC recovery'  on main menu page 1", function() {
+        describe("when user selects 'Get FREE SMSs about your MMC recovery'", function() {
             it("should show the healthsites menu", function() {
                 return tester
                     .setup.user.state('states:main_menu')
@@ -123,7 +130,8 @@ describe("app", function() {
                     .check.interaction({
                         state: 'states:healthsites',
                         reply: [
-                            'Welcome to Healthsites. What type of clinic are you looking for?',
+                            'Welcome to Healthsites. What type of clinic are'
+                            + ' you looking for?',
                             '1. Nearest Clinic',
                             '2. MMC Clinic',
                             '3. HCT Clinic'
@@ -133,7 +141,7 @@ describe("app", function() {
             });
         });
 
-        describe("when user selects '1. Rate your clinic’s MMC service' on main menu page 2", function() {
+        describe("when user selects 'Rate your clinic’s MMC service'", function() {
             it("should show the service ratings menu", function() {
                 return tester
                     .setup.user.state('states:main_menu')
@@ -141,9 +149,10 @@ describe("app", function() {
                     .check.interaction({
                         state: 'states:service_rating:location',
                         reply: [
-                            'At which clinic did you get circumcised? Please be specific with the name and ' +
-                            'location. e.g. Peterville Clinic, Rivonia, Johannesburg'
-                        ].join('\n')
+                            'At which clinic did you get circumcised? Please',
+                            ' be specific with the name and location. e.g.',
+                            ' Peterville Clinic, Rivonia, Johannesburg.'
+                        ].join('')
                     })
                     .run();
             });
@@ -157,8 +166,9 @@ describe("app", function() {
                     .check.interaction({
                         state: 'states:service_rating:end_negative',
                         reply: [
-                            'Thank you for your interest. We are only looking for ratings from men who have had ' +
-                            'their circumcision at a clinic recently.',
+                            'Thank you for your interest. We are only looking' +
+                            ' for ratings from men who have had' +
+                            ' their circumcision at a clinic recently.',
                             '1. Main Menu',
                             '2. Exit'
                         ].join('\n')
@@ -175,18 +185,23 @@ describe("app", function() {
                     .check.interaction({
                         state: 'states:service_rating:end_positive',
                         reply: [
-                            'Thanks for rating your circumcision experience. We appreciate your feedback, it will ' +
-                            'help us improve our MMC service.',
+                            'Thanks for rating your circumcision experience.' +
+                            ' We appreciate your feedback, it will' +
+                            ' help us improve our MMC service.',
                             '1. Main Menu',
                             '2. Exit'
                         ].join('\n')
                     })
                     .check(function(api, im, app) {
                         assert.deepEqual(im.user.answers, {
-                            'states:service_rating:location': 'User entered location',
-                            'states:service_rating:would_recommend': 'service_rating:yes_recommend',
-                            'states:service_rating:rating': 'service_rating:excellent',
-                            'states:service_rating:subscribed_to_post_op_sms': 'service_rating:subscribed_helpful'
+                            'states:service_rating:location':
+                                'User entered location',
+                            'states:service_rating:would_recommend':
+                                'service_rating:yes_recommend',
+                            'states:service_rating:rating':
+                                'service_rating:excellent',
+                            'states:service_rating:subscribed_to_post_op_sms':
+                                'service_rating:subscribed_helpful'
                         });
                     })
                     .run();
@@ -201,8 +216,9 @@ describe("app", function() {
                     .check.interaction({
                         state: 'states:brothers_for_life:join',
                         reply: [
-                            'Thank you. You will now receive Brothers for Life updates. You can opt out at any ' +
-                            'point by replying STOP to an SMS you receive.',
+                            'Thank you. You will now receive Brothers for' +
+                            ' Life updates. You can opt out at any' +
+                            ' point by replying STOP to an SMS you receive.',
                             '1. Main Menu',
                             '2. Exit'
                         ].join('\n')
@@ -219,8 +235,9 @@ describe("app", function() {
                     .check.interaction({
                         state: 'states:brothers_for_life:no_join',
                         reply: [
-                            'You have selected not to receive Brothers for Life updates. You can join any time in ' +
-                            'the future by dialling *120*662#.',
+                            'You have selected not to receive Brothers for' +
+                            ' Life updates. You can join any time in' +
+                            ' the future by dialling *120*662#.',
                             '1. Main Menu',
                             '2. Exit'
                         ].join('\n')
