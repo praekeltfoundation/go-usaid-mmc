@@ -31,16 +31,16 @@ go.app = function() {
             }
         });
 
-        self.states.add('state_main_menu', function(name){
+        self.states.add('state_main_menu', function(name) {
             return new PaginatedChoiceState(name, {
                 question: $('Medical Male Circumcision (MMC):'),
                 characters_per_page: 160,
                 options_per_page: null,
                 choices: [
-                    new Choice('state_end', $('Find a clinic')),
+                    new Choice('state_healthsites', $('Find a clinic')),
                     new Choice('state_end', $('Speak to an expert for FREE')),
                     new Choice(
-                        'state_healthsites',
+                        'state_op',
                         $('Get FREE SMSs about your MMC recovery')),
                     new Choice(
                         'state_servicerating_location',
@@ -68,7 +68,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_select_language', function(name){
+        self.states.add('state_select_language', function(name) {
             var language_previously_not_set = self.im.user.lang === null;
             return new LanguageChoice(name, {
                 next: function(choice) {
@@ -96,7 +96,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_language_set', function(name){
+        self.states.add('state_language_set', function(name) {
             return new ChoiceState(name, {
                 question: $("Your new language choice has been saved."),
                 choices: [
@@ -109,7 +109,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_healthsites', function(name){
+        self.states.add('state_healthsites', function(name) {
             return new ChoiceState(name, {
                 question: $([
                     "Welcome to Healthsites. What type of clinic are you",
@@ -126,7 +126,124 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_servicerating_location', function(name){
+        // ChoiceState st-F1
+        self.states.add('state_op', function(name) {
+            return new ChoiceState(name, {
+                question: $([
+                    "We need to know when you had your MMC to send you the ",
+                    "correct SMSs. Please select:",
+                ].join("")),
+                choices: [
+                    new Choice("state_consent", $("Today")),
+                    new Choice("state_consent", $("Yesterday")),
+                    new Choice("state_op_day", $("May '15")),
+                    new Choice("state_op_day", $("June '15")),
+                    new Choice("state_op_day", $("July '15")),
+                    new Choice("state_pre_op", $("I haven't had my operation yet"))
+                ],
+                next: function(choice) {
+                    //self.im.user.set_answer("op_date", )  // save month and year first, then add day at next state
+                    return choice.value;
+                }
+            });
+        });
+
+        // FreeText st-F2
+        self.states.add('state_op_day', function(name) {
+            return new FreeText(name, {
+                question: $([
+                    "Please input the day you had your operation. For example, "
+                    + "12.",
+                ].join("")),
+                next: function(text) {
+                    /*return {
+                        name: "state_check_date_diff",
+                        creator_opts: text
+                    };*/
+                    return "state_consent";
+                }
+            });
+        });
+
+        // interstitial to check whether date is < or >= 6weeks in the past
+        /*self.states.add('state_check_date_diff', function(name) {
+
+        });*/
+
+        // ChoiceState st-F3
+        self.states.add('state_consent', function(name) {
+            return new ChoiceState(name, {
+                question: $([
+                    "Do you consent to:\n",
+                    "- Receiving some SMSs on public ",
+                    "holidays, weekends & before 8am?\n",
+                    "- Having ur cell# & language info stored so we can send u",
+                    " SMSs?"
+                ].join("")),
+                choices: [
+                    new Choice("yes", $("Yes")),
+                    new Choice("state_consent_no", $("No"))
+                ],
+                next: function(choice) {
+                    return choice.value;
+                }
+            });
+        });
+
+        // ChoiceState st-F4
+        self.states.add('state_pre_op', function(name) {
+            return new ChoiceState(name, {
+                question: $("Thank you for your interest in MMC. Unfortunately,"
+                    + " you can only register once you have had your "
+                    + "operation."),
+                choices: [
+                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_end", $("Exit"))
+                ],
+                next: function(choice) {
+                    return choice.value;
+                }
+            });
+        });
+
+        // ChoiceState st-F5
+        self.states.add('state_6week_notice', function(name) {
+            return new ChoiceState(name, {
+                question: $([
+                    "We're sorry but we only send SMSs up to 6 weeks after an ",
+                    + "operation. If your wound has not yet healed please ",
+                    + "visit the clinic. But would you like to hear about ",
+                    + "upcoming events and new services for the Brothers for ",
+                    + "Life community?"
+                ].join("")),
+                choices: [
+                    new Choice("yes", $("Yes")),
+                    new Choice("no", $("No"))
+                ],
+                next: function(choice) {
+                    return choice.value;
+                }
+            });
+        });
+
+        // ChoiceState st-F6
+        self.states.add('state_consent_no', function(name) {
+            return new ChoiceState(name, {
+                question: $([
+                    "Without your consent, we cannot send you messages."
+                ].join("")),
+                choices: [
+                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_consent", $("Back")),
+                    new Choice("state_end", $("Exit"))
+                ],
+                next: function(choice) {
+                    return choice.value;
+                }
+            });
+        });
+
+        self.states.add('state_servicerating_location', function(name) {
             self.im.user.answers = {};
             return new FreeText(name, {
                 question: $([
@@ -140,7 +257,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_servicerating_would_recommend', function(name){
+        self.states.add('state_servicerating_would_recommend', function(name) {
             return new ChoiceState(name, {
                 question: $([
                     "Would you recommend a friend to the clinic where you",
@@ -163,7 +280,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_servicerating_rating', function(name){
+        self.states.add('state_servicerating_rating', function(name) {
             return new ChoiceState(name, {
                 question: $([
                     "How would you rate the attitude of the health care",
@@ -183,7 +300,7 @@ go.app = function() {
         });
 
         self.states.add('state_servicerating_subscribed_to_post_op_sms',
-        function(name){
+        function(name) {
             return new ChoiceState(name, {
                 question: $("Did you subscribe to the post op SMS service?"),
                 choices: [
@@ -206,7 +323,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_servicerating_end_positive', function(name){
+        self.states.add('state_servicerating_end_positive', function(name) {
             return new ChoiceState(name, {
                 question: $([
                     "Thanks for rating your circumcision experience. We",
@@ -223,7 +340,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_servicerating_end_negative', function(name){
+        self.states.add('state_servicerating_end_negative', function(name) {
             return new ChoiceState(name, {
                 question: $([
                     "Thank you for your interest. We are only looking for",
@@ -241,7 +358,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_bfl_start', function(name){
+        self.states.add('state_bfl_start', function(name) {
             return new ChoiceState(name, {
                 question: $([
                     "Join Brothers for Life and we'll send you free SMSs",
@@ -259,7 +376,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_bfl_join', function(name){
+        self.states.add('state_bfl_join', function(name) {
             return new ChoiceState(name, {
                 question: $([
                     "Thank you. You will now receive Brothers for Life",
@@ -276,7 +393,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_bfl_no_join', function(name){
+        self.states.add('state_bfl_no_join', function(name) {
             return new ChoiceState(name, {
                 question: $([
                     "You have selected not to receive Brothers for Life",

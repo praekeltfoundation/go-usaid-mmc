@@ -4,8 +4,8 @@ var AppTester = vumigo.AppTester;
 var assert = require('assert');
 
 
-describe("app", function() {
-    describe("GoApp", function() {
+describe("MMC App", function() {
+    describe("USSD", function() {
         var app;
         var tester;
 
@@ -15,6 +15,7 @@ describe("app", function() {
             tester = new AppTester(app);
 
             tester
+                .setup.char_limit(182)
                 .setup.config.app({
                     name: 'test_app'
                 })
@@ -122,11 +123,11 @@ describe("app", function() {
             });
         });
 
-        describe("when user selects 'Get FREE SMSs about your MMC recovery'", function() {
+        describe("when user selects 'Find a clinic'", function() {
             it("should show the healthsites menu", function() {
                 return tester
                     .setup.user.state('state_main_menu')
-                    .input('3')
+                    .input('1')
                     .check.interaction({
                         state: 'state_healthsites',
                         reply: [
@@ -135,6 +136,117 @@ describe("app", function() {
                             '1. Nearest Clinic',
                             '2. MMC Clinic',
                             '3. HCT Clinic'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user selects 'Get FREE SMSs about your MMC recovery'", function() {
+            it("should respond with asking when op was done", function() {
+                return tester
+                    .setup.user.state('state_main_menu')
+                    .input('3')
+                    .check.interaction({
+                        state: 'state_op',
+                        reply: [
+                            "We need to know when you had your MMC to send you "
+                            + "the correct SMSs. Please select:",
+                            "1. Today",
+                            "2. Yesterday",
+                            "3. May '15",
+                            "4. June '15",
+                            "5. July '15",
+                            "6. I haven't had my operation yet"
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user selects 'I haven't had my operation yet'", function() {
+            it("should respond with stating registration is only possible after op", function() {
+                return tester
+                    .setup.user.state('state_main_menu')
+                    .inputs('3', '6')
+                    .check.interaction({
+                        state: 'state_pre_op',
+                        reply: [
+                            "Thank you for your interest in MMC. Unfortunately, you can"
+                            + " only register once you have had your operation.",
+                            "1. Main Menu",
+                            "2. Exit"
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        /*describe("when user selects 'Get FREE SMSs about your MMC recovery'", function() {
+            it("should respond with asking when op was done", function() {
+                return tester
+                    .setup.user.state('state_main_menu')
+                    .input('3', '6')
+                    .check.interaction({
+                        state: 'state_op',
+                        reply: [
+                            "We need to know when you had your MMC to send you "
+                            + "the correct SMSs. Please select:",
+                            "1. I haven't had my operation yet",
+                            "2. Back"
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });*/
+
+        describe("when user selects option 1 or 2", function() {
+            it("should respond with 'Do u consent to'", function() {
+                return tester
+                    .setup.user.state('state_main_menu')
+                    .inputs('3', '1')
+                    .check.interaction({
+                        state: 'state_consent',
+                        reply: [
+                            "Do you consent to:\n"
+                            + "- Receiving some SMSs on public holidays, "
+                            + "weekends & before 8am?\n"
+                            + "- Having ur cell# & language info stored so we "
+                            + "can send u SMSs?",
+                            "1. Yes",
+                            "2. No"
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user selects option 3, 4, 5", function() {
+            it("should respond with 'Please input the day'", function() {
+                return tester
+                    .setup.user.state('state_main_menu')
+                    .inputs('3', '4')
+                    .check.interaction({
+                        state: 'state_op_day',
+                        reply: "Please input the day you had your operation. "
+                            + "For example, 12."
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user doesn't consent", function() {
+            it("should respond with 'Without your consent'", function() {
+                return tester
+                    .setup.user.state('state_main_menu')
+                    .inputs('3', '1', '2')
+                    .check.interaction({
+                        state: 'state_consent_no',
+                        reply: [
+                            "Without your consent, we cannot send you messages.",
+                            "1. Main Menu",
+                            "2. Back",
+                            "3. Exit"
                         ].join('\n')
                     })
                     .run();
