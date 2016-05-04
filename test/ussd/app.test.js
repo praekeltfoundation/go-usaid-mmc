@@ -17,7 +17,8 @@ describe("MMC App", function() {
             tester
                 .setup.char_limit(182)
                 .setup.config.app({
-                    name: 'test_app'
+                    name: 'test_app',
+                    testing_today: '2015-05-03 06:07:08.999'
                 })
                 .setup(function(api) {
                     fixtures().forEach(api.http.fixtures.add);

@@ -7,10 +7,95 @@ go.app = function() {
     var LanguageChoice = vumigo.states.LanguageChoice;
     var PaginatedChoiceState = vumigo.states.PaginatedChoiceState;
     var EndState = vumigo.states.EndState;
+    var moment = require('moment');
 
     var GoApp = App.extend(function(self) {
         App.call(self, 'state_start');
         var $ = self.$;
+
+        get_today = function(config) {
+            if (config.testing_today) {
+                return new moment(config.testing_today, 'YYYY-MM-DD');
+            } else {
+                return new moment();
+            }
+        };
+
+        make_month_choices = function($, startDate, limit, increment, valueFormat, labelFormat) {
+          // Currently supports month translation in formats MMMM and MM
+
+            var choices = [];
+            var monthIterator = startDate;
+            for (var i=0; i<limit; i++) {
+                var raw_label = monthIterator.format(labelFormat);
+                var prefix, suffix, month, translation;
+
+                var quad_month_index = labelFormat.indexOf("MMMM");
+                var trip_month_index = labelFormat.indexOf("MMM");
+
+                if (quad_month_index > -1) {
+                    month = monthIterator.format("MMMM");
+                    prefix = raw_label.substring(0, quad_month_index);
+                    suffix = raw_label.substring(quad_month_index+month.length, raw_label.length);
+                    translation = {
+                        January: $("{{pre}}January{{post}}"),
+                        February: $("{{pre}}February{{post}}"),
+                        March: $("{{pre}}March{{post}}"),
+                        April: $("{{pre}}April{{post}}"),
+                        May: $("{{pre}}May{{post}}"),
+                        June: $("{{pre}}June{{post}}"),
+                        July: $("{{pre}}July{{post}}"),
+                        August: $("{{pre}}August{{post}}"),
+                        September: $("{{pre}}September{{post}}"),
+                        October: $("{{pre}}October{{post}}"),
+                        November: $("{{pre}}November{{post}}"),
+                        December: $("{{pre}}December{{post}}"),
+                    };
+                    translated_label = translation[month].context({
+                        pre: prefix,
+                        post: suffix
+                    });
+                } else if (trip_month_index > -1) {
+                    month = monthIterator.format("MMM");
+                    prefix = raw_label.substring(0, trip_month_index);
+                    suffix = raw_label.substring(trip_month_index+month.length, raw_label.length);
+                    translation = {
+                        Jan: $("{{pre}}Jan{{post}}"),
+                        Feb: $("{{pre}}Feb{{post}}"),
+                        Mar: $("{{pre}}Mar{{post}}"),
+                        Apr: $("{{pre}}Apr{{post}}"),
+                        May: $("{{pre}}May{{post}}"),
+                        Jun: $("{{pre}}Jun{{post}}"),
+                        Jul: $("{{pre}}Jul{{post}}"),
+                        Aug: $("{{pre}}Aug{{post}}"),
+                        Sep: $("{{pre}}Sep{{post}}"),
+                        Oct: $("{{pre}}Oct{{post}}"),
+                        Nov: $("{{pre}}Nov{{post}}"),
+                        Dec: $("{{pre}}Dec{{post}}"),
+                    };
+                    translated_label = translation[month].context({
+                        pre: prefix,
+                        post: suffix
+                    });
+                } else {
+                    // assume numbers don't need translation
+                    translated_label = raw_label;
+                }
+
+                choices.push(new Choice(monthIterator.format(valueFormat),
+                                        translated_label));
+                monthIterator.add(increment, 'months');
+            }
+
+            return choices;
+        };
+
+        is_date_diff_less_than_6weeks = function(im, date) {
+            /*var today = get_today(im.config);
+            console.log(date.diff(today, "weeks"));
+            return date.diff(today, "weeks") < 6;*/
+            return true;
+        };
 
         self.init = function() {
             // Fetch the contact from the contact store that matches the current
@@ -128,6 +213,8 @@ go.app = function() {
 
         // ChoiceState st-F1
         self.states.add('state_op', function(name) {
+            var today = get_today(self.im.config);
+            var month_choice = make_month_choices($, today, 3, 1, "YYYYMM", "MMMM 'YY");
             return new ChoiceState(name, {
                 question: $([
                     "We need to know when you had your MMC to send you the ",
@@ -136,39 +223,43 @@ go.app = function() {
                 choices: [
                     new Choice("state_consent", $("Today")),
                     new Choice("state_consent", $("Yesterday")),
-                    new Choice("state_op_day", $("May '15")),
-                    new Choice("state_op_day", $("June '15")),
-                    new Choice("state_op_day", $("July '15")),
+                    month_choice[0],
+                    month_choice[1],
+                    month_choice[2],
                     new Choice("state_pre_op", $("I haven't had my operation yet"))
                 ],
                 next: function(choice) {
                     //self.im.user.set_answer("op_date", )  // save month and year first, then add day at next state
-                    return choice.value;
+                    if (choice.value === "state_consent" ||
+                        choice.value === "state_pre_op") {
+
+                        return choice.value;
+                    } else {
+                        return {
+                            name: "state_op_day",
+                            creator_opts: choice.value
+                        };
+                    }
                 }
             });
         });
 
         // FreeText st-F2
-        self.states.add('state_op_day', function(name) {
+        self.states.add('state_op_day', function(name, month_year) {
             return new FreeText(name, {
                 question: $([
                     "Please input the day you had your operation. For example, "
                     + "12.",
                 ].join("")),
                 next: function(text) {
-                    /*return {
-                        name: "state_check_date_diff",
-                        creator_opts: text
-                    };*/
-                    return "state_consent";
+                    if (is_date_diff_less_than_6weeks(text+month_year)) {
+                        return "state_consent";
+                    } else {
+                        return "state_6week_notice";
+                    }
                 }
             });
         });
-
-        // interstitial to check whether date is < or >= 6weeks in the past
-        /*self.states.add('state_check_date_diff', function(name) {
-
-        });*/
 
         // ChoiceState st-F3
         self.states.add('state_consent', function(name) {
