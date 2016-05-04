@@ -28,7 +28,7 @@ describe("app", function() {
                 return tester
                     .start()
                     .check.interaction({
-                        state: 'states:select_language',
+                        state: 'state_select_language',
                         reply: [
                             'Welcome to MMC Service. Choose your language:',
                             '1. English',
@@ -48,10 +48,10 @@ describe("app", function() {
         describe("when the user selects a language", function() {
             it("should save result to contact and display the main menu", function() {
                 return tester
-                    .setup.user.state('states:select_language')
+                    .setup.user.state('state_select_language')
                     .input('1')
                     .check.interaction({
-                        state: 'states:main_menu'
+                        state: 'state_main_menu'
                     })
                     .check(function(api, im, app) {
                         assert.strictEqual(
@@ -65,10 +65,10 @@ describe("app", function() {
             it("should save the new langauge to the contact and notify the user of the change", function() {
                 return tester
                     .setup.user.lang('en')
-                    .setup.user.state('states:main_menu')
+                    .setup.user.state('state_main_menu')
                     .inputs('4', '3', '2')
                     .check.interaction({
-                        state: 'states:language_set',
+                        state: 'state_language_set',
                         reply: [
                             "Your new language choice has been saved.",
                             "1. Main Menu",
@@ -89,7 +89,7 @@ describe("app", function() {
                     .setup.user.lang('en')
                     .start()
                     .check.interaction({
-                        state: 'states:main_menu',
+                        state: 'state_main_menu',
                         reply: [
                             'Medical Male Circumcision (MMC):',
                             '1. Find a clinic',
@@ -105,10 +105,10 @@ describe("app", function() {
         describe("when next is selected on main menu page 1", function() {
             it("should show the main menu page 2", function() {
                 return tester
-                    .setup.user.state('states:main_menu')
+                    .setup.user.state('state_main_menu')
                     .input('4')
                     .check.interaction({
-                        state: 'states:main_menu',
+                        state: 'state_main_menu',
                         reply: [
                             'Medical Male Circumcision (MMC):',
                             '1. Rate your clinic\'s MMC service',
@@ -125,10 +125,10 @@ describe("app", function() {
         describe("when user selects 'Get FREE SMSs about your MMC recovery'", function() {
             it("should show the healthsites menu", function() {
                 return tester
-                    .setup.user.state('states:main_menu')
+                    .setup.user.state('state_main_menu')
                     .input('3')
                     .check.interaction({
-                        state: 'states:healthsites',
+                        state: 'state_healthsites',
                         reply: [
                             'Welcome to Healthsites. What type of clinic are'
                             + ' you looking for?',
@@ -144,10 +144,10 @@ describe("app", function() {
         describe("when user selects 'Rate your clinic’s MMC service'", function() {
             it("should show the service ratings menu", function() {
                 return tester
-                    .setup.user.state('states:main_menu')
+                    .setup.user.state('state_main_menu')
                     .inputs('4', '1')
                     .check.interaction({
-                        state: 'states:service_rating:location',
+                        state: 'state_servicerating_location',
                         reply: [
                             'At which clinic did you get circumcised? Please',
                             ' be specific with the name and location. e.g.',
@@ -161,10 +161,10 @@ describe("app", function() {
         describe("when user responds 'I have not been circumcised' in service rating question 2", function() {
             it("should respond with 'looking for ratings by circumcised men'", function() {
                 return tester
-                    .setup.user.state('states:service_rating:location')
+                    .setup.user.state('state_servicerating_location')
                     .inputs('User entered location', '3')
                     .check.interaction({
-                        state: 'states:service_rating:end_negative',
+                        state: 'state_servicerating_end_negative',
                         reply: [
                             'Thank you for your interest. We are only looking' +
                             ' for ratings from men who have had' +
@@ -180,10 +180,10 @@ describe("app", function() {
         describe("when user responds 'Yes/No' in service rating question 2", function() {
             it("should finish the questionnaire and get a Thank you response", function() {
                 return tester
-                    .setup.user.state('states:service_rating:location')
+                    .setup.user.state('state_servicerating_location')
                     .inputs('User entered location', '1', '5', '1')
                     .check.interaction({
-                        state: 'states:service_rating:end_positive',
+                        state: 'state_servicerating_end_positive',
                         reply: [
                             'Thanks for rating your circumcision experience.' +
                             ' We appreciate your feedback, it will' +
@@ -194,14 +194,14 @@ describe("app", function() {
                     })
                     .check(function(api, im, app) {
                         assert.deepEqual(im.user.answers, {
-                            'states:service_rating:location':
+                            'state_servicerating_location':
                                 'User entered location',
-                            'states:service_rating:would_recommend':
-                                'service_rating:yes_recommend',
-                            'states:service_rating:rating':
-                                'service_rating:excellent',
-                            'states:service_rating:subscribed_to_post_op_sms':
-                                'service_rating:subscribed_helpful'
+                            'state_servicerating_would_recommend':
+                                'servicerating_yes_recommend',
+                            'state_servicerating_rating':
+                                'servicerating_excellent',
+                            'state_servicerating_subscribed_to_post_op_sms':
+                                'servicerating_subscribed_helpful'
                         });
                     })
                     .run();
@@ -211,10 +211,10 @@ describe("app", function() {
         describe("when users chooses '2. Join Brothers for Life' in main menu page 2 and selects '1. Join'", function() {
             it("should notify user that they shall receive Brothers for Life updates", function() {
                 return tester
-                    .setup.user.state('states:main_menu')
+                    .setup.user.state('state_main_menu')
                     .inputs('4', '2', '1')
                     .check.interaction({
-                        state: 'states:brothers_for_life:join',
+                        state: 'state_bfl_join',
                         reply: [
                             'Thank you. You will now receive Brothers for' +
                             ' Life updates. You can opt out at any' +
@@ -230,10 +230,10 @@ describe("app", function() {
         describe("when users chooses '2. Join Brothers for Life' in main menu page 2 and selects '2. No thanks'", function() {
             it("should inform the user how to join Brothers for Life later if they wish.", function() {
                 return tester
-                    .setup.user.state('states:main_menu')
+                    .setup.user.state('state_main_menu')
                     .inputs('4', '2', '2')
                     .check.interaction({
-                        state: 'states:brothers_for_life:no_join',
+                        state: 'state_bfl_no_join',
                         reply: [
                             'You have selected not to receive Brothers for' +
                             ' Life updates. You can join any time in' +
