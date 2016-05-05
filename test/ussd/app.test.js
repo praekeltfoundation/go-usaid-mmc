@@ -236,6 +236,85 @@ describe("MMC App", function() {
             });
         });
 
+        describe("when user select a date that is >= 6 weeks", function() {
+            it("should respond with 'We are sorry but we only...'", function() {
+                return tester
+                    .setup.user.state('state_main_menu')
+                    .inputs('3', '4', '20')
+                    .check.interaction({
+                        state: 'state_6week_notice',
+                        reply: [
+                            "We only send SMSs up to 6 wks after MMC. Visit "
+                            + "the clinic if you aren't healed. If you'd like "
+                            + "to hear about events & services from Brothers "
+                            + "for Life?",
+                            "1. Yes",
+                            "2. No"
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user select a date that is < 6 weeks", function() {
+            it("should respond with 'Do u consent...'", function() {
+                return tester
+                    .setup.user.state('state_main_menu')
+                    .inputs('3', '4', '5')
+                    .check.interaction({
+                        state: 'state_consent',
+                        reply: [
+                            "Do you consent to:\n"
+                            + "- Receiving some SMSs on public holidays, "
+                            + "weekends & before 8am?\n"
+                            + "- Having ur cell# & language info stored so we "
+                            + "can send u SMSs?",
+                            "1. Yes",
+                            "2. No"
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user chooses to join BFL", function() {
+            it("should respond with 'Thank you...'", function() {
+                return tester
+                    .setup.user.state('state_main_menu')
+                    .inputs('3', '4', '20', '1')
+                    .check.interaction({
+                        state: 'state_bfl_join',
+                        reply: [
+                            'Thank you. You will now receive Brothers for' +
+                            ' Life updates. You can opt out at any' +
+                            ' point by replying STOP to an SMS you receive.',
+                            '1. Main Menu',
+                            '2. Exit'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user chooses to not to join BFL", function() {
+            it("should respond with 'You have selected...'", function() {
+                return tester
+                    .setup.user.state('state_main_menu')
+                    .inputs('3', '4', '20', '2')
+                    .check.interaction({
+                        state: 'state_bfl_no_join',
+                        reply: [
+                            'You have selected not to receive Brothers for' +
+                            ' Life updates. You can join any time in' +
+                            ' the future by dialling *120*662#.',
+                            '1. Main Menu',
+                            '2. Exit'
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
         describe("when user doesn't consent", function() {
             it("should respond with 'Without your consent'", function() {
                 return tester

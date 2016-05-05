@@ -90,11 +90,12 @@ go.app = function() {
             return choices;
         };
 
+        // date parameter being a date string in YYYYMMDD format
         is_date_diff_less_than_6weeks = function(im, date) {
-            /*var today = get_today(im.config);
-            console.log(date.diff(today, "weeks"));
-            return date.diff(today, "weeks") < 6;*/
-            return true;
+            var today = get_today(im.config);
+            var d = new moment(date, 'YYYYMMDD');
+
+            return d.diff(today, "weeks") < 6;
         };
 
         self.init = function() {
@@ -252,7 +253,10 @@ go.app = function() {
                     + "12.",
                 ].join("")),
                 next: function(text) {
-                    if (is_date_diff_less_than_6weeks(text+month_year)) {
+                    // add a zero to input if a single-digit number
+                    if (text.length == 1) text = "0" + text;
+
+                    if (is_date_diff_less_than_6weeks(self.im, month_year+text)) {
                         return "state_consent";
                     } else {
                         return "state_6week_notice";
@@ -301,18 +305,19 @@ go.app = function() {
         self.states.add('state_6week_notice', function(name) {
             return new ChoiceState(name, {
                 question: $([
-                    "We're sorry but we only send SMSs up to 6 weeks after an ",
-                    + "operation. If your wound has not yet healed please ",
-                    + "visit the clinic. But would you like to hear about ",
-                    + "upcoming events and new services for the Brothers for ",
-                    + "Life community?"
+                    "We only send SMSs up to 6 wks after MMC. Visit the clinic "
+                    + "if you aren't healed. If you'd like to hear about "
+                    + "events & services from Brothers for Life?"
                 ].join("")),
                 choices: [
-                    new Choice("yes", $("Yes")),
-                    new Choice("no", $("No"))
+                    new Choice("state_bfl_join", $("Yes")),
+                    new Choice("state_bfl_no_join", $("No"))
                 ],
                 next: function(choice) {
-                    return choice.value;
+                    return {
+                        name: choice.value,
+                        creator_opts: true
+                    };
                 }
             });
         });
@@ -331,6 +336,17 @@ go.app = function() {
                 next: function(choice) {
                     return choice.value;
                 }
+            });
+        });
+
+        self.states.add('state_end_registration', function(name) {
+            return new EndState(name, {
+                text: $([
+                    "Thank you. You are now subscrbd to MMC msgs. Remember if "
+                    + "u hav prolonged pain, visit ur nearest clinic. Call "
+                    + "0800212685 or send a please call me to 0828816202",
+                ].join('')),
+                next: 'state_start'
             });
         });
 
@@ -462,12 +478,15 @@ go.app = function() {
                         "state_bfl_no_join", $("No Thanks")),
                 ],
                 next: function(choice) {
-                    return choice.value;
+                    return {
+                        name: choice.value,
+                        creator_opts: false
+                    };
                 }
             });
         });
 
-        self.states.add('state_bfl_join', function(name) {
+        self.states.add('state_bfl_join', function(name, post_op_registration) {
             return new ChoiceState(name, {
                 question: $([
                     "Thank you. You will now receive Brothers for Life",
@@ -479,12 +498,22 @@ go.app = function() {
                     new Choice("state_end", $("Exit")),
                 ],
                 next: function(choice) {
-                    return choice.value;
+                    if (choice.value !== "state_main_menu") {
+                        return {
+                            name: post_op_registration
+                                ? "state_end_registration"
+                                : choice.value,
+                            creator_opts: post_op_registration
+                        };
+                    } else {
+                        return choice.value;
+                    }
+
                 }
             });
         });
 
-        self.states.add('state_bfl_no_join', function(name) {
+        self.states.add('state_bfl_no_join', function(name, post_op_registration) {
             return new ChoiceState(name, {
                 question: $([
                     "You have selected not to receive Brothers for Life",
@@ -496,7 +525,16 @@ go.app = function() {
                     new Choice("state_end", $("Exit")),
                 ],
                 next: function(choice) {
-                    return choice.value;
+                    if (choice.value !== "state_main_menu") {
+                        return {
+                            name: post_op_registration
+                                ? "state_end_registration"
+                                : choice.value,
+                            creator_opts: post_op_registration
+                        };
+                    } else {
+                        return choice.value;
+                    }
                 }
             });
         });
