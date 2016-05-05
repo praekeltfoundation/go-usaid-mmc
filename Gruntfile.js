@@ -91,17 +91,14 @@ module.exports = function (grunt) {
         },
 
         mochaTest: {
+            options: {
+                reporter: 'spec'
+            },
             test_sms: {
-                src: ['<%= paths.test_sms %>'],
-                options: {
-                    reporter: 'spec'
-                }
+                src: ['<%= paths.test_sms %>']
             },
             test_ussd: {
-                src: ['<%= paths.test_ussd %>'],
-                options: {
-                    reporter: 'spec'
-                }
+                src: ['<%= paths.test_ussd %>']
             }
         }
     });
