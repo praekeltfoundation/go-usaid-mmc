@@ -277,7 +277,7 @@ go.app = function() {
                 ].join("")),
                 choices: [
                     new Choice("yes", $("Yes")),
-                    new Choice("state_consent_no", $("No"))
+                    new Choice("state_consent_withheld", $("No"))
                 ],
                 next: function(choice) {
                     return choice.value;
@@ -323,7 +323,7 @@ go.app = function() {
         });
 
         // ChoiceState st-F6
-        self.states.add('state_consent_no', function(name) {
+        self.states.add('state_consent_withheld', function(name) {
             return new ChoiceState(name, {
                 question: $([
                     "Without your consent, we cannot send you messages."

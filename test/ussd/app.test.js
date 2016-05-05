@@ -183,26 +183,8 @@ describe("MMC App", function() {
             });
         });
 
-        /*describe("when user selects 'Get FREE SMSs about your MMC recovery'", function() {
-            it("should respond with asking when op was done", function() {
-                return tester
-                    .setup.user.state('state_main_menu')
-                    .input('3', '6')
-                    .check.interaction({
-                        state: 'state_op',
-                        reply: [
-                            "We need to know when you had your MMC to send you "
-                            + "the correct SMSs. Please select:",
-                            "1. I haven't had my operation yet",
-                            "2. Back"
-                        ].join('\n')
-                    })
-                    .run();
-            });
-        });*/
-
         describe("when user selects option 1 or 2", function() {
-            it("should respond with 'Do u consent to'", function() {
+            it("should respond with asking for consent", function() {
                 return tester
                     .setup.user.state('state_main_menu')
                     .inputs('3', '1')
@@ -222,8 +204,8 @@ describe("MMC App", function() {
             });
         });
 
-        describe("when user selects option 3, 4, 5", function() {
-            it("should respond with 'Please input the day'", function() {
+        describe("when user selects a month when op was done (option 3, 4, 5)", function() {
+            it("should be asked to provide the day of the month", function() {
                 return tester
                     .setup.user.state('state_main_menu')
                     .inputs('3', '4')
@@ -237,7 +219,7 @@ describe("MMC App", function() {
         });
 
         describe("when user select a date that is >= 6 weeks", function() {
-            it("should respond with 'We are sorry but we only...'", function() {
+            it("should receive notice that SMSs are only send up to 6 weeks", function() {
                 return tester
                     .setup.user.state('state_main_menu')
                     .inputs('3', '4', '20')
@@ -257,7 +239,7 @@ describe("MMC App", function() {
         });
 
         describe("when user select a date that is < 6 weeks", function() {
-            it("should respond with 'Do u consent...'", function() {
+            it("should ask for consent", function() {
                 return tester
                     .setup.user.state('state_main_menu')
                     .inputs('3', '4', '5')
@@ -278,7 +260,7 @@ describe("MMC App", function() {
         });
 
         describe("when user chooses to join BFL", function() {
-            it("should respond with 'Thank you...'", function() {
+            it("should respond with confirmation of BFL subscription", function() {
                 return tester
                     .setup.user.state('state_main_menu')
                     .inputs('3', '4', '20', '1')
@@ -297,7 +279,7 @@ describe("MMC App", function() {
         });
 
         describe("when user chooses to not to join BFL", function() {
-            it("should respond with 'You have selected...'", function() {
+            it("should respond with confirmation that no BFL updates will be sent", function() {
                 return tester
                     .setup.user.state('state_main_menu')
                     .inputs('3', '4', '20', '2')
@@ -316,12 +298,12 @@ describe("MMC App", function() {
         });
 
         describe("when user doesn't consent", function() {
-            it("should respond with 'Without your consent'", function() {
+            it("should respond with explanation that messages can't be send without", function() {
                 return tester
                     .setup.user.state('state_main_menu')
                     .inputs('3', '1', '2')
                     .check.interaction({
-                        state: 'state_consent_no',
+                        state: 'state_consent_withheld',
                         reply: [
                             "Without your consent, we cannot send you messages.",
                             "1. Main Menu",
