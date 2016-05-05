@@ -6,15 +6,19 @@ var go = {};
 go;
 
 /*jshint -W083 */
+var Q = require('q');
 var vumigo = require('vumigo_v02');
 var moment = require('moment');
 //var JsonApi = vumigo.http.api.JsonApi;
 var Choice = vumigo.states.Choice;
+var HttpApi = vumigo.http.api.HttpApi;
 
 // UTILS
 go.utils = {
 
-    get_today : function(config) {
+// DATE HELPERS
+
+    get_today: function(config) {
         if (config.testing_today) {
             return new moment(config.testing_today, 'YYYY-MM-DD');
         } else {
@@ -22,7 +26,7 @@ go.utils = {
         }
     },
 
-    make_month_choices : function($, startDate, limit, increment, valueFormat, labelFormat) {
+    make_month_choices: function($, startDate, limit, increment, valueFormat, labelFormat) {
       // Currently supports month translation in formats MMMM and MM
 
         var choices = [];
@@ -92,12 +96,167 @@ go.utils = {
     },
 
     // date parameter being a date string in YYYYMMDD format
-    is_date_diff_less_than_6weeks : function(im, date) {
+    is_date_diff_less_than_6weeks: function(im, date) {
         var today = go.utils.get_today(im.config);
         var d = new moment(date, 'YYYYMMDD');
 
         return d.diff(today, "weeks") < 6;
     },
+
+// OPT-OUT HELPERS
+
+    opt_out: function(im, contact) {
+        return im.api_request('optout.optout', {
+            address_type: "msisdn",
+            address_value: contact.msisdn,
+            message_id: im.msg.message_id
+        });
+    },
+
+    opted_out: function(im, contact) {
+        return im.api_request('optout.status', {
+            address_type: "msisdn",
+            address_value: contact.msisdn
+        });
+    },
+
+    opt_in: function(im, contact) {
+        return im.api_request('optout.cancel_optout', {
+            address_type: "msisdn",
+            address_value: contact.msisdn
+        });
+    },
+
+// CONTROL API CALL HELPERS
+
+    control_api_call: function (method, params, payload, endpoint, im) {
+        var http = new HttpApi(im, {
+          headers: {
+            'Content-Type': ['application/json'],
+            'Authorization': ['ApiKey ' + im.config.control.username + ':' + im.config.control.api_key]
+          }
+        });
+        switch (method) {
+          case "post":
+            return http.post(im.config.control.url + endpoint, {
+                data: JSON.stringify(payload)
+              });
+          case "get":
+            return http.get(im.config.control.url + endpoint, {
+                params: params
+              });
+          case "patch":
+            return http.patch(im.config.control.url + endpoint, {
+                data: JSON.stringify(payload)
+              });
+          case "put":
+            return http.put(im.config.control.url + endpoint, {
+                params: params,
+                data: JSON.stringify(payload)
+              });
+          case "delete":
+            return http.delete(im.config.control.url + endpoint);
+        }
+    },
+
+// SUBSCRIPTION HELPERS
+
+    subscription_completed: function(contact, im) {
+        var params = {
+            to_addr: contact.msisdn
+        };
+        return go.utils
+            .control_api_call("get", params, null, 'subscription/', im)
+            .then(function(json_result) {
+                var parsed_data = JSON.parse(json_result.data);
+                var all_completed = true;
+                for (i=0; i<parsed_data.objects.length; i++) {
+                    if (parsed_data.objects[i].completed === false) {
+                        all_completed = false;
+                    }
+                }
+                return all_completed;
+            });
+    },
+
+    subscription_unsubscribe_all: function(contact, im) {
+        var params = {
+            to_addr: contact.msisdn
+        };
+        return go.utils
+            .control_api_call("get", params, null, 'subscription/', im)
+            .then(function(json_result) {
+                // make all subscriptions inactive
+                var update = JSON.parse(json_result.data);
+                var clean = true;
+                for (i=0;i<update.objects.length;i++) {
+                    if (update.objects[i].active === true){
+                        update.objects[i].active = false;
+                        clean = false;
+                    }
+                }
+                if (!clean) {
+                    return go.utils.control_api_call("patch", {}, update, 'subscription/', im);
+                } else {
+                    return Q();
+                }
+
+            });
+    },
+
+    subscription_set_language: function(contact, im, lang) {
+        var params = {
+            to_addr: contact.msisdn
+        };
+        return go.utils
+            .control_api_call("get", params, null, 'subscription/', im)
+            .then(function(json_result) {
+                // make all subscriptions inactive
+                var update = JSON.parse(json_result.data);
+                var clean = true;
+                var patch_url;
+
+                if (update.objects.length === 1) {
+                    if (update.objects[0].lang !== lang) {
+                        patch_url = 'subscription/' + update.objects[0].id;
+                        clean = false;
+                        update = {
+                            "lang": lang
+                        };
+                    }
+                } else if (update.objects.length >= 1) {
+                    for (i=0; i<update.objects.length; i++) {
+                        if (update.objects[i].lang !== lang){
+                            update.objects[i].lang = lang;
+                            clean = false;
+                            patch_url = 'subscription/';
+                        }
+                    }
+                }
+
+                if (!clean) {
+                    return go.utils.control_api_call("patch", {}, update, patch_url, im);
+                } else {
+                    return Q();
+                }
+
+            });
+    },
+
+    subscription_subscribe: function(contact, im) {
+        var payload = {
+          contact_key: contact.key,
+          lang: 'en',
+          message_set: "/subscription/api/v1/message_set/12/",
+          next_sequence_number: 2,
+          schedule: "/subscription/api/v1/periodic_task/1/",
+          to_addr: contact.msisdn,
+          user_account: contact.user_account
+        };
+        return go.utils.control_api_call("post", null, payload, 'subscription/', im);
+    },
+
+    "commas": "commas"
 
 };
 
