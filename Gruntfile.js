@@ -11,10 +11,12 @@ module.exports = function (grunt) {
                     'src/sms/app.js'
                 ],
                 app_ussd: [
+                    'src/ussd/utils.js',
                     'src/ussd/app.js'
                 ],
                 prd_sms: [
                     'src/sms/index.js',
+                    'src/ussd/utils.js',
                     '<%= paths.src.app_sms %>',
                     'src/sms/init.js'
                 ],

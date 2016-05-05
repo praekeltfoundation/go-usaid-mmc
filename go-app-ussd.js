@@ -5,6 +5,102 @@
 var go = {};
 go;
 
+/*jshint -W083 */
+var vumigo = require('vumigo_v02');
+var moment = require('moment');
+//var JsonApi = vumigo.http.api.JsonApi;
+var Choice = vumigo.states.Choice;
+
+// UTILS
+go.utils = {
+
+    get_today : function(config) {
+        if (config.testing_today) {
+            return new moment(config.testing_today, 'YYYY-MM-DD');
+        } else {
+            return new moment();
+        }
+    },
+
+    make_month_choices : function($, startDate, limit, increment, valueFormat, labelFormat) {
+      // Currently supports month translation in formats MMMM and MM
+
+        var choices = [];
+        var monthIterator = startDate;
+        for (var i=0; i<limit; i++) {
+            var raw_label = monthIterator.format(labelFormat);
+            var prefix, suffix, month, translation;
+
+            var quad_month_index = labelFormat.indexOf("MMMM");
+            var trip_month_index = labelFormat.indexOf("MMM");
+
+            if (quad_month_index > -1) {
+                month = monthIterator.format("MMMM");
+                prefix = raw_label.substring(0, quad_month_index);
+                suffix = raw_label.substring(quad_month_index+month.length, raw_label.length);
+                translation = {
+                    January: $("{{pre}}January{{post}}"),
+                    February: $("{{pre}}February{{post}}"),
+                    March: $("{{pre}}March{{post}}"),
+                    April: $("{{pre}}April{{post}}"),
+                    May: $("{{pre}}May{{post}}"),
+                    June: $("{{pre}}June{{post}}"),
+                    July: $("{{pre}}July{{post}}"),
+                    August: $("{{pre}}August{{post}}"),
+                    September: $("{{pre}}September{{post}}"),
+                    October: $("{{pre}}October{{post}}"),
+                    November: $("{{pre}}November{{post}}"),
+                    December: $("{{pre}}December{{post}}"),
+                };
+                translated_label = translation[month].context({
+                    pre: prefix,
+                    post: suffix
+                });
+            } else if (trip_month_index > -1) {
+                month = monthIterator.format("MMM");
+                prefix = raw_label.substring(0, trip_month_index);
+                suffix = raw_label.substring(trip_month_index+month.length, raw_label.length);
+                translation = {
+                    Jan: $("{{pre}}Jan{{post}}"),
+                    Feb: $("{{pre}}Feb{{post}}"),
+                    Mar: $("{{pre}}Mar{{post}}"),
+                    Apr: $("{{pre}}Apr{{post}}"),
+                    May: $("{{pre}}May{{post}}"),
+                    Jun: $("{{pre}}Jun{{post}}"),
+                    Jul: $("{{pre}}Jul{{post}}"),
+                    Aug: $("{{pre}}Aug{{post}}"),
+                    Sep: $("{{pre}}Sep{{post}}"),
+                    Oct: $("{{pre}}Oct{{post}}"),
+                    Nov: $("{{pre}}Nov{{post}}"),
+                    Dec: $("{{pre}}Dec{{post}}"),
+                };
+                translated_label = translation[month].context({
+                    pre: prefix,
+                    post: suffix
+                });
+            } else {
+                // assume numbers don't need translation
+                translated_label = raw_label;
+            }
+
+            choices.push(new Choice(monthIterator.format(valueFormat),
+                                    translated_label));
+            monthIterator.add(increment, 'months');
+        }
+
+        return choices;
+    },
+
+    // date parameter being a date string in YYYYMMDD format
+    is_date_diff_less_than_6weeks : function(im, date) {
+        var today = go.utils.get_today(im.config);
+        var d = new moment(date, 'YYYYMMDD');
+
+        return d.diff(today, "weeks") < 6;
+    },
+
+};
+
 go.app = function() {
     var vumigo = require('vumigo_v02');
     var App = vumigo.App;
@@ -14,96 +110,10 @@ go.app = function() {
     var LanguageChoice = vumigo.states.LanguageChoice;
     var PaginatedChoiceState = vumigo.states.PaginatedChoiceState;
     var EndState = vumigo.states.EndState;
-    var moment = require('moment');
 
     var GoApp = App.extend(function(self) {
         App.call(self, 'state_start');
         var $ = self.$;
-
-        get_today = function(config) {
-            if (config.testing_today) {
-                return new moment(config.testing_today, 'YYYY-MM-DD');
-            } else {
-                return new moment();
-            }
-        };
-
-        make_month_choices = function($, startDate, limit, increment, valueFormat, labelFormat) {
-          // Currently supports month translation in formats MMMM and MM
-
-            var choices = [];
-            var monthIterator = startDate;
-            for (var i=0; i<limit; i++) {
-                var raw_label = monthIterator.format(labelFormat);
-                var prefix, suffix, month, translation;
-
-                var quad_month_index = labelFormat.indexOf("MMMM");
-                var trip_month_index = labelFormat.indexOf("MMM");
-
-                if (quad_month_index > -1) {
-                    month = monthIterator.format("MMMM");
-                    prefix = raw_label.substring(0, quad_month_index);
-                    suffix = raw_label.substring(quad_month_index+month.length, raw_label.length);
-                    translation = {
-                        January: $("{{pre}}January{{post}}"),
-                        February: $("{{pre}}February{{post}}"),
-                        March: $("{{pre}}March{{post}}"),
-                        April: $("{{pre}}April{{post}}"),
-                        May: $("{{pre}}May{{post}}"),
-                        June: $("{{pre}}June{{post}}"),
-                        July: $("{{pre}}July{{post}}"),
-                        August: $("{{pre}}August{{post}}"),
-                        September: $("{{pre}}September{{post}}"),
-                        October: $("{{pre}}October{{post}}"),
-                        November: $("{{pre}}November{{post}}"),
-                        December: $("{{pre}}December{{post}}"),
-                    };
-                    translated_label = translation[month].context({
-                        pre: prefix,
-                        post: suffix
-                    });
-                } else if (trip_month_index > -1) {
-                    month = monthIterator.format("MMM");
-                    prefix = raw_label.substring(0, trip_month_index);
-                    suffix = raw_label.substring(trip_month_index+month.length, raw_label.length);
-                    translation = {
-                        Jan: $("{{pre}}Jan{{post}}"),
-                        Feb: $("{{pre}}Feb{{post}}"),
-                        Mar: $("{{pre}}Mar{{post}}"),
-                        Apr: $("{{pre}}Apr{{post}}"),
-                        May: $("{{pre}}May{{post}}"),
-                        Jun: $("{{pre}}Jun{{post}}"),
-                        Jul: $("{{pre}}Jul{{post}}"),
-                        Aug: $("{{pre}}Aug{{post}}"),
-                        Sep: $("{{pre}}Sep{{post}}"),
-                        Oct: $("{{pre}}Oct{{post}}"),
-                        Nov: $("{{pre}}Nov{{post}}"),
-                        Dec: $("{{pre}}Dec{{post}}"),
-                    };
-                    translated_label = translation[month].context({
-                        pre: prefix,
-                        post: suffix
-                    });
-                } else {
-                    // assume numbers don't need translation
-                    translated_label = raw_label;
-                }
-
-                choices.push(new Choice(monthIterator.format(valueFormat),
-                                        translated_label));
-                monthIterator.add(increment, 'months');
-            }
-
-            return choices;
-        };
-
-        // date parameter being a date string in YYYYMMDD format
-        is_date_diff_less_than_6weeks = function(im, date) {
-            var today = get_today(im.config);
-            var d = new moment(date, 'YYYYMMDD');
-
-            return d.diff(today, "weeks") < 6;
-        };
 
         self.init = function() {
             // Fetch the contact from the contact store that matches the current
@@ -221,8 +231,8 @@ go.app = function() {
 
         // ChoiceState st-F1
         self.states.add('state_op', function(name) {
-            var today = get_today(self.im.config);
-            var month_choice = make_month_choices($, today, 3, 1, "YYYYMM", "MMMM 'YY");
+            var today = go.utils.get_today(self.im.config);
+            var month_choice = go.utils.make_month_choices($, today, 3, 1, "YYYYMM", "MMMM 'YY");
             return new ChoiceState(name, {
                 question: $([
                     "We need to know when you had your MMC to send you the ",
@@ -263,7 +273,7 @@ go.app = function() {
                     // add a zero to input if a single-digit number
                     if (text.length == 1) text = "0" + text;
 
-                    if (is_date_diff_less_than_6weeks(self.im, month_year+text)) {
+                    if (go.utils.is_date_diff_less_than_6weeks(self.im, month_year+text)) {
                         return "state_consent";
                     } else {
                         return "state_6week_notice";
