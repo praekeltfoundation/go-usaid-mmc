@@ -8,9 +8,11 @@ module.exports = function (grunt) {
         paths: {
             src: {
                 app_sms: [
+                    'src/utils.js',
                     'src/sms_app.js'
                 ],
                 app_ussd: [
+                    'src/utils.js',
                     'src/ussd_app.js'
                 ],
                 prd_sms: [
@@ -33,11 +35,13 @@ module.exports = function (grunt) {
             },
             test_sms: [
                 'test/setup.js',
+                'src/utils.js',
                 '<%= paths.src.app_sms %>',
                 'test/sms_app.test.js'
             ],
             test_ussd: [
                 'test/setup.js',
+                'src/utils.js',
                 '<%= paths.src.app_ussd %>',
                 'test/ussd_app.test.js'
             ]
