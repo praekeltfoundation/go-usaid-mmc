@@ -2,7 +2,7 @@ var vumigo = require('vumigo_v02');
 var fixtures = require('./fixtures');
 var AppTester = vumigo.AppTester;
 var assert = require('assert');
-
+var _ = require('lodash');
 
 describe("app", function() {
     describe("GoApp", function() {
@@ -16,12 +16,101 @@ describe("app", function() {
 
             tester
                 .setup.config.app({
-                    name: 'test_app'
+                    name: 'test_app',
+                    endpoints: {
+                        "sms": {"delivery_class": "sms"}
+                    },
+                    channel: "*120*662*5#",
                 })
                 .setup(function(api) {
                     fixtures().forEach(api.http.fixtures.add);
                 });
         });
+
+        // TIMEOUT TESTING
+
+        describe("when return user times-out first time", function() {
+            it("should be welcomed back and given options", function() {
+                return tester
+                    .setup.user.lang('en')
+                    .setup.user.state('state_main_menu')
+                    .inputs(
+                          '4'  // state_main_menu - 'more'
+                        , '3'  // state_main_menu - 'change language'
+                        , '2'  // state_select_language - 'iziZulu'
+                        , {session_event: 'close'}  // timeout
+                        , {session_event: 'new'}  // redial
+                    )
+                    .check.interaction({
+                        state: 'state_timed_out',
+                        reply: [
+                            "Welcome back to the Medical Male Circumcision (MMC"
+                            + ") service. What would you like to do?",
+                            "1. Return to last screen visited",
+                            "2. Main Menu",
+                            "3. Exit",
+                        ].join("\n"),
+                    })
+                    .check(function(api) {
+                        var smses = _.where(api.outbound.store, {
+                            endpoint: 'sms'
+                        });
+                        var sms = smses[0];
+                        assert.equal(smses.length,1);
+                        assert.equal(sms.content,
+                            "Thanks for using the *120*662# MMC service! Dial "
+                                + "back anytime to find MMC clinics, sign up "
+                                + "for free SMSs about men's health or speak to"
+                                + " a MMC expert (20c/20sec)"
+                        );
+                        assert.equal(sms.to_addr,'+27123456789');
+
+                        assert.strictEqual(
+                            app.contact.extra.language_choice, 'zu');
+                    })
+                    .run();
+            });
+        });
+
+        describe("when return user times-out again", function() {
+            it("should be welcomed back and given options", function() {
+                return tester
+                    .setup.user.lang('en')
+                    .setup.user.state('state_main_menu')
+                    .inputs(
+                          '4'  // state_main_menu - 'more'
+                        , '3'  // state_main_menu - 'change language'
+                        , '2'  // state_select_language - 'iziZulu'
+                        , {session_event: 'close'}  // timeout
+                        , {session_event: 'new'}  // redial
+                        , {session_event: 'close'}  // timeout
+                        , {session_event: 'new'}  // redial
+                    )
+                    .check.interaction({
+                        state: 'state_timed_out',
+                        reply: [
+                            "Welcome back to the Medical Male Circumcision (MMC"
+                            + ") service. What would you like to do?",
+                            "1. Return to last screen visited",
+                            "2. Main Menu",
+                            "3. Exit",
+                        ].join("\n"),
+                    })
+                    .check(function(api) {
+                        var smses = _.where(api.outbound.store, {
+                            endpoint: 'sms'
+                        });
+                        var sms = smses[0];
+                        assert.equal(smses.length,1);  // still only 1 sms sent
+                        assert.equal(sms.to_addr,'+27123456789');
+
+                        assert.strictEqual(
+                            app.contact.extra.language_choice, 'zu');
+                    })
+                    .run();
+            });
+        });
+
 
         describe("when the user starts a session without being registered", function() {
             it("should ask to select language for future sessions", function() {
