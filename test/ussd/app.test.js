@@ -223,6 +223,10 @@ describe("app", function() {
                             '2. Exit'
                         ].join('\n')
                     })
+                    .check(function(api) {
+                        assert.strictEqual(
+                            app.contact.extra.bfl_member, true);
+                    })
                     .run();
             });
         });

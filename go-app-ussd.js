@@ -267,6 +267,7 @@ go.app = function() {
         });
 
         self.states.add('state_bfl_join', function(name){
+            self.contact.extra.bfl_member = true;
             return new ChoiceState(name, {
                 question: $([
                     "Thank you. You will now receive Brothers for Life",
