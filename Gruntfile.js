@@ -8,20 +8,20 @@ module.exports = function (grunt) {
         paths: {
             src: {
                 app_sms: [
-                    'src/sms/app.js'
+                    'src/sms_app.js'
                 ],
                 app_ussd: [
-                    'src/ussd/app.js'
+                    'src/ussd_app.js'
                 ],
                 prd_sms: [
-                    'src/sms/index.js',
+                    'src/index.js',
                     '<%= paths.src.app_sms %>',
-                    'src/sms/init.js'
+                    'src/init.js'
                 ],
                 prd_ussd: [
-                    'src/ussd/index.js',
+                    'src/index.js',
                     '<%= paths.src.app_ussd %>',
-                    'src/ussd/init.js'
+                    'src/init.js'
                 ],
                 all: [
                     'src/**/*.js'
@@ -32,14 +32,14 @@ module.exports = function (grunt) {
                 prd_ussd: 'go-app-ussd.js'
             },
             test_sms: [
-                'test/sms/setup.js',
+                'test/setup.js',
                 '<%= paths.src.app_sms %>',
-                'test/sms/**/*.test.js'
+                'test/sms_app.test.js'
             ],
             test_ussd: [
-                'test/ussd/setup.js',
+                'test/setup.js',
                 '<%= paths.src.app_ussd %>',
-                'test/ussd/**/*.test.js'
+                'test/ussd_app.test.js'
             ]
         },
 
