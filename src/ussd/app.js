@@ -62,7 +62,7 @@ go.app = function() {
         };
 
         self.get_dialback_sms = function() {
-            return $("Thanks for using the *120*662# MMC service! Dial back "
+            return $("Thanks for using the {{channel}} MMC service! Dial back "
                 + "anytime to find MMC clinics, sign up for free SMSs about "
                 + "men's health or speak to a MMC expert (20c/20sec)")
                 .context({

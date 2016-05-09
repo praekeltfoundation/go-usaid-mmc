@@ -20,7 +20,7 @@ describe("app", function() {
                     endpoints: {
                         "sms": {"delivery_class": "sms"}
                     },
-                    channel: "*120*662*5#",
+                    channel: "*120*662#",
                 })
                 .setup(function(api) {
                     fixtures().forEach(api.http.fixtures.add);
