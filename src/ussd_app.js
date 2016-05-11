@@ -394,7 +394,7 @@ go.app = function() {
                     " workers at the clinic where you got circumcised?",
                 ].join("")),
                 choices: [
-                    new Choice("servicerating_very_bad", $("Very Bad")),
+                    new Choice("servicerating_very_bad", $("Very bad")),
                     new Choice("servicerating_bad", $("Bad")),
                     new Choice("servicerating_ok", $("OK")),
                     new Choice("servicerating_good", $("Good")),
@@ -474,7 +474,7 @@ go.app = function() {
                 ].join("")),
                 choices: [
                     new Choice("state_bfl_join", $("Join")),
-                    new Choice("state_bfl_no_join", $("No Thanks"))
+                    new Choice("state_bfl_no_join", $("No thanks"))
                 ],
                 next: function(choice) {
                     return choice.value;
