@@ -75,7 +75,7 @@ describe("MMC App", function() {
                             "Your new language choice has been saved.",
                             "1. Main Menu",
                             "2. Exit",
-                        ].join("\n"),
+                        ].join('\n'),
                     })
                     .check(function(api, im, app) {
                         assert.strictEqual(
@@ -246,11 +246,11 @@ describe("MMC App", function() {
                     .check.interaction({
                         state: 'state_consent',
                         reply: [
-                            "Do you consent to:\n"
-                            + "- Receiving some SMSs on public holidays, "
-                            + "weekends & before 8am?\n"
-                            + "- Having ur cell# & language info stored so we "
-                            + "can send u SMSs?",
+                            "Do you consent to:",
+                            "- Receiving some SMSs on public holidays, "
+                            + "weekends & before 8am?",
+                            "- Having ur cell# & language info stored so we can"
+                            + " send u SMSs?",
                             "1. Yes",
                             "2. No"
                         ].join('\n')

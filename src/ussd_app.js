@@ -182,12 +182,12 @@ go.app = function() {
         self.states.add('state_consent', function(name) {
             return new ChoiceState(name, {
                 question: $([
-                    "Do you consent to:\n",
-                    "- Receiving some SMSs on public ",
-                    "holidays, weekends & before 8am?\n",
-                    "- Having ur cell# & language info stored so we can send u",
-                    " SMSs?"
-                ].join("")),
+                    "Do you consent to:",
+                    "- Receiving some SMSs on public holidays, weekends & "
+                    + "before 8am?",
+                    "- Having ur cell# & language info stored so we can send u"
+                    + " SMSs?"
+                ].join('\n')),
                 choices: [
                     new Choice("state_end_registration", $("Yes")),
                     new Choice("state_consent_withheld", $("No"))
