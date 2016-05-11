@@ -227,10 +227,7 @@ go.app = function() {
                     new Choice("state_bfl_no_join", $("No"))
                 ],
                 next: function(choice) {
-                    return {
-                        name: choice.value,
-                        creator_opts: true
-                    };
+                    return choice.value;
                 }
             });
         });
@@ -352,7 +349,7 @@ go.app = function() {
                 ].join("")),
                 choices: [
                     new Choice("state_main_menu", $("Main Menu")),
-                    new Choice("state_end", $("Exit")),
+                    new Choice("state_end", $("Exit"))
                 ],
                 next: function(choice) {
                     return choice.value;
@@ -369,7 +366,7 @@ go.app = function() {
                 ].join("")),
                 choices: [
                     new Choice("state_main_menu", $("Main Menu")),
-                    new Choice("state_end", $("Exit")),
+                    new Choice("state_end", $("Exit"))
                 ],
                 next: function(choice) {
                     //TODO make web request to store results
@@ -387,19 +384,15 @@ go.app = function() {
                 ].join("")),
                 choices: [
                     new Choice("state_bfl_join", $("Join")),
-                    new Choice(
-                        "state_bfl_no_join", $("No Thanks")),
+                    new Choice("state_bfl_no_join", $("No Thanks"))
                 ],
                 next: function(choice) {
-                    return {
-                        name: choice.value,
-                        creator_opts: false
-                    };
+                    return choice.value;
                 }
             });
         });
 
-        self.states.add('state_bfl_join', function(name, post_op_registration) {
+        self.states.add('state_bfl_join', function(name) {
             return new ChoiceState(name, {
                 question: $([
                     "Thank you. You will now receive Brothers for Life",
@@ -411,22 +404,12 @@ go.app = function() {
                     new Choice("state_end", $("Exit")),
                 ],
                 next: function(choice) {
-                    if (choice.value !== "state_main_menu") {
-                        return {
-                            name: post_op_registration
-                                ? "state_end_registration"
-                                : choice.value,
-                            creator_opts: post_op_registration
-                        };
-                    } else {
-                        return choice.value;
-                    }
-
+                    return choice.value;
                 }
             });
         });
 
-        self.states.add('state_bfl_no_join', function(name, post_op_registration) {
+        self.states.add('state_bfl_no_join', function(name) {
             return new ChoiceState(name, {
                 question: $([
                     "You have selected not to receive Brothers for Life",
@@ -438,20 +421,10 @@ go.app = function() {
                     new Choice("state_end", $("Exit")),
                 ],
                 next: function(choice) {
-                    if (choice.value !== "state_main_menu") {
-                        return {
-                            name: post_op_registration
-                                ? "state_end_registration"
-                                : choice.value,
-                            creator_opts: post_op_registration
-                        };
-                    } else {
-                        return choice.value;
-                    }
+                    return choice.value;
                 }
             });
         });
-
     });
 
     return {
