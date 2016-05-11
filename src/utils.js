@@ -85,11 +85,12 @@ go.utils = {
     },
 
     // date parameter being a date string in YYYYMMDD format
-    is_date_diff_less_than_6weeks: function(im, date) {
+    // x being the number of weeks to check against
+    is_date_diff_less_than_x_weeks: function(im, date, x) {
         var today = go.utils.get_today(im.config);
         var d = new moment(date, 'YYYYMMDD');
 
-        return d.diff(today, "weeks") < 6;
+        return d.diff(today, "weeks") < x;
     },
 
     // OPT-OUT HELPERS

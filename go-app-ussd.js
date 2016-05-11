@@ -92,11 +92,12 @@ go.utils = {
     },
 
     // date parameter being a date string in YYYYMMDD format
-    is_date_diff_less_than_6weeks: function(im, date) {
+    // x being the number of weeks to check against
+    is_date_diff_less_than_x_weeks: function(im, date, x) {
         var today = go.utils.get_today(im.config);
         var d = new moment(date, 'YYYYMMDD');
 
-        return d.diff(today, "weeks") < 6;
+        return d.diff(today, "weeks") < x;
     },
 
     // OPT-OUT HELPERS
@@ -424,7 +425,7 @@ go.app = function() {
                     // add a zero to input if a single-digit number
                     if (day.length == 1) day = "0" + day;
 
-                    if (go.utils.is_date_diff_less_than_6weeks(self.im, year_month+day)) {
+                    if (go.utils.is_date_diff_less_than_x_weeks(self.im, year_month+day, 6)) {
                         return "state_consent";
                     } else {
                         return "state_6week_notice";

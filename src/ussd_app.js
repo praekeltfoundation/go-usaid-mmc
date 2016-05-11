@@ -169,7 +169,7 @@ go.app = function() {
                     // add a zero to input if a single-digit number
                     if (day.length == 1) day = "0" + day;
 
-                    if (go.utils.is_date_diff_less_than_6weeks(self.im, year_month+day)) {
+                    if (go.utils.is_date_diff_less_than_x_weeks(self.im, year_month+day, 6)) {
                         return "state_consent";
                     } else {
                         return "state_6week_notice";
