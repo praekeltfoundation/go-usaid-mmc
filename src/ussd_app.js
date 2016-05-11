@@ -144,7 +144,6 @@ go.app = function() {
                     new Choice("state_pre_op", $("I haven't had my operation yet"))
                 ],
                 next: function(choice) {
-                    //self.im.user.set_answer("op_date", )  // save month and year first, then add day at next state
                     if (choice.value === "state_consent" ||
                         choice.value === "state_pre_op") {
 
@@ -160,17 +159,17 @@ go.app = function() {
         });
 
         // FreeText st-F2
-        self.states.add('state_op_day', function(name, month_year) {
+        self.states.add('state_op_day', function(name, year_month) {
             return new FreeText(name, {
                 question: $([
                     "Please input the day you had your operation. For example, "
                     + "12.",
                 ].join("")),
-                next: function(text) {
+                next: function(day) {
                     // add a zero to input if a single-digit number
-                    if (text.length == 1) text = "0" + text;
+                    if (day.length == 1) day = "0" + day;
 
-                    if (go.utils.is_date_diff_less_than_6weeks(self.im, month_year+text)) {
+                    if (go.utils.is_date_diff_less_than_6weeks(self.im, year_month+day)) {
                         return "state_consent";
                     } else {
                         return "state_6week_notice";
@@ -190,7 +189,7 @@ go.app = function() {
                     " SMSs?"
                 ].join("")),
                 choices: [
-                    new Choice("yes", $("Yes")),
+                    new Choice("state_end_registration", $("Yes")),
                     new Choice("state_consent_withheld", $("No"))
                 ],
                 next: function(choice) {
