@@ -88,63 +88,56 @@ describe("MMC App", function() {
         });
 
         describe("when a user wants to unsubscribe", function() {
-            describe("when a registered user sends STOP", function() {
-                it("should unsubscribe them", function() {
-                    return tester
-                        .setup.user.addr('082333')
-                        .input('STOP')
-                        .check.interaction({
-                            state: 'states_unsubscribe',
-                            reply:
-                                "You have been unsubscribed."
-                        })
-                        .check(function(api) {
-                            var optouts = api.optout.optout_store;
-                            assert.equal(optouts.length, 2);
-                        })
-                        .run();
-                 });
-            });
-
-            describe("when an unregistered user sends BLOCK", function() {
-                it("should unsubscribe them", function() {
-                    return tester
-                        .setup.user.addr('082111')
-                        .input('BLOCK myself')
-                        .check.interaction({
-                            state: 'states_unsubscribe',
-                            reply:
-                                "You have been unsubscribed."
-                        })
-                        .run();
-                 });
-            });
+            it("to states_unsubscribe (user sent 'STOP')", function() {
+                return tester
+                    .setup.user.addr('082333')
+                    .input('STOP')
+                    .check.interaction({
+                        state: 'states_unsubscribe',
+                        reply:
+                            "You have been unsubscribed."
+                    })
+                    .check(function(api) {
+                        var optouts = api.optout.optout_store;
+                        assert.equal(optouts.length, 2);
+                    })
+                    .run();
+             });
+            it("to states_unsubscribe (user sent 'BLOCK')", function() {
+                return tester
+                    .setup.user.addr('082111')
+                    .input('BLOCK myself')
+                    .check.interaction({
+                        state: 'states_unsubscribe',
+                        reply:
+                            "You have been unsubscribed."
+                    })
+                    .run();
+             });
         });
 
         describe("when a user is opted-out", function() {
-            describe("and sends START", function() {
-                it("should opt them in", function() {
-                    return tester
-                        .setup.user.addr('27002')
-                        .input('START')
-                        .check.interaction({
-                            state: 'states_optedin',
-                            reply:
-                                "You are now able to resubscribe. "+
-                                "Please SMS 'MMC' to 555 to continue"
-                        })
-                        .check(function(api) {
-                            var optouts = api.optout.optout_store;
-                            assert.equal(optouts.length, 0);
-                        })
-                        .run();
-                 });
+            it("to states_optedin (user sent 'START')", function() {
+                return tester
+                    .setup.user.addr('27002')
+                    .input('START')
+                    .check.interaction({
+                        state: 'states_optedin',
+                        reply:
+                            "You are now able to resubscribe. "+
+                            "Please SMS 'MMC' to 555 to continue"
+                    })
+                    .check(function(api) {
+                        var optouts = api.optout.optout_store;
+                        assert.equal(optouts.length, 0);
+                    })
+                    .run();
             });
         });
 
-        describe("when a user sends in MMC", function() {
+        describe("when a user sends 'MMC'", function() {
             describe("when the user is unregistered", function() {
-                it("should register them, ask for their language choice", function() {
+                it("to states_language (register them, ask for their language choice)", function() {
                     return tester
                         .setup.user.addr('082111')
                         .input('MMC')
@@ -169,153 +162,125 @@ describe("MMC App", function() {
                         .run();
                 });
             });
-
             describe("when the user is registered", function() {
-                describe("if they have received all messages", function() {
-                    it("should tell them they've received all messages", function() {
-                        return tester
-                            .setup.user.addr('082333')
-                            .input('MMC')
-                            .check.interaction({
-                                state: 'states_finished_messages',
-                                reply:
-                                    "You have finished your set of SMSs and your circumcision " +
-                                    "wound should be healed. If not, please visit your local " +
-                                    "clinic. Thanks for using the MMC info service.",
-                            })
-                            .run();
-                    });
-                });
-
-                describe("if they have NOT received all messages", function() {
-                    it("should tell them to wait and how to STOP", function() {
-                        return tester
-                            .setup.user.addr('082444')
-                            .input('MMC')
-                            .check.interaction({
-                                state: 'states_unfinished_messages',
-                                reply:
-                                    "MMC info: U r registered to receive SMSs about ur " +
-                                    "circumcision. To opt out SMS 'STOP' to 555. If u have " +
-                                    "concerns with ur wound please visit ur local clinic.",
-                            })
-                            .run();
-                    });
-                });
-
-            });
-        });
-
-        describe("when a user sends in anything except STOP, BLOCK, MMC", function() {
-            describe("when the user is unregistered", function() {
-                it("should tell them how to register", function() {
+                it("to states_finished_messages (after having received all messages)", function() {
                     return tester
-                        .setup.user.addr('082111')
-                        .input('ouch')
+                        .setup.user.addr('082333')
+                        .input('MMC')
                         .check.interaction({
-                            state: 'states_how_to_register',
+                            state: 'states_finished_messages',
                             reply:
-                                "Welcome to the Medical Male Circumcision (MMC) info service. " +
-                                "To get FREE info on how to look after your circumcision " +
-                                "wound please SMS 'MMC' to 555."
+                                "You have finished your set of SMSs and your circumcision " +
+                                "wound should be healed. If not, please visit your local " +
+                                "clinic. Thanks for using the MMC info service.",
                         })
                         .run();
                 });
-            });
-
-            describe("when the user is registered", function() {
-                describe("if they are responding to language choice", function() {
-
-                    describe("if they enter STOP", function() {
-                        it("should opt them out", function() {
-                            return tester
-                                .setup.user.addr('082111')
-                                .inputs('MMC', 'STOP')
-                                .check.interaction({
-                                    state: 'states_unsubscribe',
-                                    reply: "You have been unsubscribed."
-                                })
-                                .run();
-                        });
-                    });
-
-                    describe("if they only have one subscription", function() {
-                        it("should update them to language", function() {
-                            return tester
-                                .setup.user.addr('082111')
-                                .inputs('MMC', '1')
-                                .check.interaction({
-                                    state: 'states_update_language_success',
-                                    reply:
-                                        "The wound will heal in 6 weeks. Do not have sex for 6 weeks to " +
-                                        "prevent infecting or damaging the wound. Avoid smoking, alcohol " +
-                                        "and drugs.  Keep your penis upright for 7 - 10 days, until the " +
-                                        "swelling goes down. Wear clean underwear every day. Briefs, not " +
-                                        "boxers. Don't worry if some blood stains the bandage. If blood " +
-                                        "soaks the bandage, go to the clinic immediately.",
-                                })
-                                .check.user.properties({lang: 'xh'})
-                                .run();
-                        });
-                    });
-
-                    describe("if they have more than one subscription", function() {
-                        it("should update all subscriptions to language", function() {
-                            return tester
-                                .setup.user.addr('082222')
-                                .inputs('MMC', '2')
-                                .check.interaction({
-                                    state: 'states_update_language_success',
-                                    reply:
-                                        "The wound will heal in 6 weeks. Do not have sex for 6 weeks to " +
-                                        "prevent infecting or damaging the wound. Avoid smoking, alcohol " +
-                                        "and drugs.  Keep your penis upright for 7 - 10 days, until the " +
-                                        "swelling goes down. Wear clean underwear every day. Briefs, not " +
-                                        "boxers. Don't worry if some blood stains the bandage. If blood " +
-                                        "soaks the bandage, go to the clinic immediately.",
-                                })
-                                .check.user.properties({lang: 'zu'})
-                                .run();
-                        });
-                    });
-
+                it("to states_unfinished_messages (having not received all messages; info on how to STOP", function() {
+                    return tester
+                        .setup.user.addr('082444')
+                        .input('MMC')
+                        .check.interaction({
+                            state: 'states_unfinished_messages',
+                            reply:
+                                "MMC info: U r registered to receive SMSs about ur " +
+                                "circumcision. To opt out SMS 'STOP' to 555. If u have " +
+                                "concerns with ur wound please visit ur local clinic.",
+                        })
+                        .run();
                 });
-
-
-                describe("if they have received all messages", function() {
-                    it("should tell them they've received all messages", function() {
+                it("to states_unsubscribe ('STOP')", function() {
+                    return tester
+                        .setup.user.addr('082111')
+                        .inputs('MMC', 'STOP')
+                        .check.interaction({
+                            state: 'states_unsubscribe',
+                            reply: "You have been unsubscribed."
+                        })
+                    .run();
+                });
+                describe("if they only have one subscription", function() {
+                    it("to states_update_language_success (update language)", function() {
                         return tester
-                            .setup.user.addr('082333')
-                            .input('gah')
+                            .setup.user.addr('082111')
+                            .inputs('MMC', '1')
                             .check.interaction({
-                                state: 'states_finished_messages',
+                                state: 'states_update_language_success',
                                 reply:
-                                    "You have finished your set of SMSs and your circumcision " +
-                                    "wound should be healed. If not, please visit your local " +
-                                    "clinic. Thanks for using the MMC info service.",
+                                    "The wound will heal in 6 weeks. Do not have sex for 6 weeks to " +
+                                    "prevent infecting or damaging the wound. Avoid smoking, alcohol " +
+                                    "and drugs.  Keep your penis upright for 7 - 10 days, until the " +
+                                    "swelling goes down. Wear clean underwear every day. Briefs, not " +
+                                    "boxers. Don't worry if some blood stains the bandage. If blood " +
+                                    "soaks the bandage, go to the clinic immediately.",
                             })
+                            .check.user.properties({lang: 'xh'})
                             .run();
                     });
                 });
-
-                describe("if they have NOT received all messages", function() {
-                    it("should tell them to wait and how to STOP", function() {
+                describe("if they have more than one subscription", function() {
+                    it("to states_update_language_success (update language for all subscriptions)", function() {
                         return tester
-                            .setup.user.addr('082444')
-                            .input('why')
+                            .setup.user.addr('082222')
+                            .inputs('MMC', '2')
                             .check.interaction({
-                                state: 'states_unfinished_messages',
+                                state: 'states_update_language_success',
                                 reply:
-                                    "MMC info: U r registered to receive SMSs about ur " +
-                                    "circumcision. To opt out SMS 'STOP' to 555. If u have " +
-                                    "concerns with ur wound please visit ur local clinic.",
+                                    "The wound will heal in 6 weeks. Do not have sex for 6 weeks to " +
+                                    "prevent infecting or damaging the wound. Avoid smoking, alcohol " +
+                                    "and drugs.  Keep your penis upright for 7 - 10 days, until the " +
+                                    "swelling goes down. Wear clean underwear every day. Briefs, not " +
+                                    "boxers. Don't worry if some blood stains the bandage. If blood " +
+                                    "soaks the bandage, go to the clinic immediately.",
                             })
+                            .check.user.properties({lang: 'zu'})
                             .run();
                     });
                 });
             });
         });
 
+        describe("when a user sends anything except 'STOP', 'BLOCK', 'MMC'", function() {
+            it("to states_how_to_register (unregistered user)", function() {
+                return tester
+                    .setup.user.addr('082111')
+                    .input('ouch')
+                    .check.interaction({
+                        state: 'states_how_to_register',
+                        reply:
+                            "Welcome to the Medical Male Circumcision (MMC) info service. " +
+                            "To get FREE info on how to look after your circumcision " +
+                            "wound please SMS 'MMC' to 555."
+                    })
+                    .run();
+            });
+            it("to states_finished_messages (received all messages)", function() {
+                return tester
+                    .setup.user.addr('082333')
+                    .input('gah')
+                    .check.interaction({
+                        state: 'states_finished_messages',
+                        reply:
+                            "You have finished your set of SMSs and your circumcision " +
+                            "wound should be healed. If not, please visit your local " +
+                            "clinic. Thanks for using the MMC info service.",
+                    })
+                    .run();
+            });
+            it("to states_unfinished_messages (not received all messages)", function() {
+                return tester
+                    .setup.user.addr('082444')
+                    .input('why')
+                    .check.interaction({
+                        state: 'states_unfinished_messages',
+                        reply:
+                            "MMC info: U r registered to receive SMSs about ur " +
+                            "circumcision. To opt out SMS 'STOP' to 555. If u have " +
+                            "concerns with ur wound please visit ur local clinic.",
+                    })
+                    .run();
+            });
+        });
 
         // METRICS
         describe("testing metrics", function() {
@@ -333,7 +298,7 @@ describe("MMC App", function() {
                 });
             });
 
-            describe("when an unregistered user sends in MMC", function() {
+            describe("when an unregistered user sends 'MMC'", function() {
                 it("should increase the number of registered users", function() {
                     return tester
                         .setup.user.addr('082111')
@@ -346,7 +311,7 @@ describe("MMC App", function() {
                 });
             });
 
-            describe("when a user sends in STOP", function() {
+            describe("when a user sends 'STOP'", function() {
                 it("should increase the number of opted out users", function() {
                     return tester
                         .setup.user.addr('082333')
@@ -358,8 +323,6 @@ describe("MMC App", function() {
                         .run();
                 });
             });
-
         });
-
     });
 });
