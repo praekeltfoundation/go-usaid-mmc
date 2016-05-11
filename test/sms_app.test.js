@@ -6,8 +6,8 @@ var messagestore = require('./optoutstore');
 var DummyOptoutResource = messagestore.DummyOptoutResource;
 
 
-describe("app", function() {
-    describe("GoApp", function() {
+describe("MMC App", function() {
+    describe("SMS", function() {
         var app;
         var tester;
 

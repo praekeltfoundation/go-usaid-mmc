@@ -11,8 +11,14 @@ go.app = function() {
     var GoApp = App.extend(function(self) {
         App.call(self, 'state_start');
         var $ = self.$;
+        var interrupt = true;
 
         self.init = function() {
+
+            self.im.on('session:close', function(e) {
+                return self.dial_back(e);
+            });
+
             // Fetch the contact from the contact store that matches the current
             // user's address. When we get the contact, we put the contact on
             // the app so we can reference it easily when creating each state.
@@ -23,7 +29,91 @@ go.app = function() {
                 });
         };
 
-        self.states.add('state_start', function(name) {
+    // DIALBACK SMS HANDLING
+
+        self.should_send_dialback = function(e) {
+            return e.user_terminated
+                && !go.utils.is_true(self.contact.extra.redial_sms_sent);
+        };
+
+        self.send_dialback = function() {
+            return self.im.outbound
+                .send_to_user({
+                    endpoint: 'sms',
+                    content: self.get_dialback_sms()
+                })
+                .then(function() {
+                    self.contact.extra.redial_sms_sent = 'true';
+                    return self.im.contacts.save(self.contact);
+                });
+        };
+
+        self.dial_back = function(e) {
+            if (!self.should_send_dialback(e)) { return; }
+            return self.send_dialback();
+        };
+
+        self.get_dialback_sms = function() {
+            return $("Thanks for using the {{channel}} MMC service! Dial back "
+                + "anytime to find MMC clinics, sign up for free SMSs about "
+                + "men's health or speak to a MMC expert (20c/20sec)")
+                .context({
+                    channel: self.im.config.channel
+                });
+        };
+
+
+
+    // TIMEOUT HANDLING
+
+        // determine whether timed_out state should be used
+        self.timed_out = function() {
+            var no_redirects = [
+
+            ];
+
+            return self.im.msg.session_event === 'new'
+                && self.im.user.state.name
+                && no_redirects.indexOf(self.im.user.state.name) === -1;
+        };
+
+        // override normal state adding
+        self.add = function(name, creator) {
+            self.states.add(name, function(name, opts) {
+                if (!interrupt || !self.timed_out(self.im))
+                    return creator(name, opts);
+
+                interrupt = false;
+                var timeout_opts = opts || {};
+                timeout_opts.name = name;
+                return self.states.create('state_timed_out', timeout_opts);
+            });
+        };
+
+        // timeout state
+        self.states.add('state_timed_out', function(name, creator_opts) {
+            //var readable_no = go.utils.readable_sa_msisdn(self.contact.msisdn);
+
+            return new ChoiceState(name, {
+                question: $("Welcome back to the Medical Male Circumcision (MMC"
+                    + ") service. What would you like to do?"),
+                choices: [
+                    new Choice(creator_opts.name, $("Return to last screen "
+                        +"visited")),
+                    new Choice('state_main_menu', $("Main Menu")),
+                    new Choice('state_end', $("Exit"))
+                ],
+
+                next: function(choice) {
+                    return {
+                        name: choice.value,
+                        creator_opts: creator_opts
+                    };
+                }
+            });
+        });
+
+        self.add('state_start', function(name) {
             if (!self.im.user.lang) {
                 return self.states.create('state_select_language');
             } else {
@@ -31,16 +121,16 @@ go.app = function() {
             }
         });
 
-        self.states.add('state_main_menu', function(name){
+        self.add('state_main_menu', function(name){
             return new PaginatedChoiceState(name, {
                 question: $('Medical Male Circumcision (MMC):'),
                 characters_per_page: 160,
                 options_per_page: null,
                 choices: [
-                    new Choice('state_end', $('Find a clinic')),
+                    new Choice('state_healthsites', $('Find a clinic')),
                     new Choice('state_end', $('Speak to an expert for FREE')),
                     new Choice(
-                        'state_healthsites',
+                        'state_op',
                         $('Get FREE SMSs about your MMC recovery')),
                     new Choice(
                         'state_servicerating_location',
@@ -57,18 +147,18 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_end', function(name) {
+        self.add('state_end', function(name) {
             return new EndState(name, {
                 text: $([
-                    'Thanks for using the *120*662# MMC service! Dial back',
-                    ' anytime to find MMC clinics, sign up for healing SMSs',
-                    ' or find more info about MMC (20c/20sec) Yenzakahle! ',
-                ].join('')),
+                    "Thanks for using the *120*662# MMC service! Dial back",
+                    " anytime to find MMC clinics, sign up for healing SMSs",
+                    " or find more info about MMC (20c/20sec) Yenzakahle!",
+                ].join("")),
                 next: 'state_start'
             });
         });
 
-        self.states.add('state_select_language', function(name){
+        self.add('state_select_language', function(name){
             var language_previously_not_set = self.im.user.lang === null;
             return new LanguageChoice(name, {
                 next: function(choice) {
@@ -96,7 +186,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_language_set', function(name){
+        self.add('state_language_set', function(name){
             return new ChoiceState(name, {
                 question: $("Your new language choice has been saved."),
                 choices: [
@@ -109,7 +199,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_healthsites', function(name){
+        self.add('state_healthsites', function(name){
             return new ChoiceState(name, {
                 question: $([
                     "Welcome to Healthsites. What type of clinic are you",
@@ -126,7 +216,141 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_servicerating_location', function(name){
+        // ChoiceState st-F1
+        self.states.add('state_op', function(name) {
+            var today = go.utils.get_today(self.im.config);
+            var month_choice = go.utils.make_month_choices($, today, 3, -1, "YYYYMM", "MMMM 'YY");
+            return new ChoiceState(name, {
+                question: $([
+                    "We need to know when you had your MMC to send you the ",
+                    "correct SMSs. Please select:",
+                ].join("")),
+                choices: [
+                    new Choice("state_consent", $("Today")),
+                    new Choice("state_consent", $("Yesterday")),
+                    month_choice[0],
+                    month_choice[1],
+                    month_choice[2],
+                    new Choice("state_pre_op", $("I haven't had my operation yet"))
+                ],
+                next: function(choice) {
+                    if (choice.value === "state_consent" ||
+                        choice.value === "state_pre_op") {
+
+                        return choice.value;
+                    } else {
+                        return {
+                            name: "state_op_day",
+                            creator_opts: choice.value
+                        };
+                    }
+                }
+            });
+        });
+
+        // FreeText st-F2
+        self.states.add('state_op_day', function(name, year_month) {
+            return new FreeText(name, {
+                question: $([
+                    "Please input the day you had your operation. For example, ",
+                    "12."
+                ].join("")),
+                next: function(day) {
+                    // add a zero to input if a single-digit number
+                    if (day.length == 1) day = "0" + day;
+
+                    if (go.utils.is_date_diff_less_than_x_weeks(self.im, year_month+day, 6)) {
+                        return "state_consent";
+                    } else {
+                        return "state_6week_notice";
+                    }
+                }
+            });
+        });
+
+        // ChoiceState st-F3
+        self.states.add('state_consent', function(name) {
+            return new ChoiceState(name, {
+                question: $([
+                    "Do you consent to:",
+                    "- Receiving some SMSs on public holidays, weekends & "
+                    + "before 8am?",
+                    "- Having ur cell# & language info stored so we can send u"
+                    + " SMSs?"
+                ].join('\n')),
+                choices: [
+                    new Choice("state_end_registration", $("Yes")),
+                    new Choice("state_consent_withheld", $("No"))
+                ],
+                next: function(choice) {
+                    return choice.value;
+                }
+            });
+        });
+
+        // ChoiceState st-F4
+        self.states.add('state_pre_op', function(name) {
+            return new ChoiceState(name, {
+                question: $("Thank you for your interest in MMC. Unfortunately,"
+                    + " you can only register once you have had your "
+                    + "operation."),
+                choices: [
+                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_end", $("Exit"))
+                ],
+                next: function(choice) {
+                    return choice.value;
+                }
+            });
+        });
+
+        // ChoiceState st-F5
+        self.states.add('state_6week_notice', function(name) {
+            return new ChoiceState(name, {
+                question: $([
+                    "We only send SMSs up to 6 wks after MMC. Visit the clinic ",
+                    "if you aren't healed. If you'd like to hear about ",
+                    "events & services from Brothers for Life?"
+                ].join("")),
+                choices: [
+                    new Choice("state_bfl_join", $("Yes")),
+                    new Choice("state_bfl_no_join", $("No"))
+                ],
+                next: function(choice) {
+                    return choice.value;
+                }
+            });
+        });
+
+        // ChoiceState st-F6
+        self.states.add('state_consent_withheld', function(name) {
+            return new ChoiceState(name, {
+                question: $([
+                    "Without your consent, we cannot send you messages."
+                ].join("")),
+                choices: [
+                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_consent", $("Back")),
+                    new Choice("state_end", $("Exit"))
+                ],
+                next: function(choice) {
+                    return choice.value;
+                }
+            });
+        });
+
+        self.states.add('state_end_registration', function(name) {
+            return new EndState(name, {
+                text: $([
+                    "Thank you. You are now subscrbd to MMC msgs. Remember if ",
+                    "u hav prolonged pain, visit ur nearest clinic. Call ",
+                    "0800212685 or send a please call me to 0828816202",
+                ].join("")),
+                next: 'state_start'
+            });
+        });
+
+        self.add('state_servicerating_location', function(name){
             self.im.user.answers = {};
             return new FreeText(name, {
                 question: $([
@@ -140,7 +364,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_servicerating_would_recommend', function(name){
+        self.add('state_servicerating_would_recommend', function(name){
             return new ChoiceState(name, {
                 question: $([
                     "Would you recommend a friend to the clinic where you",
@@ -163,7 +387,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_servicerating_rating', function(name){
+        self.add('state_servicerating_rating', function(name){
             return new ChoiceState(name, {
                 question: $([
                     "How would you rate the attitude of the health care",
@@ -182,7 +406,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_servicerating_subscribed_to_post_op_sms',
+        self.add('state_servicerating_subscribed_to_post_op_sms',
         function(name){
             return new ChoiceState(name, {
                 question: $("Did you subscribe to the post op SMS service?"),
@@ -206,7 +430,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_servicerating_end_positive', function(name){
+        self.add('state_servicerating_end_positive', function(name){
             return new ChoiceState(name, {
                 question: $([
                     "Thanks for rating your circumcision experience. We",
@@ -215,7 +439,7 @@ go.app = function() {
                 ].join("")),
                 choices: [
                     new Choice("state_main_menu", $("Main Menu")),
-                    new Choice("state_end", $("Exit")),
+                    new Choice("state_end", $("Exit"))
                 ],
                 next: function(choice) {
                     return choice.value;
@@ -223,7 +447,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_servicerating_end_negative', function(name){
+        self.add('state_servicerating_end_negative', function(name){
             return new ChoiceState(name, {
                 question: $([
                     "Thank you for your interest. We are only looking for",
@@ -232,7 +456,7 @@ go.app = function() {
                 ].join("")),
                 choices: [
                     new Choice("state_main_menu", $("Main Menu")),
-                    new Choice("state_end", $("Exit")),
+                    new Choice("state_end", $("Exit"))
                 ],
                 next: function(choice) {
                     //TODO make web request to store results
@@ -241,7 +465,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_bfl_start', function(name){
+        self.add('state_bfl_start', function(name){
             return new ChoiceState(name, {
                 question: $([
                     "Join Brothers for Life and we'll send you free SMSs",
@@ -250,8 +474,7 @@ go.app = function() {
                 ].join("")),
                 choices: [
                     new Choice("state_bfl_join", $("Join")),
-                    new Choice(
-                        "state_bfl_no_join", $("No Thanks")),
+                    new Choice("state_bfl_no_join", $("No Thanks"))
                 ],
                 next: function(choice) {
                     return choice.value;
@@ -259,7 +482,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_bfl_join', function(name){
+        self.add('state_bfl_join', function(name){
             return new ChoiceState(name, {
                 question: $([
                     "Thank you. You will now receive Brothers for Life",
@@ -276,7 +499,7 @@ go.app = function() {
             });
         });
 
-        self.states.add('state_bfl_no_join', function(name){
+        self.add('state_bfl_no_join', function(name){
             return new ChoiceState(name, {
                 question: $([
                     "You have selected not to receive Brothers for Life",
@@ -292,7 +515,6 @@ go.app = function() {
                 }
             });
         });
-
     });
 
     return {
