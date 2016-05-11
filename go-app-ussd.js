@@ -316,10 +316,10 @@ go.app = function() {
         self.states.add('state_end', function(name) {
             return new EndState(name, {
                 text: $([
-                    'Thanks for using the *120*662# MMC service! Dial back',
-                    ' anytime to find MMC clinics, sign up for healing SMSs',
-                    ' or find more info about MMC (20c/20sec) Yenzakahle! ',
-                ].join('')),
+                    "Thanks for using the *120*662# MMC service! Dial back",
+                    " anytime to find MMC clinics, sign up for healing SMSs",
+                    " or find more info about MMC (20c/20sec) Yenzakahle!",
+                ].join("")),
                 next: 'state_start'
             });
         });
@@ -418,8 +418,8 @@ go.app = function() {
         self.states.add('state_op_day', function(name, year_month) {
             return new FreeText(name, {
                 question: $([
-                    "Please input the day you had your operation. For example, "
-                    + "12.",
+                    "Please input the day you had your operation. For example, ",
+                    "12."
                 ].join("")),
                 next: function(day) {
                     // add a zero to input if a single-digit number
@@ -474,9 +474,9 @@ go.app = function() {
         self.states.add('state_6week_notice', function(name) {
             return new ChoiceState(name, {
                 question: $([
-                    "We only send SMSs up to 6 wks after MMC. Visit the clinic "
-                    + "if you aren't healed. If you'd like to hear about "
-                    + "events & services from Brothers for Life?"
+                    "We only send SMSs up to 6 wks after MMC. Visit the clinic ",
+                    "if you aren't healed. If you'd like to hear about ",
+                    "events & services from Brothers for Life?"
                 ].join("")),
                 choices: [
                     new Choice("state_bfl_join", $("Yes")),
@@ -508,10 +508,10 @@ go.app = function() {
         self.states.add('state_end_registration', function(name) {
             return new EndState(name, {
                 text: $([
-                    "Thank you. You are now subscrbd to MMC msgs. Remember if "
-                    + "u hav prolonged pain, visit ur nearest clinic. Call "
-                    + "0800212685 or send a please call me to 0828816202",
-                ].join('')),
+                    "Thank you. You are now subscrbd to MMC msgs. Remember if ",
+                    "u hav prolonged pain, visit ur nearest clinic. Call ",
+                    "0800212685 or send a please call me to 0828816202",
+                ].join("")),
                 next: 'state_start'
             });
         });

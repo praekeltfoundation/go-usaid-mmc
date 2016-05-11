@@ -297,6 +297,41 @@ describe("MMC App", function() {
             });
         });
 
+        describe("when user choose to go to main menu", function() {
+            it("should show the main menu page 1", function() {
+                return tester
+                    .setup.user.state('state_main_menu')
+                    .inputs('3', '5', '13', '2', '1')
+                    .check.interaction({
+                        state: 'state_main_menu',
+                        reply: [
+                            'Medical Male Circumcision (MMC):',
+                            '1. Find a clinic',
+                            '2. Speak to an expert for FREE',
+                            '3. Get FREE SMSs about your MMC recovery',
+                            '4. More',
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user exits", function() {
+            it("should respond with end state message", function() {
+                return tester
+                    .setup.user.state('state_main_menu')
+                    .inputs('3', '1', '2', '3')
+                    .check.interaction({
+                        state: 'state_end',
+                        reply: "Thanks for using the *120*662# MMC service! "
+                            + "Dial back anytime to find MMC clinics, sign up "
+                            + "for healing SMSs or find more info about MMC "
+                            + "(20c/20sec) Yenzakahle!"
+                    })
+                    .run();
+            });
+        });
+
         describe("when user doesn't consent", function() {
             it("should respond with explanation that messages can't be send without", function() {
                 return tester
@@ -310,6 +345,43 @@ describe("MMC App", function() {
                             "2. Back",
                             "3. Exit"
                         ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user doesn't consent, but goes 'back'", function() {
+            it("should respond with asking for consent", function() {
+                return tester
+                    .setup.user.state('state_main_menu')
+                    .inputs('3', '1', '2', '2')
+                    .check.interaction({
+                        state: 'state_consent',
+                        reply: [
+                            "Do you consent to:\n"
+                            + "- Receiving some SMSs on public holidays, "
+                            + "weekends & before 8am?\n"
+                            + "- Having ur cell# & language info stored so we "
+                            + "can send u SMSs?",
+                            "1. Yes",
+                            "2. No"
+                        ].join('\n')
+                    })
+                    .run();
+            });
+        });
+
+        describe("when user doesn't consent, and exits", function() {
+            it("should respond with end state message", function() {
+                return tester
+                    .setup.user.state('state_main_menu')
+                    .inputs('3', '1', '2', '3')
+                    .check.interaction({
+                        state: 'state_end',
+                        reply: "Thanks for using the *120*662# MMC service! "
+                            + "Dial back anytime to find MMC clinics, sign up "
+                            + "for healing SMSs or find more info about MMC "
+                            + "(20c/20sec) Yenzakahle!"
                     })
                     .run();
             });
