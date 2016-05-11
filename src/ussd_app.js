@@ -129,7 +129,7 @@ go.app = function() {
         // ChoiceState st-F1
         self.states.add('state_op', function(name) {
             var today = go.utils.get_today(self.im.config);
-            var month_choice = go.utils.make_month_choices($, today, 3, 1, "YYYYMM", "MMMM 'YY");
+            var month_choice = go.utils.make_month_choices($, today, 3, -1, "YYYYMM", "MMMM 'YY");
             return new ChoiceState(name, {
                 question: $([
                     "We need to know when you had your MMC to send you the ",

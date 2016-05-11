@@ -97,7 +97,7 @@ go.utils = {
         var today = go.utils.get_today(im.config);
         var d = new moment(date, 'YYYYMMDD');
 
-        return d.diff(today, "weeks") < x;
+        return today.diff(d, "weeks") < x;
     },
 
     // OPT-OUT HELPERS

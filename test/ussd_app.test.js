@@ -156,8 +156,8 @@ describe("MMC App", function() {
                             "1. Today",
                             "2. Yesterday",
                             "3. May '15",
-                            "4. June '15",
-                            "5. July '15",
+                            "4. April '15",
+                            "5. March '15",
                             "6. I haven't had my operation yet"
                         ].join('\n')
                     })
@@ -222,7 +222,7 @@ describe("MMC App", function() {
             it("should receive notice that SMSs are only send up to 6 weeks", function() {
                 return tester
                     .setup.user.state('state_main_menu')
-                    .inputs('3', '4', '20')
+                    .inputs('3', '5', '13')
                     .check.interaction({
                         state: 'state_6week_notice',
                         reply: [
@@ -263,7 +263,7 @@ describe("MMC App", function() {
             it("should respond with confirmation of BFL subscription", function() {
                 return tester
                     .setup.user.state('state_main_menu')
-                    .inputs('3', '4', '20', '1')
+                    .inputs('3', '5', '13', '1')
                     .check.interaction({
                         state: 'state_bfl_join',
                         reply: [
@@ -282,7 +282,7 @@ describe("MMC App", function() {
             it("should respond with confirmation that no BFL updates will be sent", function() {
                 return tester
                     .setup.user.state('state_main_menu')
-                    .inputs('3', '4', '20', '2')
+                    .inputs('3', '5', '13', '2')
                     .check.interaction({
                         state: 'state_bfl_no_join',
                         reply: [
