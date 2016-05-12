@@ -746,7 +746,6 @@ go.app = function() {
         });
 
         self.add('state_bfl_join', function(name){
-            self.contact.extra.bfl_member = true;
             return new ChoiceState(name, {
                 question: $([
                     "Thank you. You will now receive Brothers for Life",
@@ -758,7 +757,17 @@ go.app = function() {
                     new Choice("state_end", $("Exit")),
                 ],
                 next: function(choice) {
-                    return choice.value;
+                    self.contact.extra.bfl_member = "true";
+                    return self.im.groups
+                        .get("bfl")
+                        .then(function(group) {
+                            self.contact.groups.push(group.key);
+                            return self.im.contacts
+                                .save(self.contact)
+                                .then(function() {
+                                    return choice.value;
+                                });
+                        });
                 }
             });
         });

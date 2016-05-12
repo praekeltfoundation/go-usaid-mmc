@@ -22,6 +22,10 @@ describe("MMC App", function() {
                 })
                 .setup(function(api) {
                     fixtures().forEach(api.http.fixtures.add);
+                    api.groups.add( {
+                        key: "bfl_key",
+                        name: "bfl",
+                    });
                 });
         });
 
@@ -248,6 +252,34 @@ describe("MMC App", function() {
                                 "1. Main Menu",
                                 "2. Exit"
                             ].join("\n")
+                        })
+                        .run();
+                });
+                it("to state_main_menu (user added to BFL group)", function() {
+                    return tester
+                        .setup.user.state("state_main_menu")
+                        .inputs("3", "5", "13", "1", "1")
+                        .check.interaction({
+                            state: "state_main_menu"
+                        })
+                        .check(function(api) {
+                            var contact = api.contacts.store[0];
+                            assert.equal(contact.extra.bfl_member, "true");
+                            assert.deepEqual(contact.groups, ["bfl_key"]);
+                        })
+                        .run();
+                });
+                it("to state_end (user added to BFL group)", function() {
+                    return tester
+                        .setup.user.state("state_main_menu")
+                        .inputs("3", "5", "13", "1", "2")
+                        .check.interaction({
+                            state: "state_end"
+                        })
+                        .check(function(api) {
+                            var contact = api.contacts.store[0];
+                            assert.equal(contact.extra.bfl_member, "true");
+                            assert.deepEqual(contact.groups, ["bfl_key"]);
                         })
                         .run();
                 });
@@ -493,7 +525,7 @@ describe("MMC App", function() {
                         })
                         .run();
                 });
-                it("to state_end via decision to join", function() {
+                it("to state_end via decision to join (user added to BFL group)", function() {
                     return tester
                         .setup.user.state("state_main_menu")
                         .inputs("4", "2", "1", "2")
@@ -503,6 +535,11 @@ describe("MMC App", function() {
                                 + "Dial back anytime to find MMC clinics, sign up "
                                 + "for healing SMSs or find more info about MMC "
                                 + "(20c/20sec) Yenzakahle!"
+                        })
+                        .check(function(api) {
+                            var contact = api.contacts.store[0];
+                            assert.equal(contact.extra.bfl_member, "true");
+                            assert.deepEqual(contact.groups, ["bfl_key"]);
                         })
                         .run();
                 });
@@ -519,7 +556,7 @@ describe("MMC App", function() {
                         })
                         .run();
                 });
-                it("to state_main_menu via state_bfl_join", function() {
+                it("to state_main_menu via state_bfl_join (user added to BFL group)", function() {
                     return tester
                         .setup.user.state("state_main_menu")
                         .inputs("4", "2", "1", "1")
@@ -532,6 +569,11 @@ describe("MMC App", function() {
                                 "3. Get FREE SMSs about your MMC recovery",
                                 "4. More",
                             ].join("\n")
+                        })
+                        .check(function(api) {
+                            var contact = api.contacts.store[0];
+                            assert.equal(contact.extra.bfl_member, "true");
+                            assert.deepEqual(contact.groups, ["bfl_key"]);
                         })
                         .run();
                 });
