@@ -178,25 +178,25 @@ go.utils = {
 
     subscription_unsubscribe_all: function(contact, im) {
         var params = {
-        to_addr: contact.msisdn
+            to_addr: contact.msisdn
         };
         return go.utils
-        .control_api_call("get", params, null, 'subscription/', im)
-        .then(function(json_result) {
-            // make all subscriptions inactive
-            var update = JSON.parse(json_result.data);
-            var clean = true;
-            for (i=0;i<update.objects.length;i++) {
-                if (update.objects[i].active === true){
-                    update.objects[i].active = false;
-                    clean = false;
+            .control_api_call("get", params, null, 'subscription/', im)
+            .then(function(json_result) {
+                // make all subscriptions inactive
+                var update = JSON.parse(json_result.data);
+                var clean = true;
+                for (i=0;i<update.objects.length;i++) {
+                    if (update.objects[i].active === true){
+                        update.objects[i].active = false;
+                        clean = false;
+                    }
                 }
-            }
-            if (!clean) {
-                return go.utils.control_api_call("patch", {}, update, 'subscription/', im);
-            } else {
-                return Q();
-            }
+                if (!clean) {
+                    return go.utils.control_api_call("patch", {}, update, 'subscription/', im);
+                } else {
+                    return Q();
+                }
 
         });
     },
@@ -242,13 +242,13 @@ go.utils = {
 
         subscription_subscribe: function(contact, im) {
             var payload = {
-              contact_key: contact.key,
-              lang: 'en',
-              message_set: "/subscription/api/v1/message_set/12/",
-              next_sequence_number: 2,
-              schedule: "/subscription/api/v1/periodic_task/1/",
-              to_addr: contact.msisdn,
-              user_account: contact.user_account
+                contact_key: contact.key,
+                lang: 'en',
+                message_set: "/subscription/api/v1/message_set/12/",
+                next_sequence_number: 2,
+                schedule: "/subscription/api/v1/periodic_task/1/",
+                to_addr: contact.msisdn,
+                user_account: contact.user_account
             };
             return go.utils.control_api_call("post", null, payload, 'subscription/', im);
         },
