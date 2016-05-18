@@ -167,43 +167,43 @@ go.utils = {
 
     subscription_completed: function(contact, im) {
         var params = {
-        to_addr: contact.msisdn
+            to_addr: contact.msisdn
         };
         return go.utils
-        .control_api_call("get", params, null, 'subscription/', im)
-        .then(function(json_result) {
-            var parsed_data = JSON.parse(json_result.data);
-            var all_completed = true;
-            for (i=0; i<parsed_data.objects.length; i++) {
-                if (parsed_data.objects[i].completed === false) {
-                    all_completed = false;
+            .control_api_call("get", params, null, 'subscription/', im)
+            .then(function(json_result) {
+                var parsed_data = JSON.parse(json_result.data);
+                var all_completed = true;
+                for (i=0; i<parsed_data.objects.length; i++) {
+                    if (parsed_data.objects[i].completed === false) {
+                        all_completed = false;
+                    }
                 }
-            }
             return all_completed;
         });
     },
 
     subscription_unsubscribe_all: function(contact, im) {
         var params = {
-        to_addr: contact.msisdn
+            to_addr: contact.msisdn
         };
         return go.utils
-        .control_api_call("get", params, null, 'subscription/', im)
-        .then(function(json_result) {
-            // make all subscriptions inactive
-            var update = JSON.parse(json_result.data);
-            var clean = true;
-            for (i=0;i<update.objects.length;i++) {
-                if (update.objects[i].active === true){
-                    update.objects[i].active = false;
-                    clean = false;
+            .control_api_call("get", params, null, 'subscription/', im)
+            .then(function(json_result) {
+                // make all subscriptions inactive
+                var update = JSON.parse(json_result.data);
+                var clean = true;
+                for (i=0;i<update.objects.length;i++) {
+                    if (update.objects[i].active === true){
+                        update.objects[i].active = false;
+                        clean = false;
+                    }
                 }
-            }
-            if (!clean) {
-                return go.utils.control_api_call("patch", {}, update, 'subscription/', im);
-            } else {
-                return Q();
-            }
+                if (!clean) {
+                    return go.utils.control_api_call("patch", {}, update, 'subscription/', im);
+                } else {
+                    return Q();
+                }
 
         });
     },
@@ -222,7 +222,7 @@ go.utils = {
 
                 if (update.objects.length === 1) {
                 if (update.objects[0].lang !== lang) {
-                    patch_url = 'subscription/' + update.objects[0].id;
+                    patch_url = 'subscription/' + update.objects[0].id + '/';
                     clean = false;
                     update = {
                         "lang": lang
@@ -247,18 +247,19 @@ go.utils = {
             });
         },
 
-        subscription_subscribe: function(contact, im) {
+        subscription_subscribe: function(contact, im, language) {
             var payload = {
-              contact_key: contact.key,
-              lang: 'en',
-              message_set: "/subscription/api/v1/message_set/12/",
-              next_sequence_number: 2,
-              schedule: "/subscription/api/v1/periodic_task/1/",
-              to_addr: contact.msisdn,
-              user_account: contact.user_account
+                contact_key: contact.key,
+                lang: language,
+                message_set: "/subscription/api/v1/message_set/12/",
+                next_sequence_number: 2,
+                schedule: "/subscription/api/v1/periodic_task/1/",
+                to_addr: contact.msisdn,
+                user_account: contact.user_account
             };
             return go.utils.control_api_call("post", null, payload, 'subscription/', im);
         },
+
 };
 
 go.app = function() {
@@ -431,7 +432,12 @@ go.app = function() {
                             if (language_previously_not_set) {
                                 return "state_main_menu";
                             } else {
-                                return 'state_language_set';
+                                return go.utils
+                                    .subscription_set_language(self.contact,
+                                        self.im, self.contact.extra.language_choice)
+                                    .then(function() {
+                                        return 'state_language_set';
+                                    });
                             }
                         });
                 },
@@ -521,12 +527,18 @@ go.app = function() {
                 next: function(day) {
                     // add a zero to input if a single-digit number
                     if (day.length == 1) day = "0" + day;
+                    var date_of_op = year_month+day;
+                    self.contact.extra.date_of_op = date_of_op;  //YYYYMMDD
 
-                    if (go.utils.is_date_diff_less_than_x_weeks(self.im, year_month+day, 6)) {
-                        return "state_consent";
-                    } else {
-                        return "state_6week_notice";
-                    }
+                    return self.im.contacts
+                        .save(self.contact)
+                        .then(function() {
+                            if (go.utils.is_date_diff_less_than_x_weeks(self.im, date_of_op, 6)) {
+                                return "state_consent";
+                            } else {
+                                return "state_6week_notice";
+                            }
+                        });
                 }
             });
         });
@@ -542,7 +554,7 @@ go.app = function() {
                     + " SMSs?"
                 ].join('\n')),
                 choices: [
-                    new Choice("state_end_registration", $("Yes")),
+                    new Choice("state_save_and_subscribe", $("Yes")),
                     new Choice("state_consent_withheld", $("No"))
                 ],
                 next: function(choice) {
@@ -600,6 +612,30 @@ go.app = function() {
                     return choice.value;
                 }
             });
+        });
+
+        // interstitial
+        self.states.add('state_save_and_subscribe', function(name) {
+            if (self.contact.extra.language_choice === undefined) {
+                // default to english if not yet defined
+                self.contact.extra.language_choice = "en";
+            }
+
+            var lang_choice = self.contact.extra.language_choice;
+
+            return go.utils
+                .subscription_subscribe(self.contact, self.im, lang_choice)
+                .then(function() {
+                    self.contact.extra.is_registered = "true";
+                    self.contact.extra.consent = "true";
+
+                    return self.im.user
+                        .set_lang(self.contact.extra.language_choice)
+                        .then(function() {
+                            self.im.contacts.save(self.contact);
+                            return self.states.create('state_end_registration');
+                        });
+                });
         });
 
         self.states.add('state_end_registration', function(name) {

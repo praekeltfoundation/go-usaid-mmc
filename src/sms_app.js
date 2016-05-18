@@ -128,7 +128,7 @@ go.app = function() {
 
         self.add('states_register_english', function(name) {
             return go.utils
-                .subscription_subscribe(self.contact, self.im)
+                .subscription_subscribe(self.contact, self.im, 'en')
                 .then(function() {
                     return self.states.create('states_language');
                 });
