@@ -222,7 +222,7 @@ go.utils = {
 
                 if (update.objects.length === 1) {
                 if (update.objects[0].lang !== lang) {
-                    patch_url = 'subscription/' + update.objects[0].id;
+                    patch_url = 'subscription/' + update.objects[0].id + '/';
                     clean = false;
                     update = {
                         "lang": lang

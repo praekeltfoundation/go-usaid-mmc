@@ -168,7 +168,12 @@ go.app = function() {
                             if (language_previously_not_set) {
                                 return "state_main_menu";
                             } else {
-                                return 'state_language_set';
+                                return go.utils
+                                    .subscription_set_language(self.contact,
+                                        self.im, self.contact.extra.language_choice)
+                                    .then(function() {
+                                        return 'state_language_set';
+                                    });
                             }
                         });
                 },
