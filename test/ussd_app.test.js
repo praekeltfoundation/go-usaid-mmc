@@ -254,6 +254,27 @@ describe("MMC App", function() {
                         })
                         .run();
                 });
+                it("to state_end_registration", function() {
+                    return tester
+                        .setup.user.addr("082111")
+                        .setup.user.state("state_main_menu")
+                        .inputs("3", "4", "5", "1")
+                        .check.interaction({
+                            state: "state_end_registration",
+                            reply: [
+                                "Thank you. You are now subscrbd to MMC msgs. ",
+                                "Remember if u hav prolonged pain, visit ur ",
+                                "nearest clinic. Call 0800212685 or send a ",
+                                "please call me to 0828816202"
+                            ].join("")
+                        })
+                        .check(function(api) {
+                            var contact = api.contacts.store[0];
+                            assert.equal(contact.extra.is_registered, "true");
+                            assert.equal(contact.extra.language_choice, "en");
+                        })
+                        .run();
+                });
                 it("to state_bfl_join", function() {
                     return tester
                         .setup.user.state("state_main_menu")

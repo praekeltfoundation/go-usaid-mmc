@@ -552,15 +552,7 @@ go.app = function() {
                     new Choice("state_consent_withheld", $("No"))
                 ],
                 next: function(choice) {
-                    var lang_choice = self.contact.extra.language_choice !== undefined
-                        ? self.contact.extra.language_choice
-                        : 'en';  // default to english if not yet defined
-
-                    return go.utils
-                        .subscription_subscribe(self.contact, self.im, lang_choice)
-                        .then(function() {
-                            return choice.value;
-                        });
+                    return choice.value;
                 }
             });
         });
@@ -623,7 +615,28 @@ go.app = function() {
                     "u hav prolonged pain, visit ur nearest clinic. Call ",
                     "0800212685 or send a please call me to 0828816202",
                 ].join("")),
-                next: 'state_start'
+                next: 'state_start',
+                events: {
+                    "state:enter": function() {
+                        if (self.contact.extra.language_choice === undefined) {
+                            // default to english if not yet defined
+                            self.contact.extra.language_choice = "en";
+                        }
+
+                        var lang_choice = self.contact.extra.language_choice;
+
+                        return go.utils
+                            .subscription_subscribe(self.contact, self.im, lang_choice)
+                            .then(function() {
+                                self.contact.extra.is_registered = 'true';
+                                return self.im.user
+                                    .set_lang(self.contact.extra.language_choice)
+                                    .then(function() {
+                                        self.im.contacts.save(self.contact);
+                                    });
+                            });
+                    }
+                }
             });
         });
 
