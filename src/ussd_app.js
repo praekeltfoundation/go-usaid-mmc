@@ -283,8 +283,12 @@ go.app = function() {
                     new Choice("state_consent_withheld", $("No"))
                 ],
                 next: function(choice) {
+                    var lang_choice = self.contact.extra.language_choice !== undefined
+                        ? self.contact.extra.language_choice
+                        : 'en';  // default to english if not yet defined
+
                     return go.utils
-                        .subscription_subscribe(self.contact, self.im)
+                        .subscription_subscribe(self.contact, self.im, lang_choice)
                         .then(function() {
                             return choice.value;
                         });

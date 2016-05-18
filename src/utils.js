@@ -240,10 +240,10 @@ go.utils = {
             });
         },
 
-        subscription_subscribe: function(contact, im) {
+        subscription_subscribe: function(contact, im, language) {
             var payload = {
                 contact_key: contact.key,
-                lang: 'en',
+                lang: language,
                 message_set: "/subscription/api/v1/message_set/12/",
                 next_sequence_number: 2,
                 schedule: "/subscription/api/v1/periodic_task/1/",
@@ -252,4 +252,5 @@ go.utils = {
             };
             return go.utils.control_api_call("post", null, payload, 'subscription/', im);
         },
+
 };

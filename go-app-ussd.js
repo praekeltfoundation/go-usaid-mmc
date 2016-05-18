@@ -247,10 +247,10 @@ go.utils = {
             });
         },
 
-        subscription_subscribe: function(contact, im) {
+        subscription_subscribe: function(contact, im, language) {
             var payload = {
                 contact_key: contact.key,
-                lang: 'en',
+                lang: language,
                 message_set: "/subscription/api/v1/message_set/12/",
                 next_sequence_number: 2,
                 schedule: "/subscription/api/v1/periodic_task/1/",
@@ -259,6 +259,7 @@ go.utils = {
             };
             return go.utils.control_api_call("post", null, payload, 'subscription/', im);
         },
+
 };
 
 go.app = function() {
@@ -546,8 +547,12 @@ go.app = function() {
                     new Choice("state_consent_withheld", $("No"))
                 ],
                 next: function(choice) {
+                    var lang_choice = self.contact.extra.language_choice !== undefined
+                        ? self.contact.extra.language_choice
+                        : 'en';  // default to english if not yet defined
+
                     return go.utils
-                        .subscription_subscribe(self.contact, self.im)
+                        .subscription_subscribe(self.contact, self.im, lang_choice)
                         .then(function() {
                             return choice.value;
                         });
