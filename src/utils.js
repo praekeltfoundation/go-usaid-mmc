@@ -160,18 +160,18 @@ go.utils = {
 
     subscription_completed: function(contact, im) {
         var params = {
-        to_addr: contact.msisdn
+            to_addr: contact.msisdn
         };
         return go.utils
-        .control_api_call("get", params, null, 'subscription/', im)
-        .then(function(json_result) {
-            var parsed_data = JSON.parse(json_result.data);
-            var all_completed = true;
-            for (i=0; i<parsed_data.objects.length; i++) {
-                if (parsed_data.objects[i].completed === false) {
-                    all_completed = false;
+            .control_api_call("get", params, null, 'subscription/', im)
+            .then(function(json_result) {
+                var parsed_data = JSON.parse(json_result.data);
+                var all_completed = true;
+                for (i=0; i<parsed_data.objects.length; i++) {
+                    if (parsed_data.objects[i].completed === false) {
+                        all_completed = false;
+                    }
                 }
-            }
             return all_completed;
         });
     },
