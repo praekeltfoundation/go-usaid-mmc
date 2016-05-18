@@ -283,7 +283,11 @@ go.app = function() {
                     new Choice("state_consent_withheld", $("No"))
                 ],
                 next: function(choice) {
-                    return choice.value;
+                    return go.utils
+                        .subscription_subscribe(self.contact, self.im)
+                        .then(function() {
+                            return choice.value;
+                        });
                 }
             });
         });

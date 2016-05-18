@@ -18,7 +18,22 @@ describe("MMC App", function() {
                 .setup.char_limit(182)
                 .setup.config.app({
                     name: "test_app",
-                    testing_today: "2015-05-03 06:07:08.999"
+                    testing_today: "2015-05-03 06:07:08.999",
+                    control: {
+                        username: "test_user",
+                        api_key: "test_key",
+                        url: "http://fixture/subscription/api/v1/"
+                    }
+                })
+                // Set up contacts
+                .setup(function(api) {
+                    // unregistered user
+                    api.contacts.add({
+                        msisdn: '+082111',
+                        extra: {},
+                        key: "63ee4fa9-6888-4f0c-065a-939dc2473a99",
+                        user_account: "4a11907a-4cc4-415a-9011-58251e15e2b4"
+                    });
                 })
                 .setup(function(api) {
                     fixtures().forEach(api.http.fixtures.add);
@@ -257,6 +272,7 @@ describe("MMC App", function() {
                 });
                 it("to state_main_menu (user added to BFL group)", function() {
                     return tester
+                        .setup.user.addr('082111')
                         .setup.user.state("state_main_menu")
                         .inputs("3", "5", "13", "1", "1")
                         .check.interaction({
@@ -271,6 +287,7 @@ describe("MMC App", function() {
                 });
                 it("to state_end (user added to BFL group)", function() {
                     return tester
+                        .setup.user.addr('082111')
                         .setup.user.state("state_main_menu")
                         .inputs("3", "5", "13", "1", "2")
                         .check.interaction({
@@ -317,6 +334,7 @@ describe("MMC App", function() {
                 });
                 it("to state_consent_withheld (flow from main menu options 1 & 2)", function() {
                     return tester
+                        .setup.user.addr('082111')
                         .setup.user.state("state_main_menu")
                         .inputs("3", "1", "2")
                         .check.interaction({
@@ -332,6 +350,7 @@ describe("MMC App", function() {
                 });
                 it("to state_end via state_consent_withheld", function() {
                     return tester
+                        .setup.user.addr('082111')
                         .setup.user.state("state_main_menu")
                         .inputs("3", "1", "2", "3")
                         .check.interaction({
@@ -345,6 +364,7 @@ describe("MMC App", function() {
                 });
                 it("to state_consent via state_consent_withheld", function() {
                     return tester
+                        .setup.user.addr('082111')
                         .setup.user.state("state_main_menu")
                         .inputs("3", "1", "2", "2")
                         .check.interaction({
@@ -527,6 +547,7 @@ describe("MMC App", function() {
                 });
                 it("to state_end via decision to join (user added to BFL group)", function() {
                     return tester
+                        .setup.user.addr('082111')
                         .setup.user.state("state_main_menu")
                         .inputs("4", "2", "1", "2")
                         .check.interaction({
@@ -558,6 +579,7 @@ describe("MMC App", function() {
                 });
                 it("to state_main_menu via state_bfl_join (user added to BFL group)", function() {
                     return tester
+                        .setup.user.addr('082111')
                         .setup.user.state("state_main_menu")
                         .inputs("4", "2", "1", "1")
                         .check.interaction({
