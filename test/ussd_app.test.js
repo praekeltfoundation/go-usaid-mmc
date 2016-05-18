@@ -271,7 +271,9 @@ describe("MMC App", function() {
                         .check(function(api) {
                             var contact = api.contacts.store[0];
                             assert.equal(contact.extra.is_registered, "true");
+                            assert.equal(contact.extra.consent, "true");
                             assert.equal(contact.extra.language_choice, "en");
+                            assert.equal(contact.extra.date_of_op, "20150405");
                         })
                         .run();
                 });

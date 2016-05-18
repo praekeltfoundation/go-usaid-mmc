@@ -263,12 +263,18 @@ go.app = function() {
                 next: function(day) {
                     // add a zero to input if a single-digit number
                     if (day.length == 1) day = "0" + day;
+                    var date_of_op = year_month+day;
+                    self.contact.extra.date_of_op = date_of_op;  //YYYYMMDD
 
-                    if (go.utils.is_date_diff_less_than_x_weeks(self.im, year_month+day, 6)) {
-                        return "state_consent";
-                    } else {
-                        return "state_6week_notice";
-                    }
+                    return self.im.contacts
+                        .save(self.contact)
+                        .then(function() {
+                            if (go.utils.is_date_diff_less_than_x_weeks(self.im, date_of_op, 6)) {
+                                return "state_consent";
+                            } else {
+                                return "state_6week_notice";
+                            }
+                        });
                 }
             });
         });
@@ -284,7 +290,7 @@ go.app = function() {
                     + " SMSs?"
                 ].join('\n')),
                 choices: [
-                    new Choice("state_end_registration", $("Yes")),
+                    new Choice("state_save_and_subscribe", $("Yes")),
                     new Choice("state_consent_withheld", $("No"))
                 ],
                 next: function(choice) {
@@ -344,6 +350,30 @@ go.app = function() {
             });
         });
 
+        // interstitial
+        self.states.add('state_save_and_subscribe', function(name) {
+            if (self.contact.extra.language_choice === undefined) {
+                // default to english if not yet defined
+                self.contact.extra.language_choice = "en";
+            }
+
+            var lang_choice = self.contact.extra.language_choice;
+
+            return go.utils
+                .subscription_subscribe(self.contact, self.im, lang_choice)
+                .then(function() {
+                    self.contact.extra.is_registered = "true";
+                    self.contact.extra.consent = "true";
+
+                    return self.im.user
+                        .set_lang(self.contact.extra.language_choice)
+                        .then(function() {
+                            self.im.contacts.save(self.contact);
+                            return self.states.create('state_end_registration');
+                        });
+                });
+        });
+
         self.states.add('state_end_registration', function(name) {
             return new EndState(name, {
                 text: $([
@@ -351,28 +381,7 @@ go.app = function() {
                     "u hav prolonged pain, visit ur nearest clinic. Call ",
                     "0800212685 or send a please call me to 0828816202",
                 ].join("")),
-                next: 'state_start',
-                events: {
-                    "state:enter": function() {
-                        if (self.contact.extra.language_choice === undefined) {
-                            // default to english if not yet defined
-                            self.contact.extra.language_choice = "en";
-                        }
-
-                        var lang_choice = self.contact.extra.language_choice;
-
-                        return go.utils
-                            .subscription_subscribe(self.contact, self.im, lang_choice)
-                            .then(function() {
-                                self.contact.extra.is_registered = 'true';
-                                return self.im.user
-                                    .set_lang(self.contact.extra.language_choice)
-                                    .then(function() {
-                                        self.im.contacts.save(self.contact);
-                                    });
-                            });
-                    }
-                }
+                next: 'state_start'
             });
         });
 
