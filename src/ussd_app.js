@@ -127,7 +127,8 @@ go.app = function() {
                 characters_per_page: 160,
                 options_per_page: null,
                 choices: [
-                    new Choice('state_healthsites', $('Find a clinic')),
+                    /*** Clinic locator option disabled for now (CCI-33) ***
+                     new Choice('state_healthsites', $('Find a clinic')),*/
                     new Choice('state_end', $('Speak to an expert for FREE')),
                     new Choice(
                         'state_op',
@@ -204,6 +205,7 @@ go.app = function() {
             });
         });
 
+        /*** Clinic locator option disabled for now (CCI-33) ***
         self.add('state_healthsites', function(name){
             return new ChoiceState(name, {
                 question: $([
@@ -219,7 +221,7 @@ go.app = function() {
                     return choice.value;
                 }
             });
-        });
+        });*/
 
         // ChoiceState st-F1
         self.states.add('state_op', function(name) {

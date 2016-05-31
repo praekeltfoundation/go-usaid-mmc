@@ -82,7 +82,7 @@ describe("MMC App", function() {
                     return tester
                         .setup.user.lang("en")
                         .setup.user.state("state_main_menu")
-                        .inputs("4", "3", "2")
+                        .inputs("4", "2", "2")
                         .check.interaction({
                             state: "state_language_set",
                             reply: [
@@ -105,9 +105,10 @@ describe("MMC App", function() {
                             state: "state_main_menu",
                             reply: [
                                 "Medical Male Circumcision (MMC):",
-                                "1. Find a clinic",
-                                "2. Speak to an expert for FREE",
-                                "3. Get FREE SMSs about your MMC recovery",
+                                //"1. Find a clinic",  (disabled - see CCI-33)
+                                "1. Speak to an expert for FREE",
+                                "2. Get FREE SMSs about your MMC recovery",
+                                "3. Rate your clinic's MMC service",
                                 "4. More",
                             ].join("\n")
                         })
@@ -121,18 +122,18 @@ describe("MMC App", function() {
                             state: "state_main_menu",
                             reply: [
                                 "Medical Male Circumcision (MMC):",
-                                "1. Rate your clinic's MMC service",
-                                "2. Join Brothers for Life",
-                                "3. Change Language",
-                                "4. Exit",
-                                "5. Back",
+                                //"1. Rate your clinic's MMC service",
+                                "1. Join Brothers for Life",
+                                "2. Change Language",
+                                "3. Exit",
+                                "4. Back",
                             ].join("\n")
                         })
                         .run();
                 });
             });
 
-            describe("(Find a Clinic)", function() {
+            describe.skip("(Find a Clinic)", function() {
                 it("to state_healthsites (healthsites menu)", function() {
                     return tester
                         .setup.user.state("state_main_menu")
@@ -159,7 +160,7 @@ describe("MMC App", function() {
                 it("to state_op", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .input("3")
+                        .input("2")
                         .check.interaction({
                             state: "state_op",
                             reply: [
@@ -178,7 +179,7 @@ describe("MMC App", function() {
                 it("to state_pre_op", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .inputs("3", "6")
+                        .inputs("2", "6")
                         .check.interaction({
                             state: "state_pre_op",
                             reply: [
@@ -193,7 +194,7 @@ describe("MMC App", function() {
                 it("to state_consent (menu options 1 & 2)", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .inputs("3", "1")
+                        .inputs("2", "1")
                         .check.interaction({
                             state: "state_consent",
                             reply: [
@@ -211,7 +212,7 @@ describe("MMC App", function() {
                 it("to state_op_day (menu option 3,4,5)", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .inputs("3", "4")
+                        .inputs("2", "4")
                         .check.interaction({
                             state: "state_op_day",
                             reply: "Please input the day you had your operation. "
@@ -222,7 +223,7 @@ describe("MMC App", function() {
                 it("to state_6week_notice; op date >= 6 weeks ago", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .inputs("3", "5", "13")
+                        .inputs("2", "5", "13")
                         .check.interaction({
                             state: "state_6week_notice",
                             reply: [
@@ -239,7 +240,7 @@ describe("MMC App", function() {
                 it("to state_consent; op date < 6 weeks ago", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .inputs("3", "4", "5")
+                        .inputs("2", "4", "5")
                         .check.interaction({
                             state: "state_consent",
                             reply: [
@@ -258,7 +259,7 @@ describe("MMC App", function() {
                     return tester
                         .setup.user.addr("082111")
                         .setup.user.state("state_main_menu")
-                        .inputs("3", "4", "5", "1")
+                        .inputs("2", "4", "5", "1")
                         .check.interaction({
                             state: "state_end_registration",
                             reply: [
@@ -280,7 +281,7 @@ describe("MMC App", function() {
                 it("to state_bfl_join", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .inputs("3", "5", "13", "1")
+                        .inputs("2", "5", "13", "1")
                         .check.interaction({
                             state: "state_bfl_join",
                             reply: [
@@ -297,7 +298,7 @@ describe("MMC App", function() {
                     return tester
                         .setup.user.addr('082111')
                         .setup.user.state("state_main_menu")
-                        .inputs("3", "5", "13", "1", "1")
+                        .inputs("2", "5", "13", "1", "1")
                         .check.interaction({
                             state: "state_main_menu"
                         })
@@ -312,7 +313,7 @@ describe("MMC App", function() {
                     return tester
                         .setup.user.addr('082111')
                         .setup.user.state("state_main_menu")
-                        .inputs("3", "5", "13", "1", "2")
+                        .inputs("2", "5", "13", "1", "2")
                         .check.interaction({
                             state: "state_end"
                         })
@@ -326,7 +327,7 @@ describe("MMC App", function() {
                 it("to state_bfl_no_join", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .inputs("3", "5", "13", "2")
+                        .inputs("2", "5", "13", "2")
                         .check.interaction({
                             state: "state_bfl_no_join",
                             reply: [
@@ -342,14 +343,15 @@ describe("MMC App", function() {
                 it("to state_main_menu (page 1) via BFL state", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .inputs("3", "5", "13", "2", "1")
+                        .inputs("2", "5", "13", "2", "1")
                         .check.interaction({
                             state: "state_main_menu",
                             reply: [
                                 "Medical Male Circumcision (MMC):",
-                                "1. Find a clinic",
-                                "2. Speak to an expert for FREE",
-                                "3. Get FREE SMSs about your MMC recovery",
+                                //"1. Find a clinic",  (disabled - see CCI-33)
+                                "1. Speak to an expert for FREE",
+                                "2. Get FREE SMSs about your MMC recovery",
+                                "3. Rate your clinic's MMC service",
                                 "4. More",
                             ].join("\n")
                         })
@@ -359,7 +361,7 @@ describe("MMC App", function() {
                     return tester
                         .setup.user.addr('082111')
                         .setup.user.state("state_main_menu")
-                        .inputs("3", "1", "2")
+                        .inputs("2", "1", "2")
                         .check.interaction({
                             state: "state_consent_withheld",
                             reply: [
@@ -375,7 +377,7 @@ describe("MMC App", function() {
                     return tester
                         .setup.user.addr('082111')
                         .setup.user.state("state_main_menu")
-                        .inputs("3", "1", "2", "3")
+                        .inputs("2", "1", "2", "3")
                         .check.interaction({
                             state: "state_end",
                             reply: "Thanks for using the *120*662# MMC service! "
@@ -389,7 +391,7 @@ describe("MMC App", function() {
                     return tester
                         .setup.user.addr('082111')
                         .setup.user.state("state_main_menu")
-                        .inputs("3", "1", "2", "2")
+                        .inputs("2", "1", "2", "2")
                         .check.interaction({
                             state: "state_consent",
                             reply: [
@@ -410,7 +412,7 @@ describe("MMC App", function() {
                 it("to state_servicerating_location", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .inputs("4", "1")
+                        .inputs("3")
                         .check.interaction({
                             state: "state_servicerating_location",
                             reply: [
@@ -522,7 +524,7 @@ describe("MMC App", function() {
                 it("to state_bfl_start", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .inputs("4", "2")
+                        .inputs("4", "1")
                         .check.interaction({
                             state: "state_bfl_start",
                             reply: [
@@ -539,7 +541,7 @@ describe("MMC App", function() {
                 it("to state_bfl_join", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .inputs("4", "2", "1")
+                        .inputs("4", "1", "1")
                         .check.interaction({
                             state: "state_bfl_join",
                             reply: [
@@ -555,7 +557,7 @@ describe("MMC App", function() {
                 it("to state_bfl_no_join", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .inputs("4", "2", "2")
+                        .inputs("4", "1", "2")
                         .check.interaction({
                             state: "state_bfl_no_join",
                             reply: [
@@ -572,7 +574,7 @@ describe("MMC App", function() {
                     return tester
                         .setup.user.addr('082111')
                         .setup.user.state("state_main_menu")
-                        .inputs("4", "2", "1", "2")
+                        .inputs("4", "1", "1", "2")
                         .check.interaction({
                             state: "state_end",
                             reply: "Thanks for using the *120*662# MMC service! "
@@ -590,7 +592,7 @@ describe("MMC App", function() {
                 it("to state_end via decision not to join", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .inputs("4", "2", "2", "2")
+                        .inputs("4", "1", "2", "2")
                         .check.interaction({
                             state: "state_end",
                             reply: "Thanks for using the *120*662# MMC service! "
@@ -604,14 +606,15 @@ describe("MMC App", function() {
                     return tester
                         .setup.user.addr('082111')
                         .setup.user.state("state_main_menu")
-                        .inputs("4", "2", "1", "1")
+                        .inputs("4", "1", "1", "1")
                         .check.interaction({
                             state: "state_main_menu",
                             reply: [
                                 "Medical Male Circumcision (MMC):",
-                                "1. Find a clinic",
-                                "2. Speak to an expert for FREE",
-                                "3. Get FREE SMSs about your MMC recovery",
+                                //"1. Find a clinic",  (disabled - see CCI-33)
+                                "1. Speak to an expert for FREE",
+                                "2. Get FREE SMSs about your MMC recovery",
+                                "3. Rate your clinic's MMC service",
                                 "4. More",
                             ].join("\n")
                         })
@@ -625,14 +628,15 @@ describe("MMC App", function() {
                 it("to state_main_menu via state_bfl_no_join", function() {
                     return tester
                         .setup.user.state("state_main_menu")
-                        .inputs("4", "2", "2", "1")
+                        .inputs("4", "1", "2", "1")
                         .check.interaction({
                             state: "state_main_menu",
                             reply: [
                                 "Medical Male Circumcision (MMC):",
-                                "1. Find a clinic",
-                                "2. Speak to an expert for FREE",
-                                "3. Get FREE SMSs about your MMC recovery",
+                                //"1. Find a clinic",  (disabled - see CCI-33)
+                                "1. Speak to an expert for FREE",
+                                "2. Get FREE SMSs about your MMC recovery",
+                                "3. Rate your clinic's MMC service",
                                 "4. More",
                             ].join("\n")
                         })
