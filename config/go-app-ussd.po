@@ -1,0 +1,361 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2016-06-07 06:42:+0000\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+
+#: go-app-ussd.js:50
+msgid "{{pre}}January{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:51
+msgid "{{pre}}February{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:52
+msgid "{{pre}}March{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:53
+msgid "{{pre}}April{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:54 go-app-ussd.js:76
+msgid "{{pre}}May{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:55
+msgid "{{pre}}June{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:56
+msgid "{{pre}}July{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:57
+msgid "{{pre}}August{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:58
+msgid "{{pre}}September{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:59
+msgid "{{pre}}October{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:60
+msgid "{{pre}}November{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:61
+msgid "{{pre}}December{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:72
+msgid "{{pre}}Jan{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:73
+msgid "{{pre}}Feb{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:74
+msgid "{{pre}}Mar{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:75
+msgid "{{pre}}Apr{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:77
+msgid "{{pre}}Jun{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:78
+msgid "{{pre}}Jul{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:79
+msgid "{{pre}}Aug{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:80
+msgid "{{pre}}Sep{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:81
+msgid "{{pre}}Oct{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:82
+msgid "{{pre}}Nov{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:83
+msgid "{{pre}}Dec{{post}}"
+msgstr ""
+
+#: go-app-ussd.js:322
+msgid ""
+"Thanks for using the {{channel}} MMC service! Dial back anytime to find MMC "
+"clinics, sign up for free SMSs about men's health or speak to a MMC expert "
+"(20c/20sec)"
+msgstr ""
+
+#: go-app-ussd.js:363
+msgid ""
+"Welcome back to the Medical Male Circumcision (MMC) service. What would you "
+"like to do?"
+msgstr ""
+
+#: go-app-ussd.js:366
+msgid "Return to last screen visited"
+msgstr ""
+
+#: go-app-ussd.js:368 go-app-ussd.js:464 go-app-ussd.js:576 go-app-ussd.js:610 go-app-ussd.js:743 go-app-ussd.js:760 go-app-ussd.js:795 go-app-ussd.js:822
+msgid "Main Menu"
+msgstr ""
+
+#: go-app-ussd.js:369 go-app-ussd.js:408 go-app-ussd.js:465 go-app-ussd.js:577 go-app-ussd.js:612 go-app-ussd.js:744 go-app-ussd.js:761 go-app-ussd.js:796 go-app-ussd.js:823
+msgid "Exit"
+msgstr ""
+
+#: go-app-ussd.js:391
+msgid "Medical Male Circumcision (MMC):"
+msgstr ""
+
+#: go-app-ussd.js:397
+msgid "Speak to an expert for FREE"
+msgstr ""
+
+#: go-app-ussd.js:400
+msgid "Get FREE SMSs about your MMC recovery"
+msgstr ""
+
+#: go-app-ussd.js:403
+msgid "Rate your clinic's MMC service"
+msgstr ""
+
+#: go-app-ussd.js:406
+msgid "Join Brothers for Life"
+msgstr ""
+
+#: go-app-ussd.js:407
+msgid "Change Language"
+msgstr ""
+
+#: go-app-ussd.js:418
+msgid ""
+"Thanks for using the *120*662# MMC service! Dial back anytime to find MMC "
+"clinics, sign up for healing SMSs or find more info about MMC (20c/20sec) "
+"Yenzakahle!"
+msgstr ""
+
+#: go-app-ussd.js:446
+msgid "Welcome to MMC Service. Choose your language:"
+msgstr ""
+
+#: go-app-ussd.js:448
+msgid "English"
+msgstr ""
+
+#: go-app-ussd.js:449
+msgid "isiZulu"
+msgstr ""
+
+#: go-app-ussd.js:450
+msgid "Sesotho"
+msgstr ""
+
+#: go-app-ussd.js:451
+msgid "Siswati"
+msgstr ""
+
+#: go-app-ussd.js:452
+msgid "isiNdebele"
+msgstr ""
+
+#: go-app-ussd.js:453
+msgid "Setswana"
+msgstr ""
+
+#: go-app-ussd.js:454
+msgid "isiXhosa"
+msgstr ""
+
+#: go-app-ussd.js:455
+msgid "Xitsonga"
+msgstr ""
+
+#: go-app-ussd.js:462
+msgid "Your new language choice has been saved."
+msgstr ""
+
+#: go-app-ussd.js:496
+msgid ""
+"We need to know when you had your MMC to send you the correct SMSs. Please "
+"select:"
+msgstr ""
+
+#: go-app-ussd.js:501
+msgid "Today"
+msgstr ""
+
+#: go-app-ussd.js:502
+msgid "Yesterday"
+msgstr ""
+
+#: go-app-ussd.js:506
+msgid "I haven't had my operation yet"
+msgstr ""
+
+#: go-app-ussd.js:526
+msgid "Please input the day you had your operation. For example, 12."
+msgstr ""
+
+#: go-app-ussd.js:552
+msgid ""
+"Do you consent to:\n"
+"- Receiving some SMSs on public holidays, weekends & before 8am?\n"
+"- Having ur cell# & language info stored so we can send u SMSs?"
+msgstr ""
+
+#: go-app-ussd.js:560 go-app-ussd.js:594 go-app-ussd.js:676
+msgid "Yes"
+msgstr ""
+
+#: go-app-ussd.js:561 go-app-ussd.js:595 go-app-ussd.js:677
+msgid "No"
+msgstr ""
+
+#: go-app-ussd.js:572
+msgid ""
+"Thank you for your interest in MMC. Unfortunately, you can only register "
+"once you have had your operation."
+msgstr ""
+
+#: go-app-ussd.js:588
+msgid ""
+"We only send SMSs up to 6 wks after MMC. Visit the clinic if you aren't "
+"healed. If you'd like to hear about events & services from Brothers for "
+"Life?"
+msgstr ""
+
+#: go-app-ussd.js:606
+msgid "Without your consent, we cannot send you messages."
+msgstr ""
+
+#: go-app-ussd.js:611
+msgid "Back"
+msgstr ""
+
+#: go-app-ussd.js:646
+msgid ""
+"Thank you. You are now subscrbd to MMC msgs. Remember if u hav prolonged "
+"pain, visit ur nearest clinic. Call 0800212685 or send a please call me to "
+"0828816202"
+msgstr ""
+
+#: go-app-ussd.js:658
+msgid ""
+"At which clinic did you get circumcised? Please be specific with the name "
+"and location. e.g. Peterville Clinic, Rivonia, Johannesburg."
+msgstr ""
+
+#: go-app-ussd.js:671
+msgid "Would you recommend a friend to the clinic where you got circumcised?"
+msgstr ""
+
+#: go-app-ussd.js:680
+msgid "I have not been circumcised"
+msgstr ""
+
+#: go-app-ussd.js:694
+msgid ""
+"How would you rate the attitude of the health care workers at the clinic "
+"where you got circumcised?"
+msgstr ""
+
+#: go-app-ussd.js:699
+msgid "Very bad"
+msgstr ""
+
+#: go-app-ussd.js:700
+msgid "Bad"
+msgstr ""
+
+#: go-app-ussd.js:701
+msgid "OK"
+msgstr ""
+
+#: go-app-ussd.js:702
+msgid "Good"
+msgstr ""
+
+#: go-app-ussd.js:703
+msgid "Excellent"
+msgstr ""
+
+#: go-app-ussd.js:714
+msgid "Did you subscribe to the post op SMS service?"
+msgstr ""
+
+#: go-app-ussd.js:718
+msgid "Yes I found it helpful"
+msgstr ""
+
+#: go-app-ussd.js:721
+msgid "Yes but it was not helpful"
+msgstr ""
+
+#: go-app-ussd.js:724
+msgid "No I chose not to subscribe"
+msgstr ""
+
+#: go-app-ussd.js:727
+msgid "I didn't know about it"
+msgstr ""
+
+#: go-app-ussd.js:737
+msgid ""
+"Thanks for rating your circumcision experience. We appreciate your "
+"feedback, it will help us improve our MMC service."
+msgstr ""
+
+#: go-app-ussd.js:754
+msgid ""
+"Thank you for your interest. We are only looking for ratings from men who "
+"have had their circumcision at a clinic recently."
+msgstr ""
+
+#: go-app-ussd.js:772
+msgid ""
+"Join Brothers for Life and we'll send you free SMSs about ur health, "
+"upcoming events & services for men. brothersforlife.org T&Cs apply."
+msgstr ""
+
+#: go-app-ussd.js:778
+msgid "Join"
+msgstr ""
+
+#: go-app-ussd.js:779
+msgid "No thanks"
+msgstr ""
+
+#: go-app-ussd.js:789
+msgid ""
+"Thank you. You will now receive Brothers for Life updates. You can opt out "
+"at any point by replying STOP to an SMS you receive."
+msgstr ""
+
+#: go-app-ussd.js:816
+msgid ""
+"You have selected not to receive Brothers for Life updates. You can join "
+"any time in the future by dialling *120*662#."
+msgstr ""
