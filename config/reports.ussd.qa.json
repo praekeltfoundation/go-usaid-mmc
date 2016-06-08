@@ -3,17 +3,6 @@
         {
             "type": "diamondash.widgets.lvalue.LValueWidget",
             "time_range": "30d",
-            "name": "Total Unique Users Last (30d)",
-            "target": {
-                "metric_type": "account",
-                "store": "usaid_mmc_ussd_qa",
-                "name": "ussd.unique_users",
-                "aggregator": "last"
-                }
-        },
-        {
-            "type": "diamondash.widgets.lvalue.LValueWidget",
-            "time_range": "30d",
             "name": "Total Unique Users Sum (30d)",
             "target": {
                 "metric_type": "account",
@@ -30,15 +19,6 @@
             "bucket_size": "7d",
             "width": 6,
             "metrics": [
-                {
-                    "name": "Total Unique Users Last",
-                    "target": {
-                        "metric_type": "account",
-                        "store": "usaid_mmc_ussd_qa",
-                        "name": "ussd.unique_users",
-                        "aggregator": "last"
-                    }
-                },
                 {
                     "name": "Total Registered Users",
                     "target": {
