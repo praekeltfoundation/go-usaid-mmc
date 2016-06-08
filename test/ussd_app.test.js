@@ -96,6 +96,11 @@ describe("MMC App", function() {
                             assert.strictEqual(
                                 app.contact.extra.language_choice, "en");
                         })
+                        .check(function(api) {
+                            var metrics = api.metrics.stores.ussd_app_test;
+                            assert.equal(Object.keys(metrics).length, 1);
+                            assert.deepEqual(metrics['ussd.lang.en'].values, [1]);
+                        })
                         .run();
                 });
                 it("to state_language_set if language preference changed", function() {

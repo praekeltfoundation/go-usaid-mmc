@@ -179,15 +179,22 @@ go.app = function() {
                     new Choice("ts", $("Xitsonga")),
                 ],
                 next: function(choice) {
-                    self.contact.extra.language_choice = choice.value;
-                    return self.im.contacts.save(self.contact)
+                    var lang_choice = choice.value;
+                    self.contact.extra.language_choice = lang_choice;
+                    return self.im.contacts
+                        .save(self.contact)
                         .then(function () {
                             if (language_previously_not_set) {
-                                return "state_main_menu";
+                                return self.im.metrics.fire
+                                    .sum(['ussd', 'lang', lang_choice].join('.'), 1)
+                                    .then(function() {
+                                        return "state_main_menu";
+                                    });
                             } else {
                                 return go.utils
-                                    .subscription_set_language(self.contact,
-                                        self.im, self.contact.extra.language_choice)
+                                    .subscription_set_language(
+                                        self.contact, self.im,
+                                        self.contact.extra.language_choice)
                                     .then(function() {
                                         return 'state_language_set';
                                     });
