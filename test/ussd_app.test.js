@@ -49,7 +49,7 @@ describe("MMC App", function() {
                 });
         });
 
-        describe.only("Timeout testing", function() {
+        describe("Timeout testing", function() {
             describe("When a user times out", function() {
                 it("should send one dialback sms", function() {
                     return tester
