@@ -3,7 +3,7 @@
         {
             "type": "diamondash.widgets.lvalue.LValueWidget",
             "time_range": "30d",
-            "name": "Total Unique Users Sum (30d)",
+            "name": "Total Unique Users (30d)",
             "target": {
                 "metric_type": "account",
                 "store": "usaid_mmc_ussd_qa",
@@ -14,13 +14,13 @@
 
         {
             "type": "diamondash.widgets.graph.GraphWidget",
-            "name": "Unique Users Per Week",
+            "name": "Total Unique Users Per Week",
             "time_range": "112d",
             "bucket_size": "7d",
             "width": 6,
             "metrics": [
                 {
-                    "name": "Total Registered Users",
+                    "name": "Total Unique Users",
                     "target": {
                         "metric_type": "account",
                         "store": "usaid_mmc_ussd_qa",
@@ -29,7 +29,40 @@
                     }
                 }
             ]
-        }
+        },
+
+        "new_row",
+
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Total Sessions (30d)",
+            "target": {
+                "metric_type": "account",
+                "store": "usaid_mmc_ussd_qa",
+                "name": "ussd.sessions.transient",
+                "aggregator": "sum"
+                }
+        },
+
+        {
+            "type": "diamondash.widgets.graph.GraphWidget",
+            "name": "Total Sessions Per Week",
+            "time_range": "112d",
+            "bucket_size": "7d",
+            "width": 6,
+            "metrics": [
+                {
+                    "name": "Total Sessions",
+                    "target": {
+                        "metric_type": "account",
+                        "store": "usaid_mmc_ussd_qa",
+                        "name": "ussd.sessions.transient",
+                        "aggregator": "sum"
+                    }
+                }
+            ]
+        },
 
         "new_row",
 
