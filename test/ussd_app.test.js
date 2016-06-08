@@ -1,5 +1,6 @@
 var vumigo = require("vumigo_v02");
 var fixtures = require("./fixtures");
+var _ = require('lodash');
 var AppTester = vumigo.AppTester;
 var assert = require("assert");
 
@@ -25,6 +26,9 @@ describe("MMC App", function() {
                         url: "http://fixture/subscription/api/v1/"
                     },
                     metric_store: 'ussd_app_test',
+                    endpoints: {
+                        "sms": {"delivery_class": "sms"}
+                    },
                 })
                 // Set up contacts
                 .setup(function(api) {
@@ -43,6 +47,57 @@ describe("MMC App", function() {
                         name: "bfl",
                     });
                 });
+        });
+
+        describe.only("Timeout testing", function() {
+            describe("When a user times out", function() {
+                it("should send one dialback sms", function() {
+                    return tester
+                        .inputs(
+                            {session_event: 'new'}  // dial in first time
+                            , "3"  // state_select_language - sesotho
+                            , {session_event: 'close'}  // may or may not work
+                            , {session_event: 'new'}  // redial
+                            , {session_event: 'close'}  // may or may not work
+                        )
+                        .check(function(api) {
+                            var smses = _.where(api.outbound.store, {
+                                endpoint: 'sms'
+                            });
+                            assert.equal(smses.length, 1);
+                        })
+                        .check(function(api) {
+                            var metrics = api.metrics.stores.ussd_app_test;
+                            assert.equal(Object.keys(metrics).length, 6);
+                            assert.deepEqual(metrics['ussd.timeout_sms.sent'].values, [1]);
+                        })
+                        .run();
+                });
+            });
+            describe("When a timed out user dials back in", function() {
+                it("should show timed_out state", function() {
+                    return tester
+                        .inputs(
+                            {session_event: 'new'}  // dial in first time
+                            , "3"  // state_select_language - sesotho
+                            , {session_event: 'close'}  // may or may not work
+                            , {session_event: 'new'}  // redial
+                        )
+                        .check.interaction({
+                            state: "state_timed_out"
+                        })
+                        .run();
+                });
+                it("should go to last state", function() {
+
+                });
+                it("should go to main menu", function() {
+
+                });
+                it("should go to end state", function() {
+
+                });
+            });
         });
 
         describe("Flow testing - ", function() {
@@ -81,7 +136,7 @@ describe("MMC App", function() {
                 it("to state_main_menu after language is selected", function() {
                     return tester
                         .setup.user.state("state_select_language")
-                        .input("1")
+                        .input("2")  // zulu
                         .check.interaction({
                             state: "state_main_menu",
                             reply: [
@@ -92,14 +147,15 @@ describe("MMC App", function() {
                                 "4. More"
                             ].join('\n')
                         })
+                        .check.user.properties({lang: 'zu'})
                         .check(function() {
                             assert.strictEqual(
-                                app.contact.extra.language_choice, "en");
+                                app.contact.extra.language_choice, "zu");
                         })
                         .check(function(api) {
                             var metrics = api.metrics.stores.ussd_app_test;
                             assert.equal(Object.keys(metrics).length, 1);
-                            assert.deepEqual(metrics['ussd.lang.en'].values, [1]);
+                            assert.deepEqual(metrics['ussd.lang.zu'].values, [1]);
                         })
                         .run();
                 });

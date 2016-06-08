@@ -1,6 +1,7 @@
 go.app = function() {
     var vumigo = require('vumigo_v02');
     var MetricsHelper = require('go-jsbox-metrics-helper');
+    var Q = require('q');
     var App = vumigo.App;
     var Choice = vumigo.states.Choice;
     var ChoiceState = vumigo.states.ChoiceState;
@@ -55,7 +56,10 @@ go.app = function() {
                 })
                 .then(function() {
                     self.contact.extra.redial_sms_sent = 'true';
-                    return self.im.contacts.save(self.contact);
+                    return Q.all([
+                        self.im.contacts.save(self.contact),
+                        self.im.metrics.fire.sum('ussd.timeout_sms.sent', 1)
+                    ]);
                 });
         };
 
