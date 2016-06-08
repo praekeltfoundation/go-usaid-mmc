@@ -23,7 +23,8 @@ describe("MMC App", function() {
                         username: "test_user",
                         api_key: "test_key",
                         url: "http://fixture/subscription/api/v1/"
-                    }
+                    },
+                    metric_store: 'ussd_app_test',
                 })
                 // Set up contacts
                 .setup(function(api) {
@@ -63,6 +64,18 @@ describe("MMC App", function() {
                                 "8. Xitsonga"
                             ].join("\n")
                         })
+                        .check(function() {
+                            assert.strictEqual(
+                                app.contact.extra.language_choice, undefined);
+                        })
+                        .check(function(api) {
+                            var metrics = api.metrics.stores.ussd_app_test;
+                            assert.equal(Object.keys(metrics).length, 4);
+                            assert.deepEqual(metrics['ussd.unique_users'].values, [1]);
+                            assert.deepEqual(metrics['ussd.unique_users.transient'].values, [1]);
+                            assert.deepEqual(metrics['ussd.sessions'].values, [1]);
+                            assert.deepEqual(metrics['ussd.sessions.transient'].values, [1]);
+                        })
                         .run();
                 });
                 it("to state_main_menu after language is selected", function() {
@@ -70,7 +83,14 @@ describe("MMC App", function() {
                         .setup.user.state("state_select_language")
                         .input("1")
                         .check.interaction({
-                            state: "state_main_menu"
+                            state: "state_main_menu",
+                            reply: [
+                                "Medical Male Circumcision (MMC):",
+                                "1. Speak to an expert for FREE",
+                                "2. Get FREE SMSs about your MMC recovery",
+                                "3. Rate your clinic\'s MMC service",
+                                "4. More"
+                            ].join('\n')
                         })
                         .check(function() {
                             assert.strictEqual(
@@ -82,14 +102,18 @@ describe("MMC App", function() {
                     return tester
                         .setup.user.lang("en")
                         .setup.user.state("state_main_menu")
-                        .inputs("4", "2", "2")
+                        .inputs(
+                            "4"  // state_main_menu - More
+                            , "2"  // state_main_menu - Change Language
+                            , "2"  // state_select_language - Zulu
+                        )
                         .check.interaction({
                             state: "state_language_set",
                             reply: [
                                 "Your new language choice has been saved.",
                                 "1. Main Menu",
                                 "2. Exit",
-                            ].join("\n"),
+                            ].join("\n")
                         })
                         .check(function() {
                             assert.strictEqual(

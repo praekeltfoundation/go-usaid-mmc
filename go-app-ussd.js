@@ -265,6 +265,7 @@ go.utils = {
 
 go.app = function() {
     var vumigo = require('vumigo_v02');
+    var MetricsHelper = require('go-jsbox-metrics-helper');
     var App = vumigo.App;
     var Choice = vumigo.states.Choice;
     var ChoiceState = vumigo.states.ChoiceState;
@@ -283,6 +284,16 @@ go.app = function() {
             self.im.on('session:close', function(e) {
                 return self.dial_back(e);
             });
+
+
+            // Use the metrics helper to add metrics
+            mh = new MetricsHelper(self.im);
+            mh
+                // Total unique users
+                .add.total_unique_users('ussd.unique_users')
+                // Total sessions
+                .add.total_sessions('ussd.sessions')
+            ;
 
             // Fetch the contact from the contact store that matches the current
             // user's address. When we get the contact, we put the contact on
@@ -395,15 +406,9 @@ go.app = function() {
                     /*** Clinic locator option disabled for now (CCI-33) ***
                      new Choice('state_healthsites', $('Find a clinic')),*/
                     new Choice('state_end', $('Speak to an expert for FREE')),
-                    new Choice(
-                        'state_op',
-                        $('Get FREE SMSs about your MMC recovery')),
-                    new Choice(
-                        'state_servicerating_location',
-                        $('Rate your clinic\'s MMC service')),
-                    new Choice(
-                        'state_bfl_start',
-                        $('Join Brothers for Life')),
+                    new Choice('state_op', $('Get FREE SMSs about your MMC recovery')),
+                    new Choice('state_servicerating_location', $('Rate your clinic\'s MMC service')),
+                    new Choice('state_bfl_start', $('Join Brothers for Life')),
                     new Choice('state_select_language', $('Change Language')),
                     new Choice('state_end', $('Exit')),
                 ],
@@ -427,6 +432,17 @@ go.app = function() {
         self.add('state_select_language', function(name){
             var language_previously_not_set = self.im.user.lang === null;
             return new LanguageChoice(name, {
+                question: $("Welcome to MMC Service. Choose your language:"),
+                choices: [
+                    new Choice("en", $("English")),
+                    new Choice("zu", $("isiZulu")),
+                    new Choice("st", $("Sesotho")),
+                    new Choice("ss", $("Siswati")),
+                    new Choice("nd", $("isiNdebele")),
+                    new Choice("tn", $("Setswana")),
+                    new Choice("xh", $("isiXhosa")),
+                    new Choice("ts", $("Xitsonga")),
+                ],
                 next: function(choice) {
                     self.contact.extra.language_choice = choice.value;
                     return self.im.contacts.save(self.contact)
@@ -442,18 +458,7 @@ go.app = function() {
                                     });
                             }
                         });
-                },
-                question: $("Welcome to MMC Service. Choose your language:"),
-                choices: [
-                    new Choice("en", $("English")),
-                    new Choice("zu", $("isiZulu")),
-                    new Choice("st", $("Sesotho")),
-                    new Choice("ss", $("Siswati")),
-                    new Choice("nd", $("isiNdebele")),
-                    new Choice("tn", $("Setswana")),
-                    new Choice("xh", $("isiXhosa")),
-                    new Choice("ts", $("Xitsonga")),
-                ]
+                }
             });
         });
 
