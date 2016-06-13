@@ -286,6 +286,9 @@ go.app = function() {
                 return self.dial_back(e);
             });
 
+            self.im.on('state:enter', function(e) {
+                self.im.metrics.fire.sum(['ussd', 'views', e.state.name].join('.'), 1);
+            });
 
             // Use the metrics helper to add metrics
             mh = new MetricsHelper(self.im);

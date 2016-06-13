@@ -68,8 +68,11 @@ describe("MMC App", function() {
                         })
                         .check(function(api) {
                             var metrics = api.metrics.stores.ussd_app_test;
-                            assert.equal(Object.keys(metrics).length, 6);
+                            assert.equal(Object.keys(metrics).length, 9);
                             assert.deepEqual(metrics['ussd.timeout_sms.sent'].values, [1]);
+                            assert.deepEqual(metrics['ussd.views.state_select_language'].values, [1]);
+                            assert.deepEqual(metrics['ussd.views.state_timed_out'].values, [1]);
+                            assert.deepEqual(metrics['ussd.views.state_main_menu'].values, [1]);
                         })
                         .run();
                 });
@@ -125,7 +128,7 @@ describe("MMC App", function() {
                         })
                         .check(function(api) {
                             var metrics = api.metrics.stores.ussd_app_test;
-                            assert.equal(Object.keys(metrics).length, 4);
+                            assert.equal(Object.keys(metrics).length, 5);
                             assert.deepEqual(metrics['ussd.unique_users'].values, [1]);
                             assert.deepEqual(metrics['ussd.unique_users.transient'].values, [1]);
                             assert.deepEqual(metrics['ussd.sessions'].values, [1]);
@@ -154,7 +157,7 @@ describe("MMC App", function() {
                         })
                         .check(function(api) {
                             var metrics = api.metrics.stores.ussd_app_test;
-                            assert.equal(Object.keys(metrics).length, 1);
+                            assert.equal(Object.keys(metrics).length, 2);
                             assert.deepEqual(metrics['ussd.lang.zu'].values, [1]);
                         })
                         .run();
