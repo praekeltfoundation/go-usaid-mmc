@@ -198,5 +198,17 @@
 
         "new_row",
 
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Brothers for Life Registrations",
+            "target": {
+                "metric_type": "account",
+                "store": "usaid_mmc_ussd_qa",
+                "name": "ussd.joined.bfl",
+                "aggregator": "sum"
+                }
+        },
+
     ]
 }

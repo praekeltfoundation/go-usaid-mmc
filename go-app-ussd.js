@@ -783,7 +783,7 @@ go.app = function() {
                     new Choice("state_end", $("Exit"))
                 ],
                 next: function(choice) {
-                    //TODO make web request to store results
+                    // TODO make web request to store results
                     return choice.value;
                 }
             });
@@ -823,8 +823,11 @@ go.app = function() {
                         .get("bfl")
                         .then(function(group) {
                             self.contact.groups.push(group.key);
-                            return self.im.contacts
-                                .save(self.contact)
+                            return Q
+                                .all([
+                                    self.im.contacts.save(self.contact),
+                                    self.im.metrics.fire.sum(['ussd', 'joined', 'bfl'].join('.'), 1)
+                                ])
                                 .then(function() {
                                     return choice.value;
                                 });

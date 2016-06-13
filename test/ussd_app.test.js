@@ -400,6 +400,11 @@ describe("MMC App", function() {
                             assert.equal(contact.extra.bfl_member, "true");
                             assert.deepEqual(contact.groups, ["bfl_key"]);
                         })
+                        .check(function(api) {
+                            var metrics = api.metrics.stores.ussd_app_test;
+                            assert.equal(Object.keys(metrics).length, 6);
+                            assert.deepEqual(metrics['ussd.joined.bfl'].values, [1]);
+                        })
                         .run();
                 });
                 it("to state_end (user added to BFL group)", function() {
