@@ -364,6 +364,11 @@ describe("MMC App", function() {
                             assert.equal(contact.extra.language_choice, "en");
                             assert.equal(contact.extra.date_of_op, "20150405");
                         })
+                        .check(function(api) {
+                            var metrics = api.metrics.stores.ussd_app_test;
+                            assert.equal(Object.keys(metrics).length, 5);
+                            assert.deepEqual(metrics['ussd.post_op.registrations'].values, [1]);
+                        })
                         .run();
                 });
                 it("to state_bfl_join", function() {

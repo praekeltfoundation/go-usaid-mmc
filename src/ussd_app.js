@@ -386,8 +386,11 @@ go.app = function() {
                     self.contact.extra.is_registered = "true";
                     self.contact.extra.consent = "true";
 
-                    return self.im.user
-                        .set_lang(self.contact.extra.language_choice)
+                    return Q
+                        .all([
+                            self.im.user.set_lang(self.contact.extra.language_choice),
+                            self.im.metrics.fire.sum(['ussd', 'post_op', 'registrations'].join('.'), 1)
+                        ])
                         .then(function() {
                             self.im.contacts.save(self.contact);
                             return self.states.create('state_end_registration');
