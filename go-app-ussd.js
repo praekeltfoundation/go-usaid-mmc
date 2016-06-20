@@ -265,6 +265,8 @@ go.utils = {
 
 go.app = function() {
     var vumigo = require('vumigo_v02');
+    var MetricsHelper = require('go-jsbox-metrics-helper');
+    var Q = require('q');
     var App = vumigo.App;
     var Choice = vumigo.states.Choice;
     var ChoiceState = vumigo.states.ChoiceState;
@@ -283,6 +285,19 @@ go.app = function() {
             self.im.on('session:close', function(e) {
                 return self.dial_back(e);
             });
+
+            self.im.on('state:enter', function(e) {
+                self.im.metrics.fire.sum(['ussd', 'views', e.state.name].join('.'), 1);
+            });
+
+            // Use the metrics helper to add metrics
+            mh = new MetricsHelper(self.im);
+            mh
+                // Total unique users
+                .add.total_unique_users('ussd.unique_users')
+                // Total sessions
+                .add.total_sessions('ussd.sessions')
+            ;
 
             // Fetch the contact from the contact store that matches the current
             // user's address. When we get the contact, we put the contact on
@@ -309,7 +324,10 @@ go.app = function() {
                 })
                 .then(function() {
                     self.contact.extra.redial_sms_sent = 'true';
-                    return self.im.contacts.save(self.contact);
+                    return Q.all([
+                        self.im.contacts.save(self.contact),
+                        self.im.metrics.fire.sum('ussd.timeout_sms.sent', 1)
+                    ]);
                 });
         };
 
@@ -395,15 +413,9 @@ go.app = function() {
                     /*** Clinic locator option disabled for now (CCI-33) ***
                      new Choice('state_healthsites', $('Find a clinic')),*/
                     new Choice('state_end', $('Speak to an expert for FREE')),
-                    new Choice(
-                        'state_op',
-                        $('Get FREE SMSs about your MMC recovery')),
-                    new Choice(
-                        'state_servicerating_location',
-                        $('Rate your clinic\'s MMC service')),
-                    new Choice(
-                        'state_bfl_start',
-                        $('Join Brothers for Life')),
+                    new Choice('state_op', $('Get FREE SMSs about your MMC recovery')),
+                    new Choice('state_servicerating_location', $('Rate your clinic\'s MMC service')),
+                    new Choice('state_bfl_start', $('Join Brothers for Life')),
                     new Choice('state_select_language', $('Change Language')),
                     new Choice('state_end', $('Exit')),
                 ],
@@ -427,22 +439,6 @@ go.app = function() {
         self.add('state_select_language', function(name){
             var language_previously_not_set = self.im.user.lang === null;
             return new LanguageChoice(name, {
-                next: function(choice) {
-                    self.contact.extra.language_choice = choice.value;
-                    return self.im.contacts.save(self.contact)
-                        .then(function () {
-                            if (language_previously_not_set) {
-                                return "state_main_menu";
-                            } else {
-                                return go.utils
-                                    .subscription_set_language(self.contact,
-                                        self.im, self.contact.extra.language_choice)
-                                    .then(function() {
-                                        return 'state_language_set';
-                                    });
-                            }
-                        });
-                },
                 question: $("Welcome to MMC Service. Choose your language:"),
                 choices: [
                     new Choice("en", $("English")),
@@ -453,7 +449,30 @@ go.app = function() {
                     new Choice("tn", $("Setswana")),
                     new Choice("xh", $("isiXhosa")),
                     new Choice("ts", $("Xitsonga")),
-                ]
+                ],
+                next: function(choice) {
+                    var lang_choice = choice.value;
+                    self.contact.extra.language_choice = lang_choice;
+                    return self.im.contacts
+                        .save(self.contact)
+                        .then(function () {
+                            if (language_previously_not_set) {
+                                return self.im.metrics.fire
+                                    .sum(['ussd', 'lang', lang_choice].join('.'), 1)
+                                    .then(function() {
+                                        return "state_main_menu";
+                                    });
+                            } else {
+                                return go.utils
+                                    .subscription_set_language(
+                                        self.contact, self.im,
+                                        self.contact.extra.language_choice)
+                                    .then(function() {
+                                        return 'state_language_set';
+                                    });
+                            }
+                        });
+                }
             });
         });
 
@@ -632,8 +651,11 @@ go.app = function() {
                     self.contact.extra.is_registered = "true";
                     self.contact.extra.consent = "true";
 
-                    return self.im.user
-                        .set_lang(self.contact.extra.language_choice)
+                    return Q
+                        .all([
+                            self.im.user.set_lang(self.contact.extra.language_choice),
+                            self.im.metrics.fire.sum(['ussd', 'post_op', 'registrations'].join('.'), 1)
+                        ])
                         .then(function() {
                             self.im.contacts.save(self.contact);
                             return self.states.create('state_end_registration');
@@ -761,7 +783,7 @@ go.app = function() {
                     new Choice("state_end", $("Exit"))
                 ],
                 next: function(choice) {
-                    //TODO make web request to store results
+                    // TODO make web request to store results
                     return choice.value;
                 }
             });
@@ -801,8 +823,11 @@ go.app = function() {
                         .get("bfl")
                         .then(function(group) {
                             self.contact.groups.push(group.key);
-                            return self.im.contacts
-                                .save(self.contact)
+                            return Q
+                                .all([
+                                    self.im.contacts.save(self.contact),
+                                    self.im.metrics.fire.sum(['ussd', 'joined', 'bfl'].join('.'), 1)
+                                ])
                                 .then(function() {
                                     return choice.value;
                                 });

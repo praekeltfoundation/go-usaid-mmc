@@ -1,0 +1,214 @@
+{
+    "layout": [
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Total Unique Users (30d)",
+            "target": {
+                "metric_type": "account",
+                "store": "usaid_mmc_ussd_qa",
+                "name": "ussd.unique_users.transient",
+                "aggregator": "sum"
+                }
+        },
+
+        {
+            "type": "diamondash.widgets.graph.GraphWidget",
+            "name": "Total Unique Users Per Week",
+            "time_range": "112d",
+            "bucket_size": "7d",
+            "width": 6,
+            "metrics": [
+                {
+                    "name": "Total Unique Users",
+                    "target": {
+                        "metric_type": "account",
+                        "store": "usaid_mmc_ussd_qa",
+                        "name": "ussd.unique_users.transient",
+                        "aggregator": "sum"
+                    }
+                }
+            ]
+        },
+
+        "new_row",
+
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Total Sessions (30d)",
+            "target": {
+                "metric_type": "account",
+                "store": "usaid_mmc_ussd_qa",
+                "name": "ussd.sessions.transient",
+                "aggregator": "sum"
+                }
+        },
+
+        {
+            "type": "diamondash.widgets.graph.GraphWidget",
+            "name": "Total Sessions Per Week",
+            "time_range": "112d",
+            "bucket_size": "7d",
+            "width": 6,
+            "metrics": [
+                {
+                    "name": "Total Sessions",
+                    "target": {
+                        "metric_type": "account",
+                        "store": "usaid_mmc_ussd_qa",
+                        "name": "ussd.sessions.transient",
+                        "aggregator": "sum"
+                    }
+                }
+            ]
+        },
+
+        "new_row",
+
+        {
+            "type": "diamondash.widgets.graph.GraphWidget",
+            "name": "Initial Language Selections",
+            "time_range": "112d",
+            "bucket_size": "7d",
+            "width": 6,
+            "metrics": [
+                {
+                    "name": "English",
+                    "target": {
+                        "metric_type": "account",
+                        "store": "usaid_mmc_ussd_qa",
+                        "name": "ussd.lang.en",
+                        "aggregator": "sum"
+                    }
+                },
+                {
+                    "name": "isiZulu",
+                    "target": {
+                        "metric_type": "account",
+                        "store": "usaid_mmc_ussd_qa",
+                        "name": "ussd.lang.zu",
+                        "aggregator": "sum"
+                    }
+                },{
+                    "name": "Sesotho",
+                    "target": {
+                        "metric_type": "account",
+                        "store": "usaid_mmc_ussd_qa",
+                        "name": "ussd.lang.st",
+                        "aggregator": "sum"
+                    }
+                },{
+                    "name": "Siswati",
+                    "target": {
+                        "metric_type": "account",
+                        "store": "usaid_mmc_ussd_qa",
+                        "name": "ussd.lang.ss",
+                        "aggregator": "sum"
+                    }
+                },{
+                    "name": "isiNdebele",
+                    "target": {
+                        "metric_type": "account",
+                        "store": "usaid_mmc_ussd_qa",
+                        "name": "ussd.lang.nd",
+                        "aggregator": "sum"
+                    }
+                },{
+                    "name": "Setswana",
+                    "target": {
+                        "metric_type": "account",
+                        "store": "usaid_mmc_ussd_qa",
+                        "name": "ussd.lang.tn",
+                        "aggregator": "sum"
+                    }
+                },{
+                    "name": "isiXhosa",
+                    "target": {
+                        "metric_type": "account",
+                        "store": "usaid_mmc_ussd_qa",
+                        "name": "ussd.lang.xh",
+                        "aggregator": "sum"
+                    }
+                },{
+                    "name": "Xitsonga",
+                    "target": {
+                        "metric_type": "account",
+                        "store": "usaid_mmc_ussd_qa",
+                        "name": "ussd.lang.ts",
+                        "aggregator": "sum"
+                    }
+                },
+            ]
+        },
+
+        "new_row",
+
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Timeout SMSs Sent (30d)",
+            "target": {
+                "metric_type": "account",
+                "store": "usaid_mmc_ussd_qa",
+                "name": "ussd.timeout_sms.sent",
+                "aggregator": "sum"
+                }
+        },
+
+        {
+            "type": "diamondash.widgets.graph.GraphWidget",
+            "name": "Timeout SMSs Sent Per Week",
+            "time_range": "112d",
+            "bucket_size": "7d",
+            "width": 6,
+            "metrics": [
+                {
+                    "name": "Total SMSs Sent",
+                    "target": {
+                        "metric_type": "account",
+                        "store": "usaid_mmc_ussd_qa",
+                        "name": "ussd.timeout_sms.sent",
+                        "aggregator": "sum"
+                    }
+                }
+            ]
+        },
+
+        "new_row",
+
+        {
+            "type": "diamondash.widgets.graph.GraphWidget",
+            "name": "USSD Registrations for Post-op SMSs Per Week",
+            "time_range": "112d",
+            "bucket_size": "7d",
+            "width": 6,
+            "metrics": [
+                {
+                    "name": "Post-op Registrations",
+                    "target": {
+                        "metric_type": "account",
+                        "store": "usaid_mmc_ussd_qa",
+                        "name": "ussd.post_op.registrations",
+                        "aggregator": "sum"
+                    }
+                }
+            ]
+        },
+
+        "new_row",
+
+        {
+            "type": "diamondash.widgets.lvalue.LValueWidget",
+            "time_range": "30d",
+            "name": "Brothers for Life Registrations",
+            "target": {
+                "metric_type": "account",
+                "store": "usaid_mmc_ussd_qa",
+                "name": "ussd.joined.bfl",
+                "aggregator": "sum"
+                }
+        },
+
+    ]
+}
