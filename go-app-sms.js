@@ -253,7 +253,7 @@ go.utils = {
                 contact_key: contact.key,
                 lang: language,
                 message_set: "/subscription/api/v1/message_set/" + im.config.messageset_id + "/",
-                next_sequence_number: 2,
+                next_sequence_number: 1,
                 schedule: "/subscription/api/v1/periodic_task/1/",
                 to_addr: contact.msisdn,
                 user_account: contact.user_account
