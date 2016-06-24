@@ -27,8 +27,8 @@ describe("MMC App", function() {
                         username: "test_user",
                         api_key: "test_key",
                         url: "http://fixture/subscription/api/v1/"
-                    }
-
+                    },
+                    messageset_id: 12,
                 })
                 .setup(function(api) {
                     fixtures().forEach(function(d) {

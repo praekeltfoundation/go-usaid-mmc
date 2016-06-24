@@ -1,0 +1,26 @@
+{
+	"name": "mmc-ussd-qa",
+	"env": "qa",
+	"metric_store": "usaid_mmc_qa",
+	"sms_number": "REPLACEME",
+	"lbs_providers": ["VODACOM", "MTN"],
+	"clinic_data_source": "aat",
+	"api_key": "REPLACEME",
+	"api_url": "http://qa-clinicfinder.za.prk-host.net/clinicfinder/",
+	"template": "Your nearest clinics are: {{ results }}. Thanks for using Healthsites.",
+	"osm": {
+		"api_key": "REPLACEME"
+	},
+	"channel": "REPLACEME",
+	"control": {
+		"username": "REPLACEME",
+		"api_key": "REPLACEME",
+		"url": "http://mmc.qa.praekelt.com/subscription/api/v1/"
+	},
+    "endpoints": {
+        "sms": {
+            "delivery_class": "sms"
+        }
+  },
+  "messageset_id": 13
+}

@@ -7,5 +7,6 @@
         "username": "test_user",
         "api_key": "test_key",
         "url": "http://mmc.qa.praekelt.com/subscription/api/v1/"
-    }
+    },
+    "messageset_id": 13
 }

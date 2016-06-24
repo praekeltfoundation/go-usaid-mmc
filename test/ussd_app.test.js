@@ -29,6 +29,7 @@ describe("MMC App", function() {
                     endpoints: {
                         "sms": {"delivery_class": "sms"}
                     },
+                    messageset_id: 12,
                 })
                 // Set up contacts
                 .setup(function(api) {
