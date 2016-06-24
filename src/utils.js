@@ -213,7 +213,7 @@ go.utils = {
                 var update = JSON.parse(json_result.data);
                 var clean = true;
                 var patch_url;
-                
+
                 if (update.objects.length === 1) {
                     if (update.objects[0].lang !== lang) {
                         patch_url = 'subscription/' + update.objects[0].id + '/';
@@ -245,7 +245,7 @@ go.utils = {
             var payload = {
                 contact_key: contact.key,
                 lang: language,
-                message_set: "/subscription/api/v1/message_set/12/",
+                message_set: "/subscription/api/v1/message_set/" + im.config.messageset_id + "/",
                 next_sequence_number: 2,
                 schedule: "/subscription/api/v1/periodic_task/1/",
                 to_addr: contact.msisdn,
