@@ -9,6 +9,11 @@ go.app = function() {
     var LanguageChoice = vumigo.states.LanguageChoice;
     var PaginatedChoiceState = vumigo.states.PaginatedChoiceState;
     var EndState = vumigo.states.EndState;
+    var JsonApi = vumigo.http.api.JsonApi;
+
+    var location = require('go-jsbox-location');
+    var LocationState = location.LocationState;
+    var OpenStreetMap = location.providers.openstreetmap.OpenStreetMap;
 
     var GoApp = App.extend(function(self) {
         App.call(self, 'state_start');
@@ -34,6 +39,17 @@ go.app = function() {
                 .add.total_sessions('ussd.sessions')
             ;
 
+            // Configure URLs
+            self.req_location_url = self.im.config.api_url + 'requestlocation/';
+            self.req_lookup_url = self.im.config.api_url + 'requestlookup/';
+            self.lbsrequest_url = self.im.config.api_url + 'lbsrequest/';
+
+            self.http = new JsonApi(self.im, {
+                headers: {
+                    'Authorization': ['Token ' + self.im.config.api_key]
+                }
+            });
+
             // Fetch the contact from the contact store that matches the current
             // user's address. When we get the contact, we put the contact on
             // the app so we can reference it easily when creating each state.
@@ -42,6 +58,36 @@ go.app = function() {
                 .then(function(user_contact) {
                     self.contact = user_contact;
                 });
+        };
+
+        // METRIC HELPERS
+        self.fire_clinic_type_metric = function(clinic_type_requested) {
+            return self.im.metrics.fire.inc(
+                ['sum.clinic_type_select', clinic_type_requested].join('.'), 1);
+        };
+
+        self.fire_database_query_metric = function() {
+            var clinic_type_requested = self.im.user.answers.state_clinic_type;
+            return self.im.metrics.fire.inc(
+                ['sum.database_queries', clinic_type_requested].join('.'), 1);
+        };
+
+        self.fire_clinics_found_metric = function(clinics_found) {
+            if (clinics_found === '2') {
+                return self.im.metrics.fire.inc('sum.multiple_time_users', 1);
+            } else {
+                return Q();
+            }
+        };
+
+        self.fire_provider_metric = function(provider) {
+            return self.im.metrics.fire.inc(
+                ['sum.service_provider', provider.toLowerCase()].join('.'), 1);
+        };
+
+        self.fire_locate_type_metric = function(type) {
+            return self.im.metrics.fire.inc(
+                ['sum.locate_type', type].join('.'), 1);
         };
 
     // DIALBACK SMS HANDLING
@@ -80,6 +126,76 @@ go.app = function() {
                 });
         };
 
+    // LOCATION HELPER
+
+        self.make_clinic_search_params = function() {
+            var clinic_type_requested = self.im.user.answers.state_clinic_type;
+            var clinic_data_source = (
+                self.im.config.clinic_data_source || "internal");
+            var search_data = {
+              source: clinic_data_source,
+            };
+            search_data[clinic_type_requested] = "true";
+            return search_data;
+        };
+
+        self.make_location_data = function(contact) {
+            var location_data = {
+                point: {
+                    type: "Point",
+                    coordinates: [
+                        parseFloat(contact.extra['location:lon']),
+                        parseFloat(contact.extra['location:lat'])
+                    ]
+                }
+            };
+            return location_data;
+        };
+
+        self.make_lookup_data = function(contact, location) {
+            var lookup_data = {
+                search: self.make_clinic_search_params(),
+                response: {
+                    type: "SMS",
+                    to_addr: contact.msisdn,
+                    template: self.im.config.template
+                },
+                location: location
+            };
+            return lookup_data;
+        };
+
+        self.make_lbs_data = function(contact, pointofinterest) {
+            var lbs_data = {
+                search: {
+                    msisdn: contact.msisdn.replace(/[^0-9]/g, "")  // remove '+'
+                },
+                pointofinterest: pointofinterest
+            };
+            return lbs_data;
+        };
+
+        self.manual_locate = function(contact) {
+            return Q.all([
+                self.fire_database_query_metric(),
+                self.fire_locate_type_metric('suburb'),
+                self.http.post(self.req_lookup_url, {
+                    data: self.make_lookup_data(contact,
+                        self.make_location_data(contact))
+                })
+            ]);
+        };
+
+        self.lbs_locate = function(contact) {
+            return Q.all([
+                self.fire_database_query_metric(),
+                self.fire_locate_type_metric('lbs'),
+                self.http.post(self.lbsrequest_url, {
+                    data: self.make_lbs_data(contact,
+                        self.make_lookup_data(contact, null))
+                })
+            ]);
+        };
 
 
     // TIMEOUT HANDLING
@@ -145,9 +261,8 @@ go.app = function() {
                 characters_per_page: 160,
                 options_per_page: null,
                 choices: [
-                    /*** Clinic locator option disabled for now (CCI-33) ***
-                     new Choice('state_healthsites', $('Find a clinic')),*/
-                    new Choice('state_end', $('Speak to an expert for FREE')),
+                    new Choice('state_healthsites', $('Find a clinic')),
+                    // new Choice('state_end', $('Speak to an expert for FREE')),
                     new Choice('state_op', $('Get FREE SMSs about your MMC recovery')),
                     new Choice('state_servicerating_location', $('Rate your clinic\'s MMC service')),
                     new Choice('state_bfl_start', $('Join Brothers for Life')),
@@ -224,7 +339,6 @@ go.app = function() {
             });
         });
 
-        /*** Clinic locator option disabled for now (CCI-33) ***
         self.add('state_healthsites', function(name){
             return new ChoiceState(name, {
                 question: $([
@@ -232,15 +346,237 @@ go.app = function() {
                     " looking for?",
                 ].join("")),
                 choices: [
-                    new Choice("state_end", $("Nearest Clinic")),
-                    new Choice("state_end", $("MMC Clinic")),
-                    new Choice("state_end", $("HCT Clinic")),
+                    new Choice("nearest", $("Nearest Clinic")),
+                    new Choice("mmc", $("MMC Clinic")),
+                    new Choice("mct", $("HCT Clinic")),
                 ],
                 next: function(choice) {
-                    return choice.value;
+                    return self
+                        .fire_clinic_type_metric(choice.value)
+                        .then(function() {
+                            if (typeof self.im.msg.provider !== 'undefined' && self.im.msg.provider !== null) {
+                                var service_provider = self.im.msg.provider.trim().toUpperCase();
+                                if (self.im.config.lbs_providers.indexOf(service_provider) !== -1) {
+                                    return self
+                                        .fire_provider_metric(service_provider)
+                                        .then(function() {
+                                            return 'state_locate_permission';
+                                        });
+                                } else {
+                                    return self
+                                        .fire_provider_metric('Other')
+                                        .then(function() {
+                                            return 'state_suburb';
+                                        });
+                                }
+                            } else {
+                                // For transports that don't provide provider info
+                                return self
+                                    .fire_provider_metric('Other')
+                                    .then(function() {
+                                        return 'state_suburb';
+                                    });
+                            }
+
+                        });
                 }
             });
-        });*/
+        });
+
+        self.states.add('state_locate_permission', function(name) {
+            return new ChoiceState(name, {
+                question:
+                    $("Thanks! We will now locate your approximate " +
+                      "position and then send you an SMS with your " +
+                      "nearest clinic."),
+
+                choices: [
+                    new Choice('locate', $("Continue")),
+                    new Choice('no_locate', $("No don't locate me")),
+                ],
+
+                next: function(choice) {
+
+                    switch (choice.value) {
+                        case 'locate': return 'state_lbs_locate';
+                        case 'no_locate': return 'state_reprompt_permission';
+                    }
+                }
+            });
+        });
+
+        self.states.add('state_reprompt_permission', function(name) {
+            return new ChoiceState(name, {
+                question:
+                    $("If you do not give consent we can't locate you " +
+                      "automatically. Alternatively, tell us where you live, " +
+                      "(area or suburb)"),
+
+                choices: [
+                    new Choice('consent', $("Give consent")),
+                    new Choice('suburb', $("Enter location")),
+                    new Choice('quit', $("Quit"))
+                ],
+
+                next: function(choice) {
+                    switch (choice.value) {
+                        case 'consent': return 'state_lbs_locate';
+                        case 'suburb': return 'state_suburb';
+                        case 'quit': return 'state_quit';
+                    }
+                }
+            });
+        });
+
+        self.states.add('state_lbs_locate', function(name) {
+            return self
+                .lbs_locate(self.contact)
+                .then(function() {
+                    return self.states.create('state_health_services_enter');
+                });
+        });
+
+        self.states.add('state_suburb', function(name) {
+            return new LocationState(name, {
+                map_provider: new OpenStreetMap({
+                    api_key: self.im.config.osm.api_key,
+                    bounding_box: ["16.4500", "-22.1278", "32.8917", "-34.8333"],
+                    address_limit: 4,
+                    extract_address_data: function(result) {
+                        var formatted_address;
+                        if (!result.address) {
+                            formatted_address = result.display_name;
+                        } else {
+                            var city_town_village = result.address.city ||
+                                result.address.town || result.address.village;
+                            result.address.city_town_village = city_town_village;
+
+                            var addr_details = ['suburb', 'city_town_village'];
+                            var addr_from_details = [];
+
+                            addr_details.forEach(function(detail) {
+                                if (result.address[detail] !== undefined) {
+                                    addr_from_details.push(result.address[detail]);
+                                }
+                            });
+
+                            formatted_address = addr_from_details.join(', ');
+                        }
+                        return {
+                            formatted_address: formatted_address,
+                            lat: result.lat,
+                            lon: result.lon
+                        };
+                    },
+                    extract_address_label: function(result) {
+                        if (!result.address) {
+                            return result.display_name;
+                        } else {
+                            var city_town_village = result.address.city ||
+                                result.address.town || result.address.village;
+                            result.address.city_town_village = city_town_village;
+
+                            var addr_details = ['suburb', 'city_town_village'];
+                            var addr_from_details = [];
+
+                            addr_details.forEach(function(detail) {
+                                if (result.address[detail] !== undefined) {
+                                    addr_from_details.push(result.address[detail]);
+                                }
+                            });
+
+                            return addr_from_details.join(', ');
+                        }
+                    }
+                }),
+                question:
+                    $("To find your closest clinic we need to know " +
+                      "where you live, the suburb or area u are in. " +
+                      "Please be specific. e.g. Inanda Sandton"),
+                refine_question:
+                    $("Please select your location:"),
+                error_question:
+                    $("Sorry there are no results for your location. " +
+                      "Please re-enter your location again carefully " +
+                      "and make sure you use the correct spelling."),
+                next: 'state_locate_clinic',
+                next_text: 'More',
+                previous_text: 'Back'
+            });
+        });
+
+        self.states.add('state_locate_clinic', function(name) {
+            return self.im.contacts
+                .for_user()
+                .then(function(user_contact) {
+                    self.contact = user_contact;
+                })
+                .then(function() {
+                    return self
+                        .manual_locate(self.contact)
+                        .then(function() {
+                            return self.states.create(
+                                'state_health_services_enter');
+                        });
+                });
+        });
+
+        self.states.add('state_health_services_enter', function(name) {
+            if (self.contact.extra.clinics_found === undefined) {
+                self.contact.extra.clinics_found = "1";
+            } else {
+                self.contact.extra.clinics_found = (parseInt(
+                    self.contact.extra.clinics_found, 10) + 1).toString();
+            }
+
+            return Q
+                .all([
+                    self.im.contacts.save(self.contact),
+                    self.fire_clinics_found_metric(
+                        self.contact.extra.clinics_found)
+                ])
+                .then(function() {
+                    return self.states.create('state_health_services');
+                });
+        });
+
+        self.states.add('state_health_services', function(name) {
+            return new ChoiceState(name, {
+                question:
+                    $("U will get an SMS with clinic info. " +
+                      "Want 2 get more health info? T&Cs " +
+                      "www.brothersforlife.mobi " +
+                      "or www.zazi.org.za"),
+
+                choices: [
+                    new Choice('male', $("Yes - I'm a Man")),
+                    new Choice('female', $("Yes - I'm a Woman")),
+                    new Choice('deny', $("No"))
+                ],
+
+                next: function(choice) {
+                    self.contact.extra.health_services = choice.value;
+
+                    return self.im.contacts
+                        .save(self.contact)
+                        .then(function() {
+                            return 'state_thanks';
+                        });
+                }
+            });
+        });
+
+        self.states.add('state_thanks', function(name) {
+            return new EndState(name, {
+                text:
+                    $("Thanks for using the Healthsites " +
+                      "Service. Opt out at any stage by " +
+                      "SMSing 'STOP' in reply to your " +
+                      "clinic info message."),
+
+                next: 'state_start'
+            });
+        });
 
         // ChoiceState st-F1
         self.states.add('state_op', function(name) {
