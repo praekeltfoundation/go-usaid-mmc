@@ -226,8 +226,6 @@ go.app = function() {
 
         // timeout state
         self.states.add('state_timed_out', function(name, creator_opts) {
-            //var readable_no = go.utils.readable_sa_msisdn(self.contact.msisdn);
-
             return new ChoiceState(name, {
                 question: $("Welcome back to the Medical Male Circumcision (MMC"
                     + ") service. What would you like to do?"),
@@ -348,7 +346,7 @@ go.app = function() {
                 choices: [
                     new Choice("nearest", $("Nearest Clinic")),
                     new Choice("mmc", $("MMC Clinic")),
-                    new Choice("mct", $("HCT Clinic")),
+                    new Choice("hct", $("HCT Clinic")),
                 ],
                 next: function(choice) {
                     return self
