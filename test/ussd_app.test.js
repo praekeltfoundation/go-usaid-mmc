@@ -370,6 +370,18 @@ describe("MMC App", function() {
                             assert.equal(Object.keys(metrics).length, 5);
                             assert.deepEqual(metrics['ussd.post_op.registrations'].values, [1]);
                         })
+                        .check(function(api) {
+                            var smses = _.where(api.outbound.store, {
+                                endpoint: 'sms'
+                            });
+                            var sms = smses[0];
+                            assert.equal(smses.length,1);
+                            assert.equal(sms.content,
+                              "Thanks for subscribing to MMC SMSs. We send SMS early in morning to " +
+                              "help care for ur wound. To unsubscribe reply 'stop'. Keep your SIM in to get SMS."
+                            );
+                            assert.equal(sms.to_addr,'+082111');
+                        })
                         .run();
                 });
                 it("to state_bfl_join", function() {

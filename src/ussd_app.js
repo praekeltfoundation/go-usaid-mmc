@@ -387,7 +387,15 @@ go.app = function() {
                     return Q
                         .all([
                             self.im.user.set_lang(self.contact.extra.language_choice),
-                            self.im.metrics.fire.sum(['ussd', 'post_op', 'registrations'].join('.'), 1)
+                            self.im.metrics.fire.sum(['ussd', 'post_op', 'registrations'].join('.'), 1),
+                            self.im.outbound.send({
+                                to: self.contact,
+                                endpoint: 'sms',
+                                lang: self.contact.extra.language_choice,
+                                content: $("Thanks for subscribing to MMC SMSs. We send SMS early " +
+                                          "in morning to help care for ur wound. To unsubscribe reply " +
+                                          "'stop'. Keep your SIM in to get SMS.")
+                            })
                         ])
                         .then(function() {
                             self.im.contacts.save(self.contact);
