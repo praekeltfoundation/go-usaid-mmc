@@ -332,7 +332,7 @@ go.app = function() {
         };
 
         self.fire_database_query_metric = function() {
-            var clinic_type_requested = self.im.user.answers.state_clinic_type;
+            var clinic_type_requested = self.im.user.answers.state_healthsites;
             return self.im.metrics.fire.inc(
                 ['sum.database_queries', clinic_type_requested].join('.'), 1);
         };
@@ -394,7 +394,7 @@ go.app = function() {
     // LOCATION HELPER
 
         self.make_clinic_search_params = function() {
-            var clinic_type_requested = self.im.user.answers.state_clinic_type;
+            var clinic_type_requested = self.im.user.answers.state_healthsites;
             var clinic_data_source = (
                 self.im.config.clinic_data_source || "internal");
             var search_data = {
@@ -687,7 +687,7 @@ go.app = function() {
                     switch (choice.value) {
                         case 'consent': return 'state_lbs_locate';
                         case 'suburb': return 'state_suburb';
-                        case 'quit': return 'state_quit';
+                        case 'quit': return 'state_end';
                     }
                 }
             });
