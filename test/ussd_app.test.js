@@ -205,12 +205,13 @@ describe("MMC App", function() {
                                 "Welcome to MMC Service. Choose your language:",
                                 "1. English",
                                 "2. isiZulu",
-                                "3. Sesotho",
-                                "4. Siswati",
-                                "5. isiNdebele",
-                                "6. Setswana",
-                                "7. isiXhosa",
-                                "8. Xitsonga"
+                                "3. Afrikaans",
+                                "4. Sesotho",
+                                "5. Siswati",
+                                "6. isiNdebele",
+                                "7. Setswana",
+                                "8. isiXhosa",
+                                "9. Xitsonga"
                             ].join("\n")
                         })
                         .check(function() {

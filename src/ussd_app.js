@@ -297,6 +297,7 @@ go.app = function() {
                 choices: [
                     new Choice("en", $("English")),
                     new Choice("zu", $("isiZulu")),
+                    new Choice("af", $("Afrikaans")),
                     new Choice("st", $("Sesotho")),
                     new Choice("ss", $("Siswati")),
                     new Choice("nd", $("isiNdebele")),
