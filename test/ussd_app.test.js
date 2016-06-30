@@ -782,9 +782,10 @@ describe("MMC App", function() {
                         return tester
                             .setup.user.addr('082111')
                             .setup.user.state("state_healthsites")
+                            // .setup.user.lang('en');
                             .inputs(
                                 { content: '3',
-                                provider: 'CellC' },  // state_clinic_type
+                                provider: 'CellC' },  // state_healthsites
                                 'Friend Street',  // state_suburb
                                 '1'  // state_health_services
                             )
@@ -807,20 +808,21 @@ describe("MMC App", function() {
                     });
                 });
 
-                describe.skip("if the user two finds clinics", function() {
+                describe("if the user two finds clinics", function() {
                     it("should increase the sum.multiple_times_users metric", function() {
                         return tester
                             .setup.user.addr('082111')
                             .setup.user.state("state_healthsites")
+                            .setup.user.lang("en")
                             .inputs(
                                 { content: '2',
-                                provider: 'MTN' },  // state_clinic_type
+                                provider: 'MTN' },  // state_healthsites
                                 '1',  // state_locate_permission
                                 '2',  // state_health_services
                                 {session_event: "new"},
                                 '1',  // state_main_menu
                                 { content: '2',
-                                provider: 'CellC' },  // state_clinic_type
+                                provider: 'CellC' },  // state_healthsites
                                 'Friend Street'  // state_suburb
                             )
                             .check(function(api) {
@@ -834,15 +836,16 @@ describe("MMC App", function() {
                         return tester
                         .setup.user.addr('082111')
                         .setup.user.state("state_healthsites")
+                        .setup.user.lang("en")
                         .inputs(
                             { content: '2',
-                            provider: 'MTN' },  // state_clinic_type
+                            provider: 'MTN' },  // state_healthsites
                             '1',  // state_locate_permission
                             '2',  // state_health_services
                             {session_event: "new"},
                             '1',  // state_main_menu
                             { content: '3',
-                            provider: 'CellC' },  // state_clinic_type
+                            provider: 'CellC' },  // state_healthsites
                             'Friend Street'  // state_suburb
                         )
                         .check(function(api) {
@@ -857,14 +860,16 @@ describe("MMC App", function() {
                         return tester
                             .setup.user.addr('082111')
                             .setup.user.state("state_healthsites")
+                            .setup.user.lang("en")
                             .inputs(
                                 { content: '2',
-                                  provider: 'MTN' },  // state_clinic_type
+                                  provider: 'MTN' },  // state_healthsites
                                 '1',  // state_locate_permission
                                 '2',  // state_health_services
                                 {session_event: "new"},
+                                '1',  // state_main_menu
                                 { content: '3',
-                                  provider: 'CellC' },  // state_clinic_type
+                                  provider: 'CellC' },  // state_healthsites
                                 'Friend Street'  // state_suburb
                             )
                             .check(function(api) {
@@ -876,27 +881,28 @@ describe("MMC App", function() {
                     });
                 });
 
-                describe.skip("if the user finds three clinics", function() {
+                describe("if the user finds three clinics", function() {
                     it("should increase the sum.multiple_times_users metric",
                     function() {
                         return tester
                             .setup.user.addr('082111')
                             .setup.user.state("state_healthsites")
+                            .setup.user.lang("en")
                             .inputs(
                                 { content: '2',
-                                  provider: 'MTN' },  // state_clinic_type
+                                  provider: 'MTN' },  // state_healthsites
                                 '1',  // state_locate_permission
                                 '2',  // state_health_services
                                 {session_event: "new"},
                                 '1',  // state_main_menu
                                 { content: '2',
-                                  provider: 'CellC' },  // state_clinic_type
+                                  provider: 'CellC' },  // state_healthsites
                                 'Friend Street',  // state_suburb
                                 '2',  // state_health_services
                                 {session_event: "new"},
                                 '1',  // state_main_menu
                                 { content: '2',
-                                  provider: 'CellC' },  // state_clinic_type
+                                  provider: 'CellC' },  // state_healthsites
                                 'Quad Street',  // state_suburb
                                 '3'  // state_suburb
                             )
