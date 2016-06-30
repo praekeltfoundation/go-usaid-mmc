@@ -344,7 +344,7 @@ go.app = function() {
                     " looking for?",
                 ].join("")),
                 choices: [
-                    new Choice("nearest", $("Nearest Clinic")),
+                    new Choice("mmc", $("Nearest Clinic")),
                     new Choice("mmc", $("MMC Clinic")),
                     new Choice("hct", $("HCT Clinic")),
                 ],
