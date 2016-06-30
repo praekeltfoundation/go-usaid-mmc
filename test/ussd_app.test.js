@@ -256,7 +256,7 @@ describe("MMC App", function() {
                 });
                 it("to state_language_set if language preference changed", function() {
                     return tester
-                        .setup.user.lang("en")
+                        .setup.user.lang('en')
                         .setup.user.state("state_main_menu")
                         .inputs(
                             "5"  // state_main_menu - More
@@ -279,7 +279,7 @@ describe("MMC App", function() {
                 });
                 it("to state_main_menu (page 1); straight to main menu for already registered user", function() {
                     return tester
-                        .setup.user.lang("en")
+                        .setup.user.lang('en')
                         .start()
                         .check.interaction({
                             state: "state_main_menu",
@@ -318,7 +318,7 @@ describe("MMC App", function() {
                         .setup.user.state("state_main_menu")
                         .input("1")
                         .check.interaction({
-                            state: "state_healthsites",
+                            state: 'state_healthsites',
                             reply: [
                                 "Welcome to Healthsites. What type of clinic are"
                                 + " you looking for?",
@@ -333,7 +333,7 @@ describe("MMC App", function() {
                     it("should incr the clinic_type metric", function() {
                         return tester
                             .setup.user.addr('082111')
-                            .setup.user.state("state_healthsites")
+                            .setup.user.state('state_healthsites')
                             .input(
                                 { content: '2',
                                   provider: 'MTN' }  // state_healthsites
@@ -350,7 +350,7 @@ describe("MMC App", function() {
                     it("should confirm locating them", function() {
                         return tester
                             .setup.user.addr('082111')
-                            .setup.user.state("state_healthsites")
+                            .setup.user.state('state_healthsites')
                             .input(
                                 { content: '2',
                                   provider: 'MTN' }  // state_healthsites
@@ -372,7 +372,7 @@ describe("MMC App", function() {
                         it("should increase the sum.database_queries metric", function() {
                             return tester
                                 .setup.user.addr('082111')
-                                .setup.user.state("state_healthsites")
+                                .setup.user.state('state_healthsites')
                                 .inputs(
                                     { content: '2',
                                         provider: 'MTN' },  // state_healthsites
@@ -387,7 +387,7 @@ describe("MMC App", function() {
                         it("should ask about health services opt-in", function() {
                             return tester
                                 .setup.user.addr('082111')
-                                .setup.user.state("state_healthsites")
+                                .setup.user.state('state_healthsites')
                                 .inputs(
                                     { content: '2',
                                         provider: 'MTN' },  // state_healthsites
@@ -413,7 +413,7 @@ describe("MMC App", function() {
                             function() {
                                 return tester
                                     .setup.user.addr('082111')
-                                    .setup.user.state("state_healthsites")
+                                    .setup.user.state('state_healthsites')
                                     .setup.config.app({clinic_data_source: "aat"})
                                     .inputs(
                                         { content: '2',
@@ -450,7 +450,7 @@ describe("MMC App", function() {
                         it("should reprompt for location consent", function() {
                             return tester
                                 .setup.user.addr('082111')
-                                .setup.user.state("state_healthsites")
+                                .setup.user.state('state_healthsites')
                                 .inputs(
                                     { content: '2',
                                       provider: 'MTN' },  // state_healthsites
@@ -475,7 +475,7 @@ describe("MMC App", function() {
                                 it("should ask about health services opt-in", function() {
                                     return tester
                                     .setup.user.addr('082111')
-                                    .setup.user.state("state_healthsites")
+                                    .setup.user.state('state_healthsites')
                                     .inputs(
                                         { content: '2',
                                           provider: 'MTN' },  // state_healthsites
@@ -502,7 +502,7 @@ describe("MMC App", function() {
                                 it("should prompt for their suburb", function() {
                                     return tester
                                     .setup.user.addr('082111')
-                                    .setup.user.state("state_healthsites")
+                                    .setup.user.state('state_healthsites')
                                     .inputs(
                                         { content: '2',
                                           provider: 'MTN' },  // state_healthsites
@@ -524,7 +524,7 @@ describe("MMC App", function() {
                                 it("should ask about health services opt-in", function() {
                                     return tester
                                     .setup.user.addr('082111')
-                                    .setup.user.state("state_healthsites")
+                                    .setup.user.state('state_healthsites')
                                     .inputs(
                                         {content: '2', provider: 'MTN' }, // state_healthsites
                                         {content: '2', provider: 'MTN' },  // state_locate_permission
@@ -553,7 +553,7 @@ describe("MMC App", function() {
                         it("should show info and quit", function() {
                             return tester
                                 .setup.user.addr('082111')
-                                .setup.user.state("state_healthsites")
+                                .setup.user.state('state_healthsites')
                                 .inputs(
                                     { content: '2',
                                       provider: 'MTN' },  // state_healthsites
@@ -582,7 +582,7 @@ describe("MMC App", function() {
                     it("should ask for their suburb", function() {
                         return tester
                             .setup.user.addr('082111')
-                            .setup.user.state("state_healthsites")
+                            .setup.user.state('state_healthsites')
                             .input(
                                 { content: '2' }  // state_healthsites
                             )
@@ -602,7 +602,7 @@ describe("MMC App", function() {
                     it("should ask for their suburb", function() {
                         return tester
                             .setup.user.addr('082111')
-                            .setup.user.state("state_healthsites")
+                            .setup.user.state('state_healthsites')
                             .input(
                                 { content: '2',
                                   provider: 'CellC' }  // state_healthsites
@@ -622,7 +622,7 @@ describe("MMC App", function() {
                             it("should ask about health services opt-in", function() {
                                 return tester
                                     .setup.user.addr('082111')
-                                    .setup.user.state("state_healthsites")
+                                    .setup.user.state('state_healthsites')
                                     .inputs(
                                         { content: '3',
                                           provider: 'CellC' },  // state_healthsites
@@ -646,7 +646,7 @@ describe("MMC App", function() {
                             it("should save location data to contact", function() {
                                 return tester
                                     .setup.user.addr('082111')
-                                    .setup.user.state("state_healthsites")
+                                    .setup.user.state('state_healthsites')
                                     .inputs(
                                         { content: '3',
                                           provider: 'CellC' },  // state_healthsites
@@ -672,7 +672,7 @@ describe("MMC App", function() {
                                 function() {
                                     return tester
                                         .setup.user.addr('082111')
-                                        .setup.user.state("state_healthsites")
+                                        .setup.user.state('state_healthsites')
                                         .setup.config.app({clinic_data_source: "aat"})
                                         .inputs(
                                             { content: '3',
@@ -706,7 +706,7 @@ describe("MMC App", function() {
                                 it("should display a list of address options", function() {
                                     return tester
                                         .setup.user.addr('082111')
-                                        .setup.user.state("state_healthsites")
+                                        .setup.user.state('state_healthsites')
                                         .inputs(
                                             { content: '3',
                                               provider: 'CellC' },  // state_healthsites
@@ -729,7 +729,7 @@ describe("MMC App", function() {
                                 it("should go the next page if 'n' is chosen", function() {
                                     return tester
                                         .setup.user.addr('082111')
-                                        .setup.user.state("state_healthsites")
+                                        .setup.user.state('state_healthsites')
                                         .inputs(
                                             { content: '3',
                                               provider: 'CellC' },  // state_healthsites
@@ -751,7 +751,7 @@ describe("MMC App", function() {
                                 it("should save data to contact upon choice", function() {
                                     return tester
                                         .setup.user.addr('082111')
-                                        .setup.user.state("state_healthsites")
+                                        .setup.user.state('state_healthsites')
                                         .inputs(
                                             { content: '2',
                                               provider: 'CellC' },  // state_healthsites
@@ -781,7 +781,7 @@ describe("MMC App", function() {
                     it("should store option as extra, thank them and exit", function() {
                         return tester
                             .setup.user.addr('082111')
-                            .setup.user.state("state_healthsites")
+                            .setup.user.state('state_healthsites')
                             // .setup.user.lang('en');
                             .inputs(
                                 { content: '3',
@@ -812,8 +812,8 @@ describe("MMC App", function() {
                     it("should increase the sum.multiple_times_users metric", function() {
                         return tester
                             .setup.user.addr('082111')
-                            .setup.user.state("state_healthsites")
-                            .setup.user.lang("en")
+                            .setup.user.state('state_healthsites')
+                            .setup.user.lang('en')
                             .inputs(
                                 { content: '2',
                                 provider: 'MTN' },  // state_healthsites
@@ -835,8 +835,8 @@ describe("MMC App", function() {
                     it("should track the service provider metric", function() {
                         return tester
                         .setup.user.addr('082111')
-                        .setup.user.state("state_healthsites")
-                        .setup.user.lang("en")
+                        .setup.user.state('state_healthsites')
+                        .setup.user.lang('en')
                         .inputs(
                             { content: '2',
                             provider: 'MTN' },  // state_healthsites
@@ -859,8 +859,8 @@ describe("MMC App", function() {
                     it("should track the locate type metric", function() {
                         return tester
                             .setup.user.addr('082111')
-                            .setup.user.state("state_healthsites")
-                            .setup.user.lang("en")
+                            .setup.user.state('state_healthsites')
+                            .setup.user.lang('en')
                             .inputs(
                                 { content: '2',
                                   provider: 'MTN' },  // state_healthsites
@@ -886,8 +886,8 @@ describe("MMC App", function() {
                     function() {
                         return tester
                             .setup.user.addr('082111')
-                            .setup.user.state("state_healthsites")
-                            .setup.user.lang("en")
+                            .setup.user.state('state_healthsites')
+                            .setup.user.lang('en')
                             .inputs(
                                 { content: '2',
                                   provider: 'MTN' },  // state_healthsites
@@ -1037,7 +1037,7 @@ describe("MMC App", function() {
                             var contact = api.contacts.store[0];
                             assert.equal(contact.extra.is_registered, "true");
                             assert.equal(contact.extra.consent, "true");
-                            assert.equal(contact.extra.language_choice, "en");
+                            assert.equal(contact.extra.language_choice, 'en');
                             assert.equal(contact.extra.date_of_op, "20150405");
                         })
                         .check(function(api) {
