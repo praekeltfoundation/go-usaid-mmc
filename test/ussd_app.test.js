@@ -576,6 +576,238 @@ describe("MMC App", function() {
                     });
                 });
 
+                describe("using a provider that provides location " +
+                "based search - doing 'Nearest Clinic' searches", function() {
+                    it("should confirm locating them", function() {
+                        return tester
+                            .setup.user.addr('082111')
+                            .setup.user.state('state_healthsites')
+                            .input(
+                                { content: '1',
+                                  provider: 'MTN' }  // state_healthsites
+                            )
+                            .check.interaction({
+                                state: 'state_locate_permission',
+                                reply: [
+                                    "Thanks! We will now locate your approximate " +
+                                    "position and then send you an SMS with your " +
+                                    "nearest clinic.",
+                                    "1. Continue",
+                                    "2. No don't locate me"
+                                ].join('\n')
+                            })
+                            .run();
+                    });
+
+                    describe("if the user chooses 1. Continue", function() {
+                        it("should increase the sum.database_queries metric", function() {
+                            return tester
+                                .setup.user.addr('082111')
+                                .setup.user.state('state_healthsites')
+                                .inputs(
+                                    { content: '1',
+                                        provider: 'MTN' },  // state_healthsites
+                                    '1'  // state_locate_permission
+                                )
+                                .check(function(api) {
+                                    var metrics = api.metrics.stores.ussd_app_test;
+                                    assert.deepEqual(metrics['sum.database_queries.nearest'].values, [1]);
+                                })
+                                .run();
+                        });
+                        it("should ask about health services opt-in", function() {
+                            return tester
+                                .setup.user.addr('082111')
+                                .setup.user.state('state_healthsites')
+                                .inputs(
+                                    { content: '1',
+                                        provider: 'MTN' },  // state_healthsites
+                                    '1'  // state_locate_permission
+                                )
+                                .check.interaction({
+                                    state: 'state_health_services',
+                                    reply: [
+                                        "U will get an SMS with clinic info. " +
+                                        "Want 2 get more health info? T&Cs " +
+                                        "www.brothersforlife.mobi " +
+                                        "or www.zazi.org.za",
+                                        "1. Yes - I'm a Man",
+                                        "2. Yes - I'm a Woman",
+                                        "3. No"
+                                    ].join("\n")
+                                })
+                                .run();
+                        });
+
+                        describe("if a custom clinic source is configured", function () {
+                            it("should specify the clinic source in the search request",
+                            function() {
+                                return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state('state_healthsites')
+                                    .setup.config.app({clinic_data_source: "aat"})
+                                    .inputs(
+                                        { content: '1',
+                                          provider: 'MTN' },  // state_healthsites
+                                        '1'  // state_locate_permission
+                                    )
+                                    .check.interaction({
+                                        state: 'state_health_services',
+                                        reply: [
+                                            "U will get an SMS with clinic info. " +
+                                            "Want 2 get more health info? T&Cs " +
+                                            "www.brothersforlife.mobi " +
+                                            "or www.zazi.org.za",
+                                            "1. Yes - I'm a Man",
+                                            "2. Yes - I'm a Woman",
+                                            "3. No"
+                                        ].join("\n")
+                                    })
+                                    .check(function (api) {
+                                        var search_request = api.http.requests[0];
+                                        assert.deepEqual(
+                                            search_request.data
+                                                .pointofinterest.search, {
+                                                    "source": "aat",
+                                                    "mmc": "true",
+                                                    "hct": "true"
+                                                });
+                                    })
+                                    .run();
+                            });
+                        });
+                    });
+
+                    describe("if the user chooses 2. No don't locate", function() {
+                        it("should reprompt for location consent", function() {
+                            return tester
+                                .setup.user.addr('082111')
+                                .setup.user.state('state_healthsites')
+                                .inputs(
+                                    { content: '1',
+                                      provider: 'MTN' },  // state_healthsites
+                                    '2'  // state_locate_permission
+                                )
+                                .check.interaction({
+                                    state: 'state_reprompt_permission',
+                                    reply: [
+                                        "If you do not give consent we can't locate you automatically. " +
+                                        "Alternatively, tell us where you live, " +
+                                        "(area or suburb)",
+                                        "1. Give consent",
+                                        "2. Enter location",
+                                        "3. Quit"
+                                    ].join('\n')
+                                })
+                                .run();
+                        });
+
+                        describe("if the user replies after initially refusing consent", function() {
+                            describe("if they choose 1. Give consent", function() {
+                                it("should ask about health services opt-in", function() {
+                                    return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state('state_healthsites')
+                                    .inputs(
+                                        { content: '1',
+                                          provider: 'MTN' },  // state_healthsites
+                                        '2',  // state_locate_permission
+                                        '1'  // state_reprompt_permission
+                                    )
+                                    .check.interaction({
+                                        state: 'state_health_services',
+                                        reply: [
+                                            "U will get an SMS with clinic info. " +
+                                            "Want 2 get more health info? T&Cs " +
+                                            "www.brothersforlife.mobi " +
+                                            "or www.zazi.org.za",
+                                            "1. Yes - I'm a Man",
+                                            "2. Yes - I'm a Woman",
+                                            "3. No"
+                                        ].join("\n")
+                                    })
+                                    .run();
+                                });
+                            });
+
+                            describe("if they choose 2. Give suburb", function() {
+                                it("should prompt for their suburb", function() {
+                                    return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state('state_healthsites')
+                                    .inputs(
+                                        { content: '1',
+                                          provider: 'MTN' },  // state_healthsites
+                                        '2',  // state_locate_permission
+                                        '2'  // state_reprompt_permission
+                                    )
+                                    .check.interaction({
+                                        state: 'state_suburb',
+                                        reply:
+                                            "To find your closest clinic we need to know where you live, " +
+                                            "the suburb or area u are in. Please be " +
+                                            "specific. e.g. Inanda Sandton"
+                                    })
+                                    .run();
+                                });
+                            });
+
+                            describe("if they choose 2. and give suburb", function() {
+                                it("should ask about health services opt-in", function() {
+                                    return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state('state_healthsites')
+                                    .inputs(
+                                        {content: '1', provider: 'MTN' }, // state_healthsites
+                                        {content: '2', provider: 'MTN' },  // state_locate_permission
+                                        {content: '2', provider: 'MTN' },  // state_reprompt_permission
+                                        {content: 'Friend Street', provider: 'MTN' }  // state_suburb
+                                    )
+                                    .check.interaction({
+                                        state: 'state_health_services',
+                                        reply: [
+                                            "U will get an SMS with clinic info. " +
+                                            "Want 2 get more health info? T&Cs " +
+                                            "www.brothersforlife.mobi " +
+                                            "or www.zazi.org.za",
+                                            "1. Yes - I'm a Man",
+                                            "2. Yes - I'm a Woman",
+                                            "3. No"
+                                        ].join("\n")
+                                    })
+                                    .run();
+                                });
+                            });
+                        });
+                    });
+
+                    describe("if they choose 3. Quit", function() {
+                        it("should show info and quit", function() {
+                            return tester
+                                .setup.user.addr('082111')
+                                .setup.user.state('state_healthsites')
+                                .inputs(
+                                    { content: '1',
+                                      provider: 'MTN' },  // state_healthsites
+                                    '2',  // state_locate_permission
+                                    '3'  // state_reprompt_permission
+                                )
+                                .check.interaction({
+                                    state: 'state_end',
+                                    reply:
+                                        "Thanks for using the *120*662# MMC" +
+                                        " service! Dial back anytime to " +
+                                        "find MMC clinics, sign up for " +
+                                        "healing SMSs or find more info " +
+                                        "about MMC (20c/20sec) Yenzakahle!"
+                                })
+                                .check.reply.ends_session()
+                                .run();
+
+                        });
+                    });
+                });
+
 
                 describe("if the user on transport that does not have provider for " +
                 "location based search", function() {
@@ -754,6 +986,187 @@ describe("MMC App", function() {
                                         .setup.user.state('state_healthsites')
                                         .inputs(
                                             { content: '2',
+                                              provider: 'CellC' },  // state_healthsites
+                                            'Quad Street',  // state_suburb
+                                            '3'  // state_suburb
+                                        )
+                                        .check(function(api) {
+                                            var contact = _.find(api.contacts.store, {
+                                                                msisdn: '+082111'
+                                                            });
+                                            assert.equal(contact.extra[
+                                                'location:formatted_address'],
+                                                'Suburb number 3, City number 3');
+                                            assert.equal(contact.extra[
+                                                'location:lon'], '3.3');
+                                            assert.equal(contact.extra[
+                                                'location:lat'], '3.33');
+                                        })
+                                        .run();
+                                });
+                            });
+                        });
+                    });
+                });
+
+                describe("not using a provider that provides " +
+                "location based search - 'Nearest Clinic' searches", function() {
+                    it("should ask for their suburb", function() {
+                        return tester
+                            .setup.user.addr('082111')
+                            .setup.user.state('state_healthsites')
+                            .input(
+                                { content: '1',
+                                  provider: 'CellC' }  // state_healthsites
+                            )
+                            .check.interaction({
+                                state: 'state_suburb',
+                                reply:
+                                    "To find your closest clinic we need to know where you live, " +
+                                    "the suburb or area u are in. Please be " +
+                                    "specific. e.g. Inanda Sandton"
+                            })
+                            .run();
+                    });
+
+                    describe("after entering their suburb", function() {
+                        describe("if there is only one location option", function() {
+                            it("should ask about health services opt-in", function() {
+                                return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state('state_healthsites')
+                                    .inputs(
+                                        { content: '1',
+                                          provider: 'CellC' },  // state_healthsites
+                                        'Friend Street'  // state_suburb
+                                    )
+                                    .check.interaction({
+                                        state: 'state_health_services',
+                                        reply: [
+                                            "U will get an SMS with clinic info. " +
+                                            "Want 2 get more health info? T&Cs " +
+                                            "www.brothersforlife.mobi " +
+                                            "or www.zazi.org.za",
+                                            "1. Yes - I'm a Man",
+                                            "2. Yes - I'm a Woman",
+                                            "3. No"
+                                        ].join("\n")
+                                    })
+                                    .run();
+                            });
+
+                            it("should save location data to contact", function() {
+                                return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state('state_healthsites')
+                                    .inputs(
+                                        { content: '1',
+                                          provider: 'CellC' },  // state_healthsites
+                                        'Friend Street'  // state_suburb
+                                    )
+                                    .check(function(api) {
+                                        var contact = _.find(api.contacts.store, {
+                                                            msisdn: '+082111'
+                                                        });
+                                        assert.equal(contact.extra[
+                                            'location:formatted_address'],
+                                            'Friend Street, Suburb');
+                                        assert.equal(contact.extra[
+                                            'location:lon'], '3.1415');
+                                        assert.equal(contact.extra[
+                                            'location:lat'], '2.7182');
+                                    })
+                                    .run();
+                            });
+
+                            describe("if a custom clinic source is configured", function () {
+                                it("should specify the clinic source in the search request",
+                                function() {
+                                    return tester
+                                        .setup.user.addr('082111')
+                                        .setup.user.state('state_healthsites')
+                                        .setup.config.app({clinic_data_source: "aat"})
+                                        .inputs(
+                                            { content: '1',
+                                              provider: 'CellC' },  // state_healthsites
+                                            'Friend Street'  // state_suburb
+                                        )
+                                        .check.interaction({
+                                            state: 'state_health_services',
+                                            reply: [
+                                                "U will get an SMS with clinic info. " +
+                                                "Want 2 get more health info? T&Cs " +
+                                                "www.brothersforlife.mobi " +
+                                                "or www.zazi.org.za",
+                                                "1. Yes - I'm a Man",
+                                                "2. Yes - I'm a Woman",
+                                                "3. No"
+                                            ].join("\n")
+                                        })
+                                        .check(function (api) {
+                                            var search_request = api.http.requests[1];
+                                            assert.deepEqual(search_request.data.search, {
+                                                "source": "aat",
+                                                "mmc": "true",
+                                                "hct": "true",
+                                            });
+                                        })
+                                        .run();
+                                });
+                            });
+
+                            describe("if there are multiple location options", function() {
+                                it("should display a list of address options", function() {
+                                    return tester
+                                        .setup.user.addr('082111')
+                                        .setup.user.state('state_healthsites')
+                                        .inputs(
+                                            { content: '1',
+                                              provider: 'CellC' },  // state_healthsites
+                                            'Quad Street'  // state_suburb
+                                        )
+                                        .check.interaction({
+                                            state: 'state_suburb',
+                                            reply: [
+                                                "Please select your location:",
+                                                "1. Suburb number 1, City number 1",
+                                                "2. Suburb number 2, Town number 2",
+                                                "3. Suburb number 3, City number 3",
+                                                "n. More",
+                                                "p. Back"
+                                            ].join('\n')
+                                        })
+                                        .run();
+                                });
+
+                                it("should go the next page if 'n' is chosen", function() {
+                                    return tester
+                                        .setup.user.addr('082111')
+                                        .setup.user.state('state_healthsites')
+                                        .inputs(
+                                            { content: '1',
+                                              provider: 'CellC' },  // state_healthsites
+                                            'Quad Street',  // state_suburb
+                                            'n'  // state_suburb
+                                        )
+                                        .check.interaction({
+                                            state: 'state_suburb',
+                                            reply: [
+                                                "Please select your location:",
+                                                "1. Suburb number 4",
+                                                "n. More",
+                                                "p. Back"
+                                            ].join('\n')
+                                        })
+                                        .run();
+                                });
+
+                                it("should save data to contact upon choice", function() {
+                                    return tester
+                                        .setup.user.addr('082111')
+                                        .setup.user.state('state_healthsites')
+                                        .inputs(
+                                            { content: '1',
                                               provider: 'CellC' },  // state_healthsites
                                             'Quad Street',  // state_suburb
                                             '3'  // state_suburb

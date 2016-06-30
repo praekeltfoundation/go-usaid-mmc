@@ -135,7 +135,13 @@ go.app = function() {
             var search_data = {
               source: clinic_data_source,
             };
-            search_data[clinic_type_requested] = "true";
+            if (clinic_type_requested === "nearest") {
+                search_data.mmc = "true";
+                search_data.hct = "true";
+            }
+            else {
+                search_data[clinic_type_requested] = "true";
+            }
             return search_data;
         };
 
@@ -344,7 +350,7 @@ go.app = function() {
                     " looking for?",
                 ].join("")),
                 choices: [
-                    new Choice("mmc", $("Nearest Clinic")),
+                    new Choice("nearest", $("Nearest Clinic")),
                     new Choice("mmc", $("MMC Clinic")),
                     new Choice("hct", $("HCT Clinic")),
                 ],
