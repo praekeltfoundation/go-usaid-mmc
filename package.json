@@ -12,7 +12,8 @@
   "keywords": [
     "vumi",
     "mmc",
-    "usaid"
+    "usaid",
+    "clinicfinder"
   ],
   "author": "Praekelt Foundation",
   "license": "BSD",
@@ -25,7 +26,8 @@
     "q": "~0.9",
     "lodash": "~2.4.1",
     "moment": "~2.5.1",
-    "go-jsbox-metrics-helper": "~0.1.0"
+    "go-jsbox-metrics-helper": "~0.1.0",
+    "go-jsbox-location": "0.2.3"
   },
   "devDependencies": {
     "mocha": "~1.18",
