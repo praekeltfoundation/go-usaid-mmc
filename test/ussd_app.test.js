@@ -1716,6 +1716,15 @@ describe("MMC App", function() {
                                     "servicerating_subscribed_helpful"
                             });
                         })
+                        .check(function(api) {
+                            var contact = _.find(api.contacts.store, {
+                                            msisdn: '+27123456789'
+                                        });
+                            assert.equal(contact.extra.state_servicerating_location, "User entered location");
+                            assert.equal(contact.extra.state_servicerating_would_recommend, "servicerating_yes_recommend");
+                            assert.equal(contact.extra.state_servicerating_rating, "servicerating_excellent");
+                            assert.equal(contact.extra.state_servicerating_subscribed_to_post_op_sms, "servicerating_subscribed_helpful");
+                        })
                         .run();
                 });
             });

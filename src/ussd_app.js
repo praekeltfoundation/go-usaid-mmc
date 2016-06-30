@@ -831,8 +831,12 @@ go.app = function() {
                         "servicerating_did_not_know",
                         $("I didn't know about it")),
                 ],
-                next: function(choice) {
-                    return 'state_servicerating_end_positive';
+                next: function() {
+                    return go.utils.servicerating_save(self.im, self.contact)
+                      .then(function(){
+                        return 'state_servicerating_end_positive';
+                      });
+
                 }
             });
         });
@@ -866,7 +870,6 @@ go.app = function() {
                     new Choice("state_end", $("Exit"))
                 ],
                 next: function(choice) {
-                    // TODO make web request to store results
                     return choice.value;
                 }
             });

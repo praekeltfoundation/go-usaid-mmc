@@ -261,6 +261,17 @@ go.utils = {
             return go.utils.control_api_call("post", null, payload, 'subscription/', im);
         },
 
+        servicerating_save: function(im, contact) {
+          var sr_states = ['state_servicerating_location',
+                           'state_servicerating_would_recommend',
+                           'state_servicerating_rating',
+                           'state_servicerating_subscribed_to_post_op_sms'];
+          for (var state in sr_states) {
+              contact.extra[sr_states[state]] = im.user.answers[sr_states[state]];
+          }
+          return im.contacts.save(contact);
+      },
+
 };
 
 go.app = function() {

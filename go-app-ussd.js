@@ -261,6 +261,17 @@ go.utils = {
             return go.utils.control_api_call("post", null, payload, 'subscription/', im);
         },
 
+        servicerating_save: function(im, contact) {
+          var sr_states = ['state_servicerating_location',
+                           'state_servicerating_would_recommend',
+                           'state_servicerating_rating',
+                           'state_servicerating_subscribed_to_post_op_sms'];
+          for (var state in sr_states) {
+              contact.extra[sr_states[state]] = im.user.answers[sr_states[state]];
+          }
+          return im.contacts.save(contact);
+      },
+
 };
 
 go.app = function() {
@@ -1096,8 +1107,12 @@ go.app = function() {
                         "servicerating_did_not_know",
                         $("I didn't know about it")),
                 ],
-                next: function(choice) {
-                    return 'state_servicerating_end_positive';
+                next: function() {
+                    return go.utils.servicerating_save(self.im, self.contact)
+                      .then(function(){
+                        return 'state_servicerating_end_positive';
+                      });
+
                 }
             });
         });
@@ -1131,7 +1146,6 @@ go.app = function() {
                     new Choice("state_end", $("Exit"))
                 ],
                 next: function(choice) {
-                    // TODO make web request to store results
                     return choice.value;
                 }
             });
