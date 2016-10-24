@@ -323,8 +323,9 @@ describe("MMC App", function() {
                             reply: [
                                 "Welcome to Healthsites. What type of clinic are"
                                 + " you looking for?",
-                                "1. MMC Clinic",
-                                "2. HCT Clinic"
+                                "1. Circumcision",
+                                "2. HIV Services",
+                                "3. Gender Based Violence"
                             ].join("\n")
                         })
                         .run();

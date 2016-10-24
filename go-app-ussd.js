@@ -623,8 +623,9 @@ go.app = function() {
                     " looking for?",
                 ].join("")),
                 choices: [
-                    new Choice("mmc", $("MMC Clinic")),
-                    new Choice("hct", $("HCT Clinic")),
+                    new Choice("mmc", $("Circumcision")),
+                    new Choice("hct", $("HIV Services")),
+                    new Choice("gbv", $("Gender Based Violence"))
                 ],
                 next: function(choice) {
                     return self
