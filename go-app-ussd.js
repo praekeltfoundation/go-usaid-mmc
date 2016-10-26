@@ -337,6 +337,9 @@ go.app = function() {
         };
 
         // METRIC HELPERS
+
+
+        // METRIC HELPERS
         self.fire_clinic_type_metric = function(clinic_type_requested) {
             return self.im.metrics.fire.inc(
                 ['sum.clinic_type_select', clinic_type_requested].join('.'), 1);
@@ -366,7 +369,8 @@ go.app = function() {
                 ['sum.locate_type', type].join('.'), 1);
         };
 
-    // DIALBACK SMS HANDLING
+
+        // DIALBACK SMS HANDLING
 
         self.should_send_dialback = function(e) {
             return e.user_terminated
@@ -402,9 +406,31 @@ go.app = function() {
                 });
         };
 
-    // LOCATION HELPER
+
+        // LOCATION / LOOKUP HELPERS
+
+        self.proceed_to_location_state = function() {
+            if (typeof self.im.msg.provider !== 'undefined' && self.im.msg.provider !== null) {
+                var service_provider = self.im.msg.provider.trim().toUpperCase();
+                if (self.im.config.lbs_providers.indexOf(service_provider) !== -1) {
+                    return self
+                        .fire_provider_metric(service_provider)
+                        .then(function() {
+                            return 'state_locate_permission';
+                        });
+                }
+            }
+
+            // For non-lbs providers or transports that don't provide provider info
+            return self
+                .fire_provider_metric('Other')
+                .then(function() {
+                    return 'state_suburb';
+                });
+        };
 
         self.make_clinic_search_params = function() {
+            // TODO: update for gbv and hct/gbv subtypes
             var clinic_type_requested = self.im.user.answers.state_healthsites;
             var clinic_data_source = (
                 self.im.config.clinic_data_source || "internal");
@@ -476,7 +502,7 @@ go.app = function() {
         };
 
 
-    // TIMEOUT HANDLING
+        // TIMEOUT HANDLING
 
         // determine whether timed_out state should be used
         self.timed_out = function() {
@@ -631,31 +657,41 @@ go.app = function() {
                     return self
                         .fire_clinic_type_metric(choice.value)
                         .then(function() {
-                            if (typeof self.im.msg.provider !== 'undefined' && self.im.msg.provider !== null) {
-                                var service_provider = self.im.msg.provider.trim().toUpperCase();
-                                if (self.im.config.lbs_providers.indexOf(service_provider) !== -1) {
-                                    return self
-                                        .fire_provider_metric(service_provider)
-                                        .then(function() {
-                                            return 'state_locate_permission';
-                                        });
-                                } else {
-                                    return self
-                                        .fire_provider_metric('Other')
-                                        .then(function() {
-                                            return 'state_suburb';
-                                        });
-                                }
-                            } else {
-                                // For transports that don't provide provider info
-                                return self
-                                    .fire_provider_metric('Other')
-                                    .then(function() {
-                                        return 'state_suburb';
-                                    });
+                            switch (choice.value) {
+                                case 'mmc': return self.proceed_to_location_state();
+                                case 'hct': return 'state_healthsite_hct_types';
+                                case 'gbv': return 'state_healthsite_gbv_types';
                             }
-
                         });
+                }
+            });
+        });
+
+        self.add('state_healthsite_hct_types', function(name){
+            return new ChoiceState(name, {
+                question: $("What type of HIV service are you looking for?"),
+                choices: [
+                    new Choice("hct_testing", $("Testing")),
+                    new Choice("hct_treatment", $("Treatment")),
+                    new Choice("hct_support", $("Support"))
+                ],
+                next: function(choice) {
+                    // TODO: metric
+                    return self.proceed_to_location_state();
+                }
+            });
+        });
+
+        self.add('state_healthsite_gbv_types', function(name){
+            return new ChoiceState(name, {
+                question: $("What type of Gender Based Violence organisation are you looking for?"),
+                choices: [
+                    new Choice("gbv_thuthuzela", $("Thuthuzela Centres")),
+                    new Choice("gbv_support_org", $("Support Organisations"))
+                ],
+                next: function(choice) {
+                    // TODO: metric
+                    return self.proceed_to_location_state();
                 }
             });
         });

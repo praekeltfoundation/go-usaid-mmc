@@ -330,6 +330,7 @@ describe("MMC App", function() {
                         })
                         .run();
                 });
+
                 describe("when the user selects a clinic type", function() {
                     it("should incr the clinic_type metric", function() {
                         return tester
@@ -346,6 +347,51 @@ describe("MMC App", function() {
                             .run();
                     });
                 });
+
+                // test HIV Services sub-menu
+                describe("when the user selects the 'HIV Services' clinic type", function() {
+                    it("to state_healthsite_hct_types (HIV Services sub-menu)", function() {
+                        return tester
+                            .setup.user.state('state_healthsites')
+                            .input({
+                                content: '2'
+                            })
+                            .check.interaction({
+                                state: 'state_healthsite_hct_types',
+                                reply: [
+                                    "What type of HIV service are you looking for?",
+                                    "1. Testing",
+                                    "2. Treatment",
+                                    "3. Support"
+                                ].join("\n")
+                            })
+                            .run();
+                    });
+                });
+
+                // test Gender Based Violence sub-menu
+                describe("when the user selects the 'Gender Based Violence' " +
+                "clinic type", function() {
+                    it("to state_healthsite_gbv_types " +
+                    "(Gender Based Violence sub-menu)", function() {
+                        return tester
+                            .setup.user.state('state_healthsites')
+                            .input({
+                                content: '3'
+                            })
+                            .check.interaction({
+                                state: 'state_healthsite_gbv_types',
+                                reply: [
+                                    "What type of Gender Based Violence organisation are you " +
+                                    "looking for?",
+                                    "1. Thuthuzela Centres",
+                                    "2. Support Organisations"
+                                ].join("\n")
+                            })
+                            .run();
+                    });
+                });
+
                 describe("if the user uses a provider that provides location " +
                 "based search", function() {
                     it("should confirm locating them", function() {
@@ -624,7 +670,7 @@ describe("MMC App", function() {
                                     .setup.user.addr('082111')
                                     .setup.user.state('state_healthsites')
                                     .inputs(
-                                        { content: '2',
+                                        { content: '1',
                                           provider: 'CellC' },  // state_healthsites
                                         'Friend Street'  // state_suburb
                                     )
@@ -648,7 +694,7 @@ describe("MMC App", function() {
                                     .setup.user.addr('082111')
                                     .setup.user.state('state_healthsites')
                                     .inputs(
-                                        { content: '2',
+                                        { content: '1',
                                           provider: 'CellC' },  // state_healthsites
                                         'Friend Street'  // state_suburb
                                     )
@@ -675,7 +721,7 @@ describe("MMC App", function() {
                                         .setup.user.state('state_healthsites')
                                         .setup.config.app({clinic_data_source: "aat"})
                                         .inputs(
-                                            { content: '2',
+                                            { content: '1',
                                               provider: 'CellC' },  // state_healthsites
                                             'Friend Street'  // state_suburb
                                         )
@@ -695,7 +741,7 @@ describe("MMC App", function() {
                                             var search_request = api.http.requests[1];
                                             assert.deepEqual(search_request.data.search, {
                                                 "source": "aat",
-                                                "hct": "true",
+                                                "mmc": "true",
                                             });
                                         })
                                         .run();
@@ -708,7 +754,7 @@ describe("MMC App", function() {
                                         .setup.user.addr('082111')
                                         .setup.user.state('state_healthsites')
                                         .inputs(
-                                            { content: '2',
+                                            { content: '1',
                                               provider: 'CellC' },  // state_healthsites
                                             'Quad Street'  // state_suburb
                                         )
@@ -731,7 +777,7 @@ describe("MMC App", function() {
                                         .setup.user.addr('082111')
                                         .setup.user.state('state_healthsites')
                                         .inputs(
-                                            { content: '2',
+                                            { content: '1',
                                               provider: 'CellC' },  // state_healthsites
                                             'Quad Street',  // state_suburb
                                             'n'  // state_suburb
@@ -784,7 +830,7 @@ describe("MMC App", function() {
                             .setup.user.state('state_healthsites')
                             // .setup.user.lang('en');
                             .inputs(
-                                { content: '2',
+                                { content: '1',
                                 provider: 'CellC' },  // state_healthsites
                                 'Friend Street',  // state_suburb
                                 '1'  // state_health_services
@@ -808,7 +854,7 @@ describe("MMC App", function() {
                     });
                 });
 
-                describe("if the user two finds clinics", function() {
+                describe("if the user finds two clinics", function() {
                     it("should increase the sum.multiple_times_users metric", function() {
                         return tester
                             .setup.user.addr('082111')
@@ -844,7 +890,7 @@ describe("MMC App", function() {
                             '2',  // state_health_services
                             {session_event: "new"},
                             '1',  // state_main_menu
-                            { content: '2',
+                            { content: '1',
                             provider: 'CellC' },  // state_healthsites
                             'Friend Street'  // state_suburb
                         )
@@ -868,7 +914,7 @@ describe("MMC App", function() {
                                 '2',  // state_health_services
                                 {session_event: "new"},
                                 '1',  // state_main_menu
-                                { content: '2',
+                                { content: '1',
                                   provider: 'CellC' },  // state_healthsites
                                 'Friend Street'  // state_suburb
                             )

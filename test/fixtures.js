@@ -893,7 +893,7 @@ module.exports = function() {
             "url": "http://127.0.0.1:8000/clinicfinder/requestlookup/",
             "data": {
                 "search": {
-                    "hct": "true",
+                    "mmc": "true",
                     "source": "aat"
                },
                 "response": {
@@ -917,7 +917,7 @@ module.exports = function() {
                 "id": 2,
                 "url": "http://127.0.0.1:8000/clinicfinder/requestlookup/2/",
                 "search": {
-                    "hct": "true",
+                    "mmc": "true",
                     "source": "aat"
                 },
                 "response": {
