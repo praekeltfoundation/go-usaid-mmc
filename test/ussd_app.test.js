@@ -367,6 +367,30 @@ describe("MMC App", function() {
                             })
                             .run();
                     });
+
+                    describe("and selects a sub-type", function() {
+                        it("should include the clinic type AND sub-type in the search " +
+                        "request", function() {
+                            return tester
+                                .setup.user.addr('082111')
+                                .setup.user.state('state_healthsites')
+                                .inputs(
+                                    { content: '2',
+                                      provider: 'CellC' },  // state_healthsites
+                                    '1',  // state_healthsite_hct_types
+                                    'Friend Street'  // state_suburb
+                                )
+                                .check(function (api) {
+                                    var search_request = api.http.requests[1];
+                                    assert.deepEqual(search_request.data.search, {
+                                        "source": "internal",
+                                        "hct": "true",
+                                        "hct_testing": "true"
+                                    });
+                                })
+                                .run();
+                        });
+                    });
                 });
 
                 // test Gender Based Violence sub-menu
@@ -389,6 +413,30 @@ describe("MMC App", function() {
                                 ].join("\n")
                             })
                             .run();
+                    });
+
+                    describe("and selects a sub-type", function() {
+                        it("should include the clinic type AND sub-type in the search " +
+                        "request", function() {
+                            return tester
+                                .setup.user.addr('082111')
+                                .setup.user.state('state_healthsites')
+                                .inputs(
+                                    { content: '3',
+                                      provider: 'CellC' },  // state_healthsites
+                                    '1',  // state_healthsite_gbv_types
+                                    'Friend Street'  // state_suburb
+                                )
+                                .check(function (api) {
+                                    var search_request = api.http.requests[1];
+                                    assert.deepEqual(search_request.data.search, {
+                                        "source": "internal",
+                                        "gbv": "true",
+                                        "gbv_thuthuzela": "true"
+                                    });
+                                })
+                                .run();
+                        });
                     });
                 });
 

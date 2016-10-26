@@ -336,8 +336,6 @@ go.app = function() {
                 });
         };
 
-        // METRIC HELPERS
-
 
         // METRIC HELPERS
         self.fire_clinic_type_metric = function(clinic_type_requested) {
@@ -430,15 +428,26 @@ go.app = function() {
         };
 
         self.make_clinic_search_params = function() {
-            // TODO: update for gbv and hct/gbv subtypes
             var clinic_type_requested = self.im.user.answers.state_healthsites;
-            var clinic_data_source = (
-                self.im.config.clinic_data_source || "internal");
+            var clinic_subtype_requested = null;
+
+            if (clinic_type_requested === "hct") {
+                clinic_subtype_requested = self.im.user.answers.state_healthsite_hct_types;
+            }
+            else if (clinic_type_requested === "gbv") {
+                clinic_subtype_requested = self.im.user.answers.state_healthsite_gbv_types;
+            }
+
+            var clinic_data_source = (self.im.config.clinic_data_source || "internal");
             var search_data = {
-              source: clinic_data_source,
+                source: clinic_data_source
             };
 
             search_data[clinic_type_requested] = "true";
+
+            if (clinic_subtype_requested !== null) {
+                search_data[clinic_subtype_requested] = "true";
+            }
 
             return search_data;
         };
