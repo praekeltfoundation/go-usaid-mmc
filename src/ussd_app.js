@@ -60,6 +60,7 @@ go.app = function() {
                 });
         };
 
+
         // METRIC HELPERS
         self.fire_clinic_type_metric = function(clinic_type_requested) {
             return self.im.metrics.fire.inc(
@@ -90,7 +91,8 @@ go.app = function() {
                 ['sum.locate_type', type].join('.'), 1);
         };
 
-    // DIALBACK SMS HANDLING
+
+        // DIALBACK SMS HANDLING
 
         self.should_send_dialback = function(e) {
             return e.user_terminated
@@ -126,17 +128,50 @@ go.app = function() {
                 });
         };
 
-    // LOCATION HELPER
+
+        // LOCATION / LOOKUP HELPERS
+
+        self.proceed_to_location_state = function() {
+            if (typeof self.im.msg.provider !== 'undefined' && self.im.msg.provider !== null) {
+                var service_provider = self.im.msg.provider.trim().toUpperCase();
+                if (self.im.config.lbs_providers.indexOf(service_provider) !== -1) {
+                    return self
+                        .fire_provider_metric(service_provider)
+                        .then(function() {
+                            return 'state_locate_permission';
+                        });
+                }
+            }
+
+            // For non-lbs providers or transports that don't provide provider info
+            return self
+                .fire_provider_metric('Other')
+                .then(function() {
+                    return 'state_suburb';
+                });
+        };
 
         self.make_clinic_search_params = function() {
             var clinic_type_requested = self.im.user.answers.state_healthsites;
-            var clinic_data_source = (
-                self.im.config.clinic_data_source || "internal");
+            var clinic_subtype_requested = null;
+
+            if (clinic_type_requested === "hct") {
+                clinic_subtype_requested = self.im.user.answers.state_healthsite_hct_types;
+            }
+            else if (clinic_type_requested === "gbv") {
+                clinic_subtype_requested = self.im.user.answers.state_healthsite_gbv_types;
+            }
+
+            var clinic_data_source = (self.im.config.clinic_data_source || "internal");
             var search_data = {
-              source: clinic_data_source,
+                source: clinic_data_source
             };
 
             search_data[clinic_type_requested] = "true";
+
+            if (clinic_subtype_requested !== null) {
+                search_data[clinic_subtype_requested] = "true";
+            }
 
             return search_data;
         };
@@ -200,7 +235,7 @@ go.app = function() {
         };
 
 
-    // TIMEOUT HANDLING
+        // TIMEOUT HANDLING
 
         // determine whether timed_out state should be used
         self.timed_out = function() {
@@ -347,38 +382,49 @@ go.app = function() {
                     " looking for?",
                 ].join("")),
                 choices: [
-                    new Choice("mmc", $("MMC Clinic")),
-                    new Choice("hct", $("HCT Clinic")),
+                    new Choice("mmc", $("Circumcision")),
+                    new Choice("hct", $("HIV Services")),
+                    new Choice("gbv", $("Gender Based Violence"))
                 ],
                 next: function(choice) {
                     return self
                         .fire_clinic_type_metric(choice.value)
                         .then(function() {
-                            if (typeof self.im.msg.provider !== 'undefined' && self.im.msg.provider !== null) {
-                                var service_provider = self.im.msg.provider.trim().toUpperCase();
-                                if (self.im.config.lbs_providers.indexOf(service_provider) !== -1) {
-                                    return self
-                                        .fire_provider_metric(service_provider)
-                                        .then(function() {
-                                            return 'state_locate_permission';
-                                        });
-                                } else {
-                                    return self
-                                        .fire_provider_metric('Other')
-                                        .then(function() {
-                                            return 'state_suburb';
-                                        });
-                                }
-                            } else {
-                                // For transports that don't provide provider info
-                                return self
-                                    .fire_provider_metric('Other')
-                                    .then(function() {
-                                        return 'state_suburb';
-                                    });
+                            switch (choice.value) {
+                                case 'mmc': return self.proceed_to_location_state();
+                                case 'hct': return 'state_healthsite_hct_types';
+                                case 'gbv': return 'state_healthsite_gbv_types';
                             }
-
                         });
+                }
+            });
+        });
+
+        self.add('state_healthsite_hct_types', function(name){
+            return new ChoiceState(name, {
+                question: $("What type of HIV service are you looking for?"),
+                choices: [
+                    new Choice("hct_testing", $("Testing")),
+                    new Choice("hct_treatment", $("Treatment")),
+                    new Choice("hct_support", $("Support"))
+                ],
+                next: function(choice) {
+                    // TODO: metric
+                    return self.proceed_to_location_state();
+                }
+            });
+        });
+
+        self.add('state_healthsite_gbv_types', function(name){
+            return new ChoiceState(name, {
+                question: $("What type of Gender Based Violence organisation are you looking for?"),
+                choices: [
+                    new Choice("gbv_thuthuzela", $("Thuthuzela Centres")),
+                    new Choice("gbv_support_org", $("Support Organisations"))
+                ],
+                next: function(choice) {
+                    // TODO: metric
+                    return self.proceed_to_location_state();
                 }
             });
         });
