@@ -795,77 +795,102 @@ describe("MMC App", function() {
                                         .run();
                                 });
                             });
+                        });
 
-                            describe("if there are multiple location options", function() {
-                                it("should display a list of address options", function() {
-                                    return tester
-                                        .setup.user.addr('082111')
-                                        .setup.user.state('state_healthsites')
-                                        .inputs(
-                                            { content: '1',
-                                              provider: 'CellC' },  // state_healthsites
-                                            'Quad Street'  // state_suburb
-                                        )
-                                        .check.interaction({
-                                            state: 'state_suburb',
-                                            reply: [
-                                                "Please select your location:",
-                                                "1. Suburb number 1, City number 1",
-                                                "2. Suburb number 2, Town number 2",
-                                                "3. Suburb number 3, City number 3",
-                                                "n. More",
-                                                "p. Back"
-                                            ].join('\n')
-                                        })
-                                        .run();
-                                });
+                        describe("if there are multiple location options", function() {
+                            it("should display a list of address options", function() {
+                                return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state('state_healthsites')
+                                    .inputs(
+                                        { content: '1',
+                                          provider: 'CellC' },  // state_healthsites
+                                        'Quad Street'  // state_suburb
+                                    )
+                                    .check.interaction({
+                                        state: 'state_suburb',
+                                        reply: [
+                                            "Please select your location:",
+                                            "1. Suburb number 1, City number 1",
+                                            "2. Suburb number 2, Town number 2",
+                                            "3. Suburb number 3, City number 3",
+                                            "n. More",
+                                            "p. Back"
+                                        ].join('\n')
+                                    })
+                                    .run();
+                            });
 
-                                it("should go the next page if 'n' is chosen", function() {
-                                    return tester
-                                        .setup.user.addr('082111')
-                                        .setup.user.state('state_healthsites')
-                                        .inputs(
-                                            { content: '1',
-                                              provider: 'CellC' },  // state_healthsites
-                                            'Quad Street',  // state_suburb
-                                            'n'  // state_suburb
-                                        )
-                                        .check.interaction({
-                                            state: 'state_suburb',
-                                            reply: [
-                                                "Please select your location:",
-                                                "1. Suburb number 4",
-                                                "n. More",
-                                                "p. Back"
-                                            ].join('\n')
-                                        })
-                                        .run();
-                                });
+                            it("should go the next page if 'n' is chosen", function() {
+                                return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state('state_healthsites')
+                                    .inputs(
+                                        { content: '1',
+                                          provider: 'CellC' },  // state_healthsites
+                                        'Quad Street',  // state_suburb
+                                        'n'  // state_suburb
+                                    )
+                                    .check.interaction({
+                                        state: 'state_suburb',
+                                        reply: [
+                                            "Please select your location:",
+                                            "1. Suburb number 4",
+                                            "n. More",
+                                            "p. Back"
+                                        ].join('\n')
+                                    })
+                                    .run();
+                            });
 
-                                it("should save data to contact upon choice", function() {
-                                    return tester
-                                        .setup.user.addr('082111')
-                                        .setup.user.state('state_healthsites')
-                                        .inputs(
-                                            { content: '1',
-                                              provider: 'CellC' },  // state_healthsites
-                                            'Quad Street',  // state_suburb
-                                            '3'  // state_suburb
-                                        )
-                                        .check(function(api) {
-                                            var contact = _.find(api.contacts.store, {
-                                                                msisdn: '+082111'
-                                                            });
-                                            assert.equal(contact.extra[
-                                                'location:formatted_address'],
-                                                'Suburb number 3, City number 3');
-                                            assert.equal(contact.extra[
-                                                'location:lon'], '3.3');
-                                            assert.equal(contact.extra[
-                                                'location:lat'], '3.33');
-                                        })
-                                        .run();
-                                });
+                            it("should go to the previous page if 'p' is chosen", function() {
+                                return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state('state_healthsites')
+                                    .inputs(
+                                        { content: '1',
+                                          provider: 'CellC' },  // state_healthsites
+                                        'Quad Street',  // state_suburb
+                                        'n',  // state_suburb
+                                        'p'  // state_suburb
+                                    )
+                                    .check.interaction({
+                                        state: 'state_suburb',
+                                        reply: [
+                                            "Please select your location:",
+                                            "1. Suburb number 1, City number 1",
+                                            "2. Suburb number 2, Town number 2",
+                                            "3. Suburb number 3, City number 3",
+                                            "n. More",
+                                            "p. Back"
+                                        ].join('\n')
+                                    })
+                                    .run();
+                            });
+
+                            it("should save data to contact upon choice", function() {
+                                return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state('state_healthsites')
+                                    .inputs(
+                                        { content: '1',
+                                          provider: 'CellC' },  // state_healthsites
+                                        'Quad Street',  // state_suburb
+                                        '3'  // state_suburb
+                                    )
+                                    .check(function(api) {
+                                        var contact = _.find(api.contacts.store, {
+                                                            msisdn: '+082111'
+                                                        });
+                                        assert.equal(contact.extra[
+                                            'location:formatted_address'],
+                                            'Suburb number 3, City number 3');
+                                        assert.equal(contact.extra[
+                                            'location:lon'], '3.3');
+                                        assert.equal(contact.extra[
+                                            'location:lat'], '3.33');
+                                    })
+                                    .run();
                             });
                         });
                     });
