@@ -540,8 +540,8 @@ go.app = function() {
         // timeout state
         self.states.add('state_timed_out', function(name, creator_opts) {
             return new ChoiceState(name, {
-                question: $("Welcome back to the Medical Male Circumcision (MMC"
-                    + ") service. What would you like to do?"),
+                question: $("Welcome back to Brothers for Life"
+                    + "What would you like to do?"),
                 choices: [
                     new Choice(creator_opts.name, $("Return to last screen "
                         +"visited")),
@@ -654,7 +654,7 @@ go.app = function() {
         self.add('state_healthsites', function(name){
             return new ChoiceState(name, {
                 question: $([
-                    "Welcome to Healthsites. What type of clinic are you",
+                    "Welcome to Healthsites. What type of service are you",
                     " looking for?",
                 ].join("")),
                 choices: [
