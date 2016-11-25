@@ -321,7 +321,7 @@ describe("MMC App", function() {
                         .check.interaction({
                             state: 'state_healthsites',
                             reply: [
-                                "Welcome to Healthsites. What type of clinic are"
+                                "Welcome to Healthsites. What type of service are"
                                 + " you looking for?",
                                 "1. Circumcision",
                                 "2. HIV Services",
