@@ -202,7 +202,7 @@ describe("MMC App", function() {
                         .check.interaction({
                             state: "state_select_language",
                             reply: [
-                                "Welcome to MMC Service. Choose your language:",
+                                "Welcome to Healthsites. Choose your language:",
                                 "1. English",
                                 "2. isiZulu",
                                 "3. Afrikaans",

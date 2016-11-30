@@ -541,7 +541,7 @@ go.app = function() {
         self.states.add('state_timed_out', function(name, creator_opts) {
             return new ChoiceState(name, {
                 question: $("Welcome back to Brothers for Life"
-                    + "What would you like to do?"),
+                    + " What would you like to do?"),
                 choices: [
                     new Choice(creator_opts.name, $("Return to last screen "
                         +"visited")),
@@ -600,7 +600,7 @@ go.app = function() {
         self.add('state_select_language', function(name){
             var language_previously_not_set = self.im.user.lang === null;
             return new LanguageChoice(name, {
-                question: $("Welcome to MMC Service. Choose your language:"),
+                question: $("Welcome to Healthsites. Choose your language:"),
                 choices: [
                     new Choice("en", $("English")),
                     new Choice("zu", $("isiZulu")),
