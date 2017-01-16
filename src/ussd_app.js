@@ -16,7 +16,7 @@ go.app = function() {
     var OpenStreetMap = location.providers.openstreetmap.OpenStreetMap;
 
     var GoApp = App.extend(function(self) {
-        App.call(self, 'state_start');
+        App.call(self, 'state_main_menu');
         var $ = self.$;
         var interrupt = true;
 
