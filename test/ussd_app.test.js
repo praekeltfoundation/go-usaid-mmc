@@ -270,6 +270,24 @@ describe("MMC App", function() {
                         })
                         .run();
                 });
+                describe("Gender Based Violence state: state_healthsite_gbv_types", function() {
+                  it("to Thuthuzela clinic", function() {
+                    return tester
+                      .setup.user.state("state_healthsite_gbv_types")
+                      .inputs("1")
+                      .check.interaction({
+                        state: "state_suburb",
+                        reply: [
+                                "To find your closest clinic we need",
+                                "to know where you live, the suburb or area",
+                                "u are in. Please be specific. e.g. Inanda",
+                                "Sandton"
+                               ].join(" ")
+                      })
+                      .run();
+                  });
+                });
+                
 
 
                 // // test HIV Services sub-menu
