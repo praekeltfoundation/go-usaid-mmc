@@ -628,7 +628,7 @@ go.app = function() {
                                 return self.im.metrics.fire
                                     .sum(['ussd', 'lang', lang_choice].join('.'), 1)
                                     .then(function() {
-                                        return "state_main_menu";
+                                        return "state_mmc_start";
                                     });
                             } else {
                                 return go.utils
@@ -648,7 +648,7 @@ go.app = function() {
             return new ChoiceState(name, {
                 question: $("Your new language choice has been saved."),
                 choices: [
-                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_mmc_start", $("Main Menu")),
                     new Choice("state_end", $("Exit")),
                 ],
                 next: function(choice) {

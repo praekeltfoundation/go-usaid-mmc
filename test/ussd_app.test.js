@@ -238,7 +238,7 @@ describe("MMC App", function() {
 
                     describe("-> (Find a clinic with Location Based Services): ",
                         function() {
-                            it("should confirm locating them", function() {
+                            it("if the user chooses 1. it should confirm locating them", function() {
                                 return tester
                                     .setup.user.addr('082111')
                                     .setup.user.state('state_healthsite_mmc_types')
@@ -259,50 +259,26 @@ describe("MMC App", function() {
                                     })
                                     .run();
                             });
+                            it("should increase the sum.database_queries metric", function() {
+                                return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state('state_healthsite_mmc_types')
+                                    .inputs({
+                                            content: '1',
+                                            provider: 'MTN'
+                                        }, // state_healthsites
+                                        '1' // state_locate_permission
+                                    )
+                                    .check(function(api) {
+                                        var metrics = api.metrics.stores.ussd_app_test;
+                                        assert.deepEqual(metrics['sum.database_queries.mmc'].values, [1]);
+                                    })
+                                    .run();
+                            });
 
                             describe("if the user chooses 1. Continue", function() {
-                                it("should increase the sum.database_queries metric", function() {
-                                    return tester
-                                        .setup.user.addr('082111')
-                                        .setup.user.state('state_healthsite_mmc_types')
-                                        .inputs({
-                                                content: '1',
-                                                provider: 'MTN'
-                                            }, // state_healthsites
-                                            '1' // state_locate_permission
-                                        )
-                                        .check(function(api) {
-                                            var metrics = api.metrics.stores.ussd_app_test;
-                                            assert.deepEqual(metrics['sum.database_queries.mmc'].values, [1]);
-                                        })
-                                        .run();
-                                });
-                                it("should ask about health services opt-in", function() {
-                                    return tester
-                                        .setup.user.addr('082111')
-                                        .setup.user.state('state_healthsite_mmc_types')
-                                        .inputs({
-                                                content: '1',
-                                                provider: 'MTN'
-                                            }, // state_healthsites
-                                            '1' // state_locate_permission
-                                        )
-                                        .check.interaction({
-                                            state: 'state_health_services',
-                                            reply: [
-                                                "U will get an SMS with clinic info. " +
-                                                "Want 2 get more health info? T&Cs " +
-                                                "www.brothersforlife.mobi " +
-                                                "or www.zazi.org.za",
-                                                "1. Yes - I'm a Man",
-                                                "2. Yes - I'm a Woman",
-                                                "3. No"
-                                            ].join("\n")
-                                        })
-                                        .run();
-                                });
 
-                                describe("if a custom clinic source is configured", function() {
+                                describe(" and if a custom clinic source is configured", function() {
                                     it("should specify the clinic source in the search request",
                                         function() {
                                             return tester
@@ -318,16 +294,7 @@ describe("MMC App", function() {
                                                     '1' // state_locate_permission
                                                 )
                                                 .check.interaction({
-                                                    state: 'state_health_services',
-                                                    reply: [
-                                                        "U will get an SMS with clinic info. " +
-                                                        "Want 2 get more health info? T&Cs " +
-                                                        "www.brothersforlife.mobi " +
-                                                        "or www.zazi.org.za",
-                                                        "1. Yes - I'm a Man",
-                                                        "2. Yes - I'm a Woman",
-                                                        "3. No"
-                                                    ].join("\n")
+                                                    state: 'state_locate_permission',
                                                 })
                                                 .check(function(api) {
                                                     var search_request = api.http.requests[0];
@@ -581,7 +548,7 @@ describe("MMC App", function() {
                             it("to state_consent; op date < 6 weeks ago", function() {
                                 return tester
                                     .setup.user.state("state_healthsite_mmc_types")
-                                    .inputs("1", "1", "4", "5")
+                                    .inputs("2", "1", "4", "5")
                                     .check.interaction({
                                         state: "state_consent",
                                         reply: [
@@ -600,7 +567,7 @@ describe("MMC App", function() {
                                 return tester
                                     .setup.user.addr("082111")
                                     .setup.user.state("state_healthsite_mmc_types")
-                                    .inputs("1", "1", "4", "5", "1")
+                                    .inputs("2", "1", "4", "5", "1")
                                     .check.interaction({
                                         state: "state_end_registration",
                                         reply: [
@@ -639,7 +606,7 @@ describe("MMC App", function() {
                             it("to state_bfl_join", function() {
                                 return tester
                                     .setup.user.state("state_healthsite_mmc_types")
-                                    .inputs("3", "5", "13", "1")
+                                    .inputs("4", "5", "13", "1")
                                     .check.interaction({
                                         state: "state_bfl_join",
                                         reply: [
@@ -656,7 +623,7 @@ describe("MMC App", function() {
                                 return tester
                                     .setup.user.addr('082111')
                                     .setup.user.state("state_healthsite_mmc_types")
-                                    .inputs("3", "5", "13", "1", "1")
+                                    .inputs("4", "5", "13", "1", "1")
                                     .check.interaction({
                                         state: "state_healthsite_mmc_types"
                                     })
@@ -676,7 +643,7 @@ describe("MMC App", function() {
                                 return tester
                                     .setup.user.addr('082111')
                                     .setup.user.state("state_healthsite_mmc_types")
-                                    .inputs("3", "5", "13", "1", "2")
+                                    .inputs("4", "5", "13", "1", "2")
                                     .check.interaction({
                                         state: "state_end"
                                     })
@@ -690,18 +657,9 @@ describe("MMC App", function() {
                             it("to state_main_menu (page 1) via BFL state", function() {
                                 return tester
                                     .setup.user.state("state_healthsite_mmc_types")
-                                    .inputs("2", "5", "13", "2", "1")
+                                    .inputs("4", "5", "13", "2", "1")
                                     .check.interaction({
-                                        state: "state_main_menu",
-                                        reply: [
-                                            "Medical Male Circumcision (MMC):",
-                                            "1. Find a clinic",
-                                            // "1. Speak to an expert for FREE",
-                                            "2. Get FREE SMSs about your MMC recovery",
-                                            "3. Rate your clinic's MMC service",
-                                            "4. Join Brothers for Life",
-                                            "5. More",
-                                        ].join("\n")
+                                        state: "state_healthsites",
                                     })
                                     .run();
                             });
@@ -964,15 +922,6 @@ describe("MMC App", function() {
                                 .inputs("4", "1", "1")
                                 .check.interaction({
                                     state: "state_healthsite_mmc_types",
-                                    reply: [
-                                        "Medical Male Circumcision (MMC):",
-                                        "1. Find a clinic",
-                                        // "1. Speak to an expert for FREE",
-                                        "2. Get FREE SMSs about your MMC recovery",
-                                        "3. Rate your clinic's MMC service",
-                                        "4. Join Brothers for Life",
-                                        "5. More",
-                                    ].join("\n")
                                 })
                                 .check(function(api) {
                                     var contact = api.contacts.store[0];
@@ -987,15 +936,6 @@ describe("MMC App", function() {
                                 .inputs("4", "2", "1")
                                 .check.interaction({
                                     state: "state_healthsite_mmc_types",
-                                    reply: [
-                                        "Medical Male Circumcision (MMC):",
-                                        "1. Find a clinic",
-                                        // "1. Speak to an expert for FREE",
-                                        "2. Get FREE SMSs about your MMC recovery",
-                                        "3. Rate your clinic's MMC service",
-                                        "4. Join Brothers for Life",
-                                        "5. More",
-                                    ].join("\n")
                                 })
                                 .run();
                         });
@@ -1521,56 +1461,12 @@ describe("MMC App", function() {
 
 
             describe("(Language Choice)", function() {
-                it("to state_select_language", function() {
-                    return tester
-                        .start()
-                        .inputs(
-                            '1',
-                            '2',
-                            '2')
-                        .check.interaction({
-                            state: "state_select_language",
-                            reply: [
-                                "Welcome to Healthsites. Choose your language:",
-                                "1. English",
-                                "2. isiZulu",
-                                "3. Afrikaans",
-                                "4. Sesotho",
-                                "5. Siswati",
-                                "6. isiNdebele",
-                                "7. Setswana",
-                                "8. isiXhosa",
-                                "9. Xitsonga"
-                            ].join("\n")
-                        })
-                        .check(function() {
-                            assert.strictEqual(
-                                app.contact.extra.language_choice, undefined);
-                        })
-                        .check(function(api) {
-                            var metrics = api.metrics.stores.ussd_app_test;
-                            assert.equal(Object.keys(metrics).length, 5);
-                            assert.deepEqual(metrics['ussd.unique_users'].values, [1]);
-                            assert.deepEqual(metrics['ussd.unique_users.transient'].values, [1]);
-                            assert.deepEqual(metrics['ussd.sessions'].values, [1]);
-                            assert.deepEqual(metrics['ussd.sessions.transient'].values, [1]);
-                        })
-                        .run();
-                });
-                it("to state_main_menu after language is selected", function() {
+                it("to state_mmc_start after language is selected", function() {
                     return tester
                         .setup.user.state("state_select_language")
                         .input("2") // zulu
                         .check.interaction({
-                            state: "state_main_menu",
-                            reply: [
-                                "Medical Male Circumcision (MMC):",
-                                "1. Find a clinic",
-                                "2. Get FREE SMSs about your MMC recovery",
-                                "3. Rate your clinic\'s MMC service",
-                                "4. Join Brothers for Life",
-                                "5. More"
-                            ].join('\n')
+                            state: "state_mmc_start",
                         })
                         .check.user.properties({
                             lang: 'zu'
@@ -1583,44 +1479,6 @@ describe("MMC App", function() {
                             var metrics = api.metrics.stores.ussd_app_test;
                             assert.equal(Object.keys(metrics).length, 2);
                             assert.deepEqual(metrics['ussd.lang.zu'].values, [1]);
-                        })
-                        .run();
-                });
-                it("to state_language_set if language preference changed", function() {
-                    return tester
-                        .setup.user.lang('en')
-                        .setup.user.state("state_main_menu")
-                        .inputs(
-                            "5" // state_main_menu - More
-                            , "1" // state_main_menu - Change Language
-                            , "2" // state_select_language - Zulu
-                        )
-                        .check.interaction({
-                            state: "state_language_set",
-                            reply: [
-                                "Your new language choice has been saved.",
-                                "1. Main Menu",
-                                "2. Exit",
-                            ].join("\n")
-                        })
-                        .check(function() {
-                            assert.strictEqual(
-                                app.contact.extra.language_choice, "zu");
-                        })
-                        .run();
-                });
-                it("to state_main_menu (page 2) after 'More' selected", function() {
-                    return tester
-                        .setup.user.state("state_main_menu")
-                        .input("5")
-                        .check.interaction({
-                            state: "state_main_menu",
-                            reply: [
-                                "Medical Male Circumcision (MMC):",
-                                "1. Change Language",
-                                "2. Exit",
-                                "3. Back",
-                            ].join("\n")
                         })
                         .run();
                 });
