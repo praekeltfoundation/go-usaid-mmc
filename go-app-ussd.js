@@ -565,7 +565,6 @@ go.app = function() {
                 options_per_page: null,
                 choices: [
                     new Choice('mmc', $('Find a clinic')),
-                    // new Choice('state_end', $('Speak to an expert for FREE')),
                     new Choice('state_mmc_start', $('Get FREE SMSs about your MMC recovery')),
                     new Choice('state_servicerating_location', $('Rate your clinic\'s MMC service')),
                     new Choice('state_bfl_start', $('Join Brothers for Life')),
