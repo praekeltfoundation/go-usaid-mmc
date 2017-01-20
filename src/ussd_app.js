@@ -282,13 +282,13 @@ go.app = function() {
             });
         });
 
-        self.add('state_healthsites_mmc_types', function(name){
+        self.add('state_healthsite_mmc_types', function(name){
             return new PaginatedChoiceState(name, {
                 question: $('Medical Male Circumcision (MMC):'),
                 characters_per_page: 160,
                 options_per_page: null,
                 choices: [
-                    new Choice('state_healthsites', $('Find a clinic')),
+                    new Choice('mmc', $('Find a clinic')),
                     // new Choice('state_end', $('Speak to an expert for FREE')),
                     new Choice('state_op', $('Get FREE SMSs about your MMC recovery')),
                     new Choice('state_servicerating_location', $('Rate your clinic\'s MMC service')),
@@ -297,7 +297,10 @@ go.app = function() {
                     new Choice('state_end', $('Exit')),
                 ],
                 next: function(choice) {
-                    return choice.value;
+                  if (choice.value == 'mmc'){
+                    return self.proceed_to_location_state();
+                  }
+                  return choice.value;
                 }
             });
         });
@@ -383,7 +386,7 @@ go.app = function() {
                         .fire_clinic_type_metric(choice.value)
                         .then(function() {
                             switch (choice.value) {
-                                case 'mmc': return self.proceed_to_location_state();
+                                case 'mmc': return 'state_healthsite_mmc_types';
                                 case 'hct': return 'state_healthsite_hct_types';
                                 case 'gbv': return 'state_healthsite_gbv_types';
                             }
