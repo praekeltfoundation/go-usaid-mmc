@@ -225,26 +225,263 @@ describe("MMC App", function() {
                         .run();
                 });
 
-                describe("when the user selects a clinic type", function() {
-                    it("should incr the clinic_type metric", function() {
+                describe("Start -> 'MMC Services' type", function() {
+                    it("to mmc ", function() {
                         return tester
-                            .setup.user.addr('082111')
                             .setup.user.state('state_healthsites')
-                            .input({
-                                    content: '1',
-                                    provider: 'MTN'
-                                } // state_healthsites
-                            )
-                            .check(function(api) {
-                                var metrics = api.metrics.stores.ussd_app_test;
-                                assert.deepEqual(metrics['sum.clinic_type_select.mmc'].values, [1]);
+                            .inputs('1')
+                            .check.interaction({
+                                state: 'state_healthsite_mmc_types'
                             })
                             .run();
+                    });
+
+
+                    describe("-> (Service rating)", function() {
+                        it("to state_servicerating_location", function() {
+                            return tester
+                                .setup.user.state("state_healthsite_mmc_types")
+                                .inputs("3")
+                                .check.interaction({
+                                    state: "state_servicerating_location",
+                                    reply: [
+                                        "At which clinic did you get circumcised? Please",
+                                        " be specific with the name and location. e.g.",
+                                        " Peterville Clinic, Rivonia, Johannesburg."
+                                    ].join("")
+                                })
+                                .run();
+                        });
+                        it("to state_servicerating_would_recommend", function() {
+                            return tester
+                                .setup.user.state("state_servicerating_location")
+                                .inputs("User entered location")
+                                .check.interaction({
+                                    state: "state_servicerating_would_recommend",
+                                    reply: [
+                                        "Would you recommend a friend to the clinic" +
+                                        " where you got circumcised?",
+                                        "1. Yes",
+                                        "2. No",
+                                        "3. I have not been circumcised"
+                                    ].join("\n")
+                                })
+                                .run();
+                        });
+                        it("to state_servicerating_end_negative", function() {
+                            return tester
+                                .setup.user.state("state_servicerating_location")
+                                .inputs("User entered location", "3")
+                                .check.interaction({
+                                    state: "state_servicerating_end_negative",
+                                    reply: [
+                                        "Thank you for your interest. We are only looking" +
+                                        " for ratings from men who have had" +
+                                        " their circumcision at a clinic recently.",
+                                        "1. Main Menu",
+                                        "2. Exit"
+                                    ].join("\n")
+                                })
+                                .run();
+                        });
+                        it("to state_servicerating_rating", function() {
+                            return tester
+                                .setup.user.state("state_servicerating_location")
+                                .inputs("User entered location", "1")
+                                .check.interaction({
+                                    state: "state_servicerating_rating",
+                                    reply: [
+                                        "How would you rate the attitude of the health" +
+                                        " care workers at the clinic where you got " +
+                                        "circumcised?",
+                                        "1. Very bad",
+                                        "2. Bad",
+                                        "3. OK",
+                                        "4. Good",
+                                        "5. Excellent"
+                                    ].join("\n")
+                                })
+                                .run();
+                        });
+                        it("to state_servicerating_subscribed_to_post_op_sms", function() {
+                            return tester
+                                .setup.user.state("state_servicerating_location")
+                                .inputs("User entered location", "1", "3")
+                                .check.interaction({
+                                    state: "state_servicerating_subscribed_to_post_op_sms",
+                                    reply: [
+                                        "Did you subscribe to the post op SMS service?",
+                                        "1. Yes I found it helpful",
+                                        "2. Yes but it was not helpful",
+                                        "3. No I chose not to subscribe",
+                                        "4. I didn't know about it"
+                                    ].join("\n")
+                                })
+                                .run();
+                        });
+                        it("to state_servicerating_end_positive", function() {
+                            return tester
+                                .setup.user.state("state_servicerating_location")
+                                .inputs("User entered location", "1", "5", "1")
+                                .check.interaction({
+                                    state: "state_servicerating_end_positive",
+                                    reply: [
+                                        "Thanks for rating your circumcision experience." +
+                                        " We appreciate your feedback, it will" +
+                                        " help us improve our MMC service.",
+                                        "1. Main Menu",
+                                        "2. Exit"
+                                    ].join("\n")
+                                })
+                                .check(function(api, im) {
+                                    assert.deepEqual(im.user.answers, {
+                                        "state_servicerating_location": "User entered location",
+                                        "state_servicerating_would_recommend": "servicerating_yes_recommend",
+                                        "state_servicerating_rating": "servicerating_excellent",
+                                        "state_servicerating_subscribed_to_post_op_sms": "servicerating_subscribed_helpful"
+                                    });
+                                })
+                                .check(function(api) {
+                                    var contact = _.find(api.contacts.store, {
+                                        msisdn: '+27123456789'
+                                    });
+                                    assert.equal(contact.extra.state_servicerating_location, "User entered location");
+                                    assert.equal(contact.extra.state_servicerating_would_recommend, "servicerating_yes_recommend");
+                                    assert.equal(contact.extra.state_servicerating_rating, "servicerating_excellent");
+                                    assert.equal(contact.extra.state_servicerating_subscribed_to_post_op_sms, "servicerating_subscribed_helpful");
+                                })
+                                .run();
+                        });
+                    });
+                    describe("-> (Brothers for Life)", function() {
+                        it("to state_bfl_start", function() {
+                            return tester
+                                .setup.user.state("state_healthsite_mmc_types")
+                                .inputs("4")
+                                .check.interaction({
+                                    state: "state_bfl_start",
+                                    reply: [
+                                        "Join Brothers for Life and we'll send you " +
+                                        "free SMSs about ur health, upcoming events & " +
+                                        "services for men. brothersforlife.org T&Cs " +
+                                        "apply.",
+                                        "1. Join",
+                                        "2. No thanks"
+                                    ].join("\n")
+                                })
+                                .run();
+                        });
+                        it("to state_bfl_join", function() {
+                            return tester
+                                .setup.user.state("state_healthsite_mmc_types")
+                                .inputs("4", "1")
+                                .check.interaction({
+                                    state: "state_bfl_join",
+                                    reply: [
+                                        "Thank you. You will now receive Brothers for" +
+                                        " Life updates. You can opt out at any" +
+                                        " point by replying STOP to an SMS you receive.",
+                                        "1. Main Menu",
+                                        "2. Exit"
+                                    ].join("\n")
+                                })
+                                .run();
+                        });
+                        it("to state_bfl_no_join", function() {
+                            return tester
+                                .setup.user.state("state_healthsite_mmc_types")
+                                .inputs("4", "2")
+                                .check.interaction({
+                                    state: "state_bfl_no_join",
+                                    reply: [
+                                        "You have selected not to receive Brothers for" +
+                                        " Life updates. You can join any time in" +
+                                        " the future by dialling *120*662#.",
+                                        "1. Main Menu",
+                                        "2. Exit"
+                                    ].join("\n")
+                                })
+                                .run();
+                        });
+                        it("to state_end via decision to join (user added to BFL group)", function() {
+                            return tester
+                                .setup.user.addr('082111')
+                                .setup.user.state("state_healthsite_mmc_types")
+                                .inputs("4", "1", "2")
+                                .check.interaction({
+                                    state: "state_end",
+                                    reply: "Thanks for using the *120*662# MMC service! " +
+                                        "Dial back anytime to find MMC clinics, sign up " +
+                                        "for healing SMSs or find more info about MMC " +
+                                        "(20c/20sec) Yenzakahle!"
+                                })
+                                .check(function(api) {
+                                    var contact = api.contacts.store[0];
+                                    assert.equal(contact.extra.bfl_member, "true");
+                                    assert.deepEqual(contact.groups, ["bfl_key"]);
+                                })
+                                .run();
+                        });
+                        it("to state_end via decision not to join", function() {
+                            return tester
+                                .setup.user.state("state_healthsite_mmc_types")
+                                .inputs("4", "2", "2")
+                                .check.interaction({
+                                    state: "state_end",
+                                    reply: "Thanks for using the *120*662# MMC service! " +
+                                        "Dial back anytime to find MMC clinics, sign up " +
+                                        "for healing SMSs or find more info about MMC " +
+                                        "(20c/20sec) Yenzakahle!"
+                                })
+                                .run();
+                        });
+                        it("to state_healthsite_mmc_types via state_bfl_join (user added to BFL group)", function() {
+                            return tester
+                                .setup.user.addr('082111')
+                                .setup.user.state("state_healthsite_mmc_types")
+                                .inputs("4", "1", "1")
+                                .check.interaction({
+                                    state: "state_healthsite_mmc_types",
+                                    reply: [
+                                        "Medical Male Circumcision (MMC):",
+                                        "1. Find a clinic",
+                                        // "1. Speak to an expert for FREE",
+                                        "2. Get FREE SMSs about your MMC recovery",
+                                        "3. Rate your clinic's MMC service",
+                                        "4. Join Brothers for Life",
+                                        "5. More",
+                                    ].join("\n")
+                                })
+                                .check(function(api) {
+                                    var contact = api.contacts.store[0];
+                                    assert.equal(contact.extra.bfl_member, "true");
+                                    assert.deepEqual(contact.groups, ["bfl_key"]);
+                                })
+                                .run();
+                        });
+                        it("to state_healthsites via state_bfl_no_join", function() {
+                            return tester
+                                .setup.user.state("state_healthsite_mmc_types")
+                                .inputs("4", "2", "1")
+                                .check.interaction({
+                                    state: "state_healthsite_mmc_types",
+                                    reply: [
+                                        "Medical Male Circumcision (MMC):",
+                                        "1. Find a clinic",
+                                        // "1. Speak to an expert for FREE",
+                                        "2. Get FREE SMSs about your MMC recovery",
+                                        "3. Rate your clinic's MMC service",
+                                        "4. Join Brothers for Life",
+                                        "5. More",
+                                    ].join("\n")
+                                })
+                                .run();
+                        });
                     });
                 });
 
                 // test HIV Services sub-menu
-                describe("when the user selects the 'HIV Services' clinic type", function() {
+                describe("Start -> 'HIV Services' clinic type", function() {
                     it("to state_healthsite_hct_types (HIV Services sub-menu)", function() {
                         return tester
                             .setup.user.state('state_healthsites')
@@ -291,7 +528,7 @@ describe("MMC App", function() {
                 });
 
                 // test Gender Based Violence sub-menu
-                describe("when the user selects the 'Gender Based Violence' " +
+                describe("Start -> 'Gender Based Violence' " +
                     "clinic type",
                     function() {
                         it("to state_healthsite_gbv_types " +
@@ -340,6 +577,26 @@ describe("MMC App", function() {
                                 });
                         });
                     });
+
+
+                describe("when the user selects a clinic type", function() {
+                    it("should incr the clinic_type metric", function() {
+                        return tester
+                            .setup.user.addr('082111')
+                            .setup.user.state('state_healthsites')
+                            .input({
+                                    content: '1',
+                                    provider: 'MTN'
+                                } // state_healthsites
+                            )
+                            .check(function(api) {
+                                var metrics = api.metrics.stores.ussd_app_test;
+                                assert.deepEqual(metrics['sum.clinic_type_select.mmc'].values, [1]);
+                            })
+                            .run();
+                    });
+                });
+
 
                 describe("if the user uses a provider that provides location " +
                     "based search",
@@ -997,9 +1254,9 @@ describe("MMC App", function() {
                     return tester
                         .start()
                         .inputs(
-                          '1',
-                          '2',
-                          '2')
+                            '1',
+                            '2',
+                            '2')
                         .check.interaction({
                             state: "state_select_language",
                             reply: [
@@ -1101,7 +1358,7 @@ describe("MMC App", function() {
                 // disabled
             });
 
-            describe("(Post OP SMS Registration)", function() {
+            describe("(MMC Post OP SMS Registration)", function() {
                 it("to state_op", function() {
                     return tester
                         .setup.user.state("state_healthsite_mmc_types")
@@ -1376,248 +1633,9 @@ describe("MMC App", function() {
                 });
             });
 
-            describe("(Service rating)", function() {
-                it("to state_servicerating_location", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("3")
-                        .check.interaction({
-                            state: "state_servicerating_location",
-                            reply: [
-                                "At which clinic did you get circumcised? Please",
-                                " be specific with the name and location. e.g.",
-                                " Peterville Clinic, Rivonia, Johannesburg."
-                            ].join("")
-                        })
-                        .run();
-                });
-                it("to state_servicerating_would_recommend", function() {
-                    return tester
-                        .setup.user.state("state_servicerating_location")
-                        .inputs("User entered location")
-                        .check.interaction({
-                            state: "state_servicerating_would_recommend",
-                            reply: [
-                                "Would you recommend a friend to the clinic" +
-                                " where you got circumcised?",
-                                "1. Yes",
-                                "2. No",
-                                "3. I have not been circumcised"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_servicerating_end_negative", function() {
-                    return tester
-                        .setup.user.state("state_servicerating_location")
-                        .inputs("User entered location", "3")
-                        .check.interaction({
-                            state: "state_servicerating_end_negative",
-                            reply: [
-                                "Thank you for your interest. We are only looking" +
-                                " for ratings from men who have had" +
-                                " their circumcision at a clinic recently.",
-                                "1. Main Menu",
-                                "2. Exit"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_servicerating_rating", function() {
-                    return tester
-                        .setup.user.state("state_servicerating_location")
-                        .inputs("User entered location", "1")
-                        .check.interaction({
-                            state: "state_servicerating_rating",
-                            reply: [
-                                "How would you rate the attitude of the health" +
-                                " care workers at the clinic where you got " +
-                                "circumcised?",
-                                "1. Very bad",
-                                "2. Bad",
-                                "3. OK",
-                                "4. Good",
-                                "5. Excellent"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_servicerating_subscribed_to_post_op_sms", function() {
-                    return tester
-                        .setup.user.state("state_servicerating_location")
-                        .inputs("User entered location", "1", "3")
-                        .check.interaction({
-                            state: "state_servicerating_subscribed_to_post_op_sms",
-                            reply: [
-                                "Did you subscribe to the post op SMS service?",
-                                "1. Yes I found it helpful",
-                                "2. Yes but it was not helpful",
-                                "3. No I chose not to subscribe",
-                                "4. I didn't know about it"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_servicerating_end_positive", function() {
-                    return tester
-                        .setup.user.state("state_servicerating_location")
-                        .inputs("User entered location", "1", "5", "1")
-                        .check.interaction({
-                            state: "state_servicerating_end_positive",
-                            reply: [
-                                "Thanks for rating your circumcision experience." +
-                                " We appreciate your feedback, it will" +
-                                " help us improve our MMC service.",
-                                "1. Main Menu",
-                                "2. Exit"
-                            ].join("\n")
-                        })
-                        .check(function(api, im) {
-                            assert.deepEqual(im.user.answers, {
-                                "state_servicerating_location": "User entered location",
-                                "state_servicerating_would_recommend": "servicerating_yes_recommend",
-                                "state_servicerating_rating": "servicerating_excellent",
-                                "state_servicerating_subscribed_to_post_op_sms": "servicerating_subscribed_helpful"
-                            });
-                        })
-                        .check(function(api) {
-                            var contact = _.find(api.contacts.store, {
-                                msisdn: '+27123456789'
-                            });
-                            assert.equal(contact.extra.state_servicerating_location, "User entered location");
-                            assert.equal(contact.extra.state_servicerating_would_recommend, "servicerating_yes_recommend");
-                            assert.equal(contact.extra.state_servicerating_rating, "servicerating_excellent");
-                            assert.equal(contact.extra.state_servicerating_subscribed_to_post_op_sms, "servicerating_subscribed_helpful");
-                        })
-                        .run();
-                });
-            });
 
-            describe("(Brothers for Life)", function() {
-                it("to state_bfl_start", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("4")
-                        .check.interaction({
-                            state: "state_bfl_start",
-                            reply: [
-                                "Join Brothers for Life and we'll send you " +
-                                "free SMSs about ur health, upcoming events & " +
-                                "services for men. brothersforlife.org T&Cs " +
-                                "apply.",
-                                "1. Join",
-                                "2. No thanks"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_bfl_join", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("4", "1")
-                        .check.interaction({
-                            state: "state_bfl_join",
-                            reply: [
-                                "Thank you. You will now receive Brothers for" +
-                                " Life updates. You can opt out at any" +
-                                " point by replying STOP to an SMS you receive.",
-                                "1. Main Menu",
-                                "2. Exit"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_bfl_no_join", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("4", "2")
-                        .check.interaction({
-                            state: "state_bfl_no_join",
-                            reply: [
-                                "You have selected not to receive Brothers for" +
-                                " Life updates. You can join any time in" +
-                                " the future by dialling *120*662#.",
-                                "1. Main Menu",
-                                "2. Exit"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_end via decision to join (user added to BFL group)", function() {
-                    return tester
-                        .setup.user.addr('082111')
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("4", "1", "2")
-                        .check.interaction({
-                            state: "state_end",
-                            reply: "Thanks for using the *120*662# MMC service! " +
-                                "Dial back anytime to find MMC clinics, sign up " +
-                                "for healing SMSs or find more info about MMC " +
-                                "(20c/20sec) Yenzakahle!"
-                        })
-                        .check(function(api) {
-                            var contact = api.contacts.store[0];
-                            assert.equal(contact.extra.bfl_member, "true");
-                            assert.deepEqual(contact.groups, ["bfl_key"]);
-                        })
-                        .run();
-                });
-                it("to state_end via decision not to join", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("4", "2", "2")
-                        .check.interaction({
-                            state: "state_end",
-                            reply: "Thanks for using the *120*662# MMC service! " +
-                                "Dial back anytime to find MMC clinics, sign up " +
-                                "for healing SMSs or find more info about MMC " +
-                                "(20c/20sec) Yenzakahle!"
-                        })
-                        .run();
-                });
-                it("to state_main_menu via state_bfl_join (user added to BFL group)", function() {
-                    return tester
-                        .setup.user.addr('082111')
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("4", "1", "1")
-                        .check.interaction({
-                            state: "state_healthsite_mmc_types",
-                            reply: [
-                                "Medical Male Circumcision (MMC):",
-                                "1. Find a clinic",
-                                // "1. Speak to an expert for FREE",
-                                "2. Get FREE SMSs about your MMC recovery",
-                                "3. Rate your clinic's MMC service",
-                                "4. Join Brothers for Life",
-                                "5. More",
-                            ].join("\n")
-                        })
-                        .check(function(api) {
-                            var contact = api.contacts.store[0];
-                            assert.equal(contact.extra.bfl_member, "true");
-                            assert.deepEqual(contact.groups, ["bfl_key"]);
-                        })
-                        .run();
-                });
-                it("to state_healthsites via state_bfl_no_join", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("4", "2", "1")
-                        .check.interaction({
-                            state: "state_healthsite_mmc_types",
-                            reply: [
-                                "Medical Male Circumcision (MMC):",
-                                "1. Find a clinic",
-                                // "1. Speak to an expert for FREE",
-                                "2. Get FREE SMSs about your MMC recovery",
-                                "3. Rate your clinic's MMC service",
-                                "4. Join Brothers for Life",
-                                "5. More",
-                            ].join("\n")
-                        })
-                        .run();
-                });
-            });
+
+
         });
     });
 });
