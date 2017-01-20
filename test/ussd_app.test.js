@@ -207,131 +207,11 @@ describe("MMC App", function() {
         });
 
         describe("Flow testing - ", function() {
-            describe("(Language Choice & Main Menu)", function() {
-                it("to state_select_language if number not registered", function() {
-                    return tester
-                        .start()
-                        .check.interaction({
-                            state: "state_select_language",
-                            reply: [
-                                "Welcome to Healthsites. Choose your language:",
-                                "1. English",
-                                "2. isiZulu",
-                                "3. Afrikaans",
-                                "4. Sesotho",
-                                "5. Siswati",
-                                "6. isiNdebele",
-                                "7. Setswana",
-                                "8. isiXhosa",
-                                "9. Xitsonga"
-                            ].join("\n")
-                        })
-                        .check(function() {
-                            assert.strictEqual(
-                                app.contact.extra.language_choice, undefined);
-                        })
-                        .check(function(api) {
-                            var metrics = api.metrics.stores.ussd_app_test;
-                            assert.equal(Object.keys(metrics).length, 5);
-                            assert.deepEqual(metrics['ussd.unique_users'].values, [1]);
-                            assert.deepEqual(metrics['ussd.unique_users.transient'].values, [1]);
-                            assert.deepEqual(metrics['ussd.sessions'].values, [1]);
-                            assert.deepEqual(metrics['ussd.sessions.transient'].values, [1]);
-                        })
-                        .run();
-                });
-                it("to state_main_menu after language is selected", function() {
-                    return tester
-                        .setup.user.state("state_select_language")
-                        .input("2") // zulu
-                        .check.interaction({
-                            state: "state_main_menu",
-                            reply: [
-                                "Medical Male Circumcision (MMC):",
-                                "1. Find a clinic",
-                                "2. Get FREE SMSs about your MMC recovery",
-                                "3. Rate your clinic\'s MMC service",
-                                "4. Join Brothers for Life",
-                                "5. More"
-                            ].join('\n')
-                        })
-                        .check.user.properties({
-                            lang: 'zu'
-                        })
-                        .check(function() {
-                            assert.strictEqual(
-                                app.contact.extra.language_choice, "zu");
-                        })
-                        .check(function(api) {
-                            var metrics = api.metrics.stores.ussd_app_test;
-                            assert.equal(Object.keys(metrics).length, 2);
-                            assert.deepEqual(metrics['ussd.lang.zu'].values, [1]);
-                        })
-                        .run();
-                });
-                it("to state_language_set if language preference changed", function() {
-                    return tester
-                        .setup.user.lang('en')
-                        .setup.user.state("state_main_menu")
-                        .inputs(
-                            "5" // state_main_menu - More
-                            , "1" // state_main_menu - Change Language
-                            , "2" // state_select_language - Zulu
-                        )
-                        .check.interaction({
-                            state: "state_language_set",
-                            reply: [
-                                "Your new language choice has been saved.",
-                                "1. Main Menu",
-                                "2. Exit",
-                            ].join("\n")
-                        })
-                        .check(function() {
-                            assert.strictEqual(
-                                app.contact.extra.language_choice, "zu");
-                        })
-                        .run();
-                });
-                it("to state_main_menu (page 1); straight to main menu for already registered user", function() {
-                    return tester
-                        .setup.user.lang('en')
-                        .start()
-                        .check.interaction({
-                            state: "state_main_menu",
-                            reply: [
-                                "Medical Male Circumcision (MMC):",
-                                "1. Find a clinic",
-                                // "1. Speak to an expert for FREE",
-                                "2. Get FREE SMSs about your MMC recovery",
-                                "3. Rate your clinic's MMC service",
-                                "4. Join Brothers for Life",
-                                "5. More",
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_main_menu (page 2) after 'More' selected", function() {
-                    return tester
-                        .setup.user.state("state_main_menu")
-                        .input("5")
-                        .check.interaction({
-                            state: "state_main_menu",
-                            reply: [
-                                "Medical Male Circumcision (MMC):",
-                                "1. Change Language",
-                                "2. Exit",
-                                "3. Back",
-                            ].join("\n")
-                        })
-                        .run();
-                });
-            });
 
             describe("(Find a Clinic)", function() {
                 it("to state_healthsites (healthsites menu)", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
-                        .input("1")
+                        .start()
                         .check.interaction({
                             state: 'state_healthsites',
                             reply: [
@@ -1111,6 +991,126 @@ describe("MMC App", function() {
 
             });
 
+
+            describe("(Language Choice & Main Menu)", function() {
+                it("to state_select_language if number not registered", function() {
+                    return tester
+                        .start()
+                        .check.interaction({
+                            state: "state_select_language",
+                            reply: [
+                                "Welcome to Healthsites. Choose your language:",
+                                "1. English",
+                                "2. isiZulu",
+                                "3. Afrikaans",
+                                "4. Sesotho",
+                                "5. Siswati",
+                                "6. isiNdebele",
+                                "7. Setswana",
+                                "8. isiXhosa",
+                                "9. Xitsonga"
+                            ].join("\n")
+                        })
+                        .check(function() {
+                            assert.strictEqual(
+                                app.contact.extra.language_choice, undefined);
+                        })
+                        .check(function(api) {
+                            var metrics = api.metrics.stores.ussd_app_test;
+                            assert.equal(Object.keys(metrics).length, 5);
+                            assert.deepEqual(metrics['ussd.unique_users'].values, [1]);
+                            assert.deepEqual(metrics['ussd.unique_users.transient'].values, [1]);
+                            assert.deepEqual(metrics['ussd.sessions'].values, [1]);
+                            assert.deepEqual(metrics['ussd.sessions.transient'].values, [1]);
+                        })
+                        .run();
+                });
+                it("to state_main_menu after language is selected", function() {
+                    return tester
+                        .setup.user.state("state_select_language")
+                        .input("2") // zulu
+                        .check.interaction({
+                            state: "state_main_menu",
+                            reply: [
+                                "Medical Male Circumcision (MMC):",
+                                "1. Find a clinic",
+                                "2. Get FREE SMSs about your MMC recovery",
+                                "3. Rate your clinic\'s MMC service",
+                                "4. Join Brothers for Life",
+                                "5. More"
+                            ].join('\n')
+                        })
+                        .check.user.properties({
+                            lang: 'zu'
+                        })
+                        .check(function() {
+                            assert.strictEqual(
+                                app.contact.extra.language_choice, "zu");
+                        })
+                        .check(function(api) {
+                            var metrics = api.metrics.stores.ussd_app_test;
+                            assert.equal(Object.keys(metrics).length, 2);
+                            assert.deepEqual(metrics['ussd.lang.zu'].values, [1]);
+                        })
+                        .run();
+                });
+                it("to state_language_set if language preference changed", function() {
+                    return tester
+                        .setup.user.lang('en')
+                        .setup.user.state("state_main_menu")
+                        .inputs(
+                            "5" // state_main_menu - More
+                            , "1" // state_main_menu - Change Language
+                            , "2" // state_select_language - Zulu
+                        )
+                        .check.interaction({
+                            state: "state_language_set",
+                            reply: [
+                                "Your new language choice has been saved.",
+                                "1. Main Menu",
+                                "2. Exit",
+                            ].join("\n")
+                        })
+                        .check(function() {
+                            assert.strictEqual(
+                                app.contact.extra.language_choice, "zu");
+                        })
+                        .run();
+                });
+                it("to state_main_menu (page 1); straight to main menu for already registered user", function() {
+                    return tester
+                        .setup.user.lang('en')
+                        .start()
+                        .check.interaction({
+                            state: "state_main_menu",
+                            reply: [
+                                "Medical Male Circumcision (MMC):",
+                                "1. Find a clinic",
+                                // "1. Speak to an expert for FREE",
+                                "2. Get FREE SMSs about your MMC recovery",
+                                "3. Rate your clinic's MMC service",
+                                "4. Join Brothers for Life",
+                                "5. More",
+                            ].join("\n")
+                        })
+                        .run();
+                });
+                it("to state_main_menu (page 2) after 'More' selected", function() {
+                    return tester
+                        .setup.user.state("state_main_menu")
+                        .input("5")
+                        .check.interaction({
+                            state: "state_main_menu",
+                            reply: [
+                                "Medical Male Circumcision (MMC):",
+                                "1. Change Language",
+                                "2. Exit",
+                                "3. Back",
+                            ].join("\n")
+                        })
+                        .run();
+                });
+            });
             describe("(Speak to Expert)", function() {
                 // disabled
             });

@@ -16,7 +16,7 @@ go.app = function() {
     var OpenStreetMap = location.providers.openstreetmap.OpenStreetMap;
 
     var GoApp = App.extend(function(self) {
-        App.call(self, 'state_start');
+        App.call(self, 'state_healthsites');
         var $ = self.$;
         var interrupt = true;
 
@@ -282,14 +282,6 @@ go.app = function() {
             });
         });
 
-        self.add('state_start', function(name) {
-            if (!self.im.user.lang) {
-                return self.states.create('state_select_language');
-            } else {
-                return self.states.create('state_main_menu');
-            }
-        });
-
         self.add('state_main_menu', function(name){
             return new PaginatedChoiceState(name, {
                 question: $('Medical Male Circumcision (MMC):'),
@@ -317,7 +309,7 @@ go.app = function() {
                     " anytime to find MMC clinics, sign up for healing SMSs",
                     " or find more info about MMC (20c/20sec) Yenzakahle!",
                 ].join("")),
-                next: 'state_start'
+                next: 'state_healthsites'
             });
         });
 
@@ -620,7 +612,7 @@ go.app = function() {
                       "SMSing 'STOP' in reply to your " +
                       "clinic info message."),
 
-                next: 'state_start'
+                next: 'state_healthsites'
             });
         });
 
@@ -795,7 +787,7 @@ go.app = function() {
                     "u hav prolonged pain, visit ur nearest clinic. Call ",
                     "0800212685 or send a please call me to 0828816202",
                 ].join("")),
-                next: 'state_start'
+                next: 'state_healthsites'
             });
         });
 
