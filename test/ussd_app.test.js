@@ -236,7 +236,7 @@ describe("MMC App", function() {
                             .run();
                     });
 
-                    describe("Find a clinic with Location Based Services: ",
+                    describe("-> (Find a clinic with Location Based Services): ",
                         function() {
                             it("should confirm locating them", function() {
                                 return tester
@@ -486,7 +486,278 @@ describe("MMC App", function() {
                             });
                         });
 
+                    describe("-> MMC Start", function() {
+                        it("to state_mmc_start", function() {
+                            return tester
+                                .setup.user.state("state_healthsite_mmc_types")
+                                .inputs('2')
+                                .check.interaction({
+                                    state: "state_mmc_start"
+                                })
+                                .run();
+                        });
 
+                        describe("-> (Post Op Registration)", function() {
+                            it("to state_op", function() {
+                                return tester
+                                    .setup.user.state("state_mmc_start")
+                                    .input("1")
+                                    .check.interaction({
+                                        state: "state_op",
+                                        reply: [
+                                            "We need to know when you had your MMC to send you " +
+                                            "the correct SMSs. Please select:",
+                                            "1. Today",
+                                            "2. Yesterday",
+                                            "3. May '15",
+                                            "4. April '15",
+                                            "5. March '15",
+                                            "6. I haven't had my operation yet"
+                                        ].join("\n")
+                                    })
+                                    .run();
+                            });
+                            it("to state_pre_op", function() {
+                                return tester
+                                    .setup.user.state("state_healthsite_mmc_types")
+                                    .inputs("2", "1", "6")
+                                    .check.interaction({
+                                        state: "state_pre_op",
+                                        reply: [
+                                            "Thank you for your interest in MMC. Unfortunately, you can" +
+                                            " only register once you have had your operation.",
+                                            "1. Main Menu",
+                                            "2. Exit"
+                                        ].join("\n")
+                                    })
+                                    .run();
+                            });
+                            it("to state_consent (menu options 1 & 2)", function() {
+                                return tester
+                                    .setup.user.state("state_healthsite_mmc_types")
+                                    .inputs("2", "1", "1")
+                                    .check.interaction({
+                                        state: "state_consent",
+                                        reply: [
+                                            "Do you consent to:\n" +
+                                            "- Receiving some SMSs on public holidays, " +
+                                            "weekends & before 8am?\n" +
+                                            "- Having ur cell# & language info stored so we " +
+                                            "can send u SMSs?",
+                                            "1. Yes",
+                                            "2. No"
+                                        ].join("\n")
+                                    })
+                                    .run();
+                            });
+                            it("to state_op_day (menu option 3,4,5)", function() {
+                                return tester
+                                    .setup.user.state("state_healthsite_mmc_types")
+                                    .inputs("2", "1", "4")
+                                    .check.interaction({
+                                        state: "state_op_day",
+                                        reply: "Please input the day you had your operation. " +
+                                            "For example, 12."
+                                    })
+                                    .run();
+                            });
+                            it("to state_6week_notice; op date >= 6 weeks ago", function() {
+                                return tester
+                                    .setup.user.state("state_healthsite_mmc_types")
+                                    .inputs("2", "1", "5", "13")
+                                    .check.interaction({
+                                        state: "state_6week_notice",
+                                        reply: [
+                                            "We only send SMSs up to 6 wks after MMC. Visit " +
+                                            "the clinic if you aren't healed. If you'd like " +
+                                            "to hear about events & services from Brothers " +
+                                            "for Life?",
+                                            "1. Yes",
+                                            "2. No"
+                                        ].join("\n")
+                                    })
+                                    .run();
+                            });
+                            it("to state_consent; op date < 6 weeks ago", function() {
+                                return tester
+                                    .setup.user.state("state_healthsite_mmc_types")
+                                    .inputs("1", "1", "4", "5")
+                                    .check.interaction({
+                                        state: "state_consent",
+                                        reply: [
+                                            "Do you consent to:",
+                                            "- Receiving some SMSs on public holidays, " +
+                                            "weekends & before 8am?",
+                                            "- Having ur cell# & language info stored so we can" +
+                                            " send u SMSs?",
+                                            "1. Yes",
+                                            "2. No"
+                                        ].join("\n")
+                                    })
+                                    .run();
+                            });
+                            it("to state_end_registration", function() {
+                                return tester
+                                    .setup.user.addr("082111")
+                                    .setup.user.state("state_healthsite_mmc_types")
+                                    .inputs("1", "1", "4", "5", "1")
+                                    .check.interaction({
+                                        state: "state_end_registration",
+                                        reply: [
+                                            "Thank you. You are now subscrbd to MMC msgs. ",
+                                            "Remember if u hav prolonged pain, visit ur ",
+                                            "nearest clinic. Call 0800212685 or send a ",
+                                            "please call me to 0828816202"
+                                        ].join("")
+                                    })
+                                    .check(function(api) {
+                                        var contact = api.contacts.store[0];
+                                        assert.equal(contact.extra.is_registered, "true");
+                                        assert.equal(contact.extra.consent, "true");
+                                        assert.equal(contact.extra.language_choice, 'en');
+                                        assert.equal(contact.extra.date_of_op, "20150405");
+                                    })
+                                    .check(function(api) {
+                                        var metrics = api.metrics.stores.ussd_app_test;
+                                        assert.equal(Object.keys(metrics).length, 5);
+                                        assert.deepEqual(metrics['ussd.post_op.registrations'].values, [1]);
+                                    })
+                                    .check(function(api) {
+                                        var smses = _.where(api.outbound.store, {
+                                            endpoint: 'sms'
+                                        });
+                                        var sms = smses[0];
+                                        assert.equal(smses.length, 1);
+                                        assert.equal(sms.content,
+                                            "Thanks for subscribing to MMC SMSs. We send SMS early in morning to " +
+                                            "help care for ur wound. To unsubscribe reply 'stop'. Keep your SIM in to get SMS."
+                                        );
+                                        assert.equal(sms.to_addr, '+082111');
+                                    })
+                                    .run();
+                            });
+                            it("to state_bfl_join", function() {
+                                return tester
+                                    .setup.user.state("state_healthsite_mmc_types")
+                                    .inputs("3", "5", "13", "1")
+                                    .check.interaction({
+                                        state: "state_bfl_join",
+                                        reply: [
+                                            "Thank you. You will now receive Brothers for" +
+                                            " Life updates. You can opt out at any" +
+                                            " point by replying STOP to an SMS you receive.",
+                                            "1. Main Menu",
+                                            "2. Exit"
+                                        ].join("\n")
+                                    })
+                                    .run();
+                            });
+                            it("to state_healthsite_mmc_types (user added to BFL group)", function() {
+                                return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state("state_healthsite_mmc_types")
+                                    .inputs("3", "5", "13", "1", "1")
+                                    .check.interaction({
+                                        state: "state_healthsite_mmc_types"
+                                    })
+                                    .check(function(api) {
+                                        var contact = api.contacts.store[0];
+                                        assert.equal(contact.extra.bfl_member, "true");
+                                        assert.deepEqual(contact.groups, ["bfl_key"]);
+                                    })
+                                    .check(function(api) {
+                                        var metrics = api.metrics.stores.ussd_app_test;
+                                        assert.equal(Object.keys(metrics).length, 6);
+                                        assert.deepEqual(metrics['ussd.joined.bfl'].values, [1]);
+                                    })
+                                    .run();
+                            });
+                            it("to state_end (user added to BFL group)", function() {
+                                return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state("state_healthsite_mmc_types")
+                                    .inputs("3", "5", "13", "1", "2")
+                                    .check.interaction({
+                                        state: "state_end"
+                                    })
+                                    .check(function(api) {
+                                        var contact = api.contacts.store[0];
+                                        assert.equal(contact.extra.bfl_member, "true");
+                                        assert.deepEqual(contact.groups, ["bfl_key"]);
+                                    })
+                                    .run();
+                            });
+                            it("to state_main_menu (page 1) via BFL state", function() {
+                                return tester
+                                    .setup.user.state("state_healthsite_mmc_types")
+                                    .inputs("2", "5", "13", "2", "1")
+                                    .check.interaction({
+                                        state: "state_main_menu",
+                                        reply: [
+                                            "Medical Male Circumcision (MMC):",
+                                            "1. Find a clinic",
+                                            // "1. Speak to an expert for FREE",
+                                            "2. Get FREE SMSs about your MMC recovery",
+                                            "3. Rate your clinic's MMC service",
+                                            "4. Join Brothers for Life",
+                                            "5. More",
+                                        ].join("\n")
+                                    })
+                                    .run();
+                            });
+                            it("to state_consent_withheld (flow from main menu options 1 & 2)", function() {
+                                return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state("state_healthsite_mmc_types")
+                                    .inputs("2", "1", "2")
+                                    .check.interaction({
+                                        state: "state_consent_withheld",
+                                        reply: [
+                                            "Without your consent, we cannot send you messages.",
+                                            "1. Main Menu",
+                                            "2. Back",
+                                            "3. Exit"
+                                        ].join("\n")
+                                    })
+                                    .run();
+                            });
+                            it("to state_end via state_consent_withheld", function() {
+                                return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state("state_healthsite_mmc_types")
+                                    .inputs("2", "1", "2", "3")
+                                    .check.interaction({
+                                        state: "state_end",
+                                        reply: "Thanks for using the *120*662# MMC service! " +
+                                            "Dial back anytime to find MMC clinics, sign up " +
+                                            "for healing SMSs or find more info about MMC " +
+                                            "(20c/20sec) Yenzakahle!"
+                                    })
+                                    .run();
+                            });
+                            it("to state_consent via state_consent_withheld", function() {
+                                return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state("state_healthsite_mmc_types")
+                                    .inputs("2", "1", "2", "2")
+                                    .check.interaction({
+                                        state: "state_consent",
+                                        reply: [
+                                            "Do you consent to:\n" +
+                                            "- Receiving some SMSs on public holidays, " +
+                                            "weekends & before 8am?\n" +
+                                            "- Having ur cell# & language info stored so we " +
+                                            "can send u SMSs?",
+                                            "1. Yes",
+                                            "2. No"
+                                        ].join("\n")
+                                    })
+                                    .run();
+                            });
+                        });
+
+
+                    });
 
                     describe("-> (Service rating)", function() {
                         it("to state_servicerating_location", function() {
@@ -879,10 +1150,9 @@ describe("MMC App", function() {
                                 .setup.user.addr('082111')
                                 .setup.user.state('state_healthsite_mmc_types')
                                 .input({
-                                        content: '1',
-                                        provider: 'CellC'
-                                    }
-                                )
+                                    content: '1',
+                                    provider: 'CellC'
+                                })
                                 .check.interaction({
                                     state: 'state_suburb',
                                     reply: "To find your closest clinic we need to know where you live, " +
@@ -987,7 +1257,7 @@ describe("MMC App", function() {
                                 it("should display a list of address options", function() {
                                     return tester
                                         .setup.user.addr('082111')
-                                        .setup.user.state('state_healthsites')
+                                        .setup.user.state('state_healthsite_mmc_types')
                                         .inputs({
                                                 content: '1',
                                                 provider: 'CellC'
@@ -1011,7 +1281,7 @@ describe("MMC App", function() {
                                 it("should go the next page if 'n' is chosen", function() {
                                     return tester
                                         .setup.user.addr('082111')
-                                        .setup.user.state('state_healthsites')
+                                        .setup.user.state('state_healthsite_mmc_types')
                                         .inputs({
                                                 content: '1',
                                                 provider: 'CellC'
@@ -1034,7 +1304,7 @@ describe("MMC App", function() {
                                 it("should go to the previous page if 'p' is chosen", function() {
                                     return tester
                                         .setup.user.addr('082111')
-                                        .setup.user.state('state_healthsites')
+                                        .setup.user.state('state_healthsite_mmc_types')
                                         .inputs({
                                                 content: '1',
                                                 provider: 'CellC'
@@ -1060,7 +1330,7 @@ describe("MMC App", function() {
                                 it("should save data to contact upon choice", function() {
                                     return tester
                                         .setup.user.addr('082111')
-                                        .setup.user.state('state_healthsites')
+                                        .setup.user.state('state_healthsite_mmc_types')
                                         .inputs({
                                                 content: '1',
                                                 provider: 'CellC'
@@ -1358,283 +1628,6 @@ describe("MMC App", function() {
             describe("(Speak to Expert)", function() {
                 // disabled
             });
-
-            describe("(MMC Post OP SMS Registration)", function() {
-                it("to state_op", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .input("2")
-                        .check.interaction({
-                            state: "state_op",
-                            reply: [
-                                "We need to know when you had your MMC to send you " +
-                                "the correct SMSs. Please select:",
-                                "1. Today",
-                                "2. Yesterday",
-                                "3. May '15",
-                                "4. April '15",
-                                "5. March '15",
-                                "6. I haven't had my operation yet"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_pre_op", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("2", "6")
-                        .check.interaction({
-                            state: "state_pre_op",
-                            reply: [
-                                "Thank you for your interest in MMC. Unfortunately, you can" +
-                                " only register once you have had your operation.",
-                                "1. Main Menu",
-                                "2. Exit"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_consent (menu options 1 & 2)", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("2", "1")
-                        .check.interaction({
-                            state: "state_consent",
-                            reply: [
-                                "Do you consent to:\n" +
-                                "- Receiving some SMSs on public holidays, " +
-                                "weekends & before 8am?\n" +
-                                "- Having ur cell# & language info stored so we " +
-                                "can send u SMSs?",
-                                "1. Yes",
-                                "2. No"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_op_day (menu option 3,4,5)", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("2", "4")
-                        .check.interaction({
-                            state: "state_op_day",
-                            reply: "Please input the day you had your operation. " +
-                                "For example, 12."
-                        })
-                        .run();
-                });
-                it("to state_6week_notice; op date >= 6 weeks ago", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("2", "5", "13")
-                        .check.interaction({
-                            state: "state_6week_notice",
-                            reply: [
-                                "We only send SMSs up to 6 wks after MMC. Visit " +
-                                "the clinic if you aren't healed. If you'd like " +
-                                "to hear about events & services from Brothers " +
-                                "for Life?",
-                                "1. Yes",
-                                "2. No"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_consent; op date < 6 weeks ago", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("2", "4", "5")
-                        .check.interaction({
-                            state: "state_consent",
-                            reply: [
-                                "Do you consent to:",
-                                "- Receiving some SMSs on public holidays, " +
-                                "weekends & before 8am?",
-                                "- Having ur cell# & language info stored so we can" +
-                                " send u SMSs?",
-                                "1. Yes",
-                                "2. No"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_end_registration", function() {
-                    return tester
-                        .setup.user.addr("082111")
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("2", "4", "5", "1")
-                        .check.interaction({
-                            state: "state_end_registration",
-                            reply: [
-                                "Thank you. You are now subscrbd to MMC msgs. ",
-                                "Remember if u hav prolonged pain, visit ur ",
-                                "nearest clinic. Call 0800212685 or send a ",
-                                "please call me to 0828816202"
-                            ].join("")
-                        })
-                        .check(function(api) {
-                            var contact = api.contacts.store[0];
-                            assert.equal(contact.extra.is_registered, "true");
-                            assert.equal(contact.extra.consent, "true");
-                            assert.equal(contact.extra.language_choice, 'en');
-                            assert.equal(contact.extra.date_of_op, "20150405");
-                        })
-                        .check(function(api) {
-                            var metrics = api.metrics.stores.ussd_app_test;
-                            assert.equal(Object.keys(metrics).length, 5);
-                            assert.deepEqual(metrics['ussd.post_op.registrations'].values, [1]);
-                        })
-                        .check(function(api) {
-                            var smses = _.where(api.outbound.store, {
-                                endpoint: 'sms'
-                            });
-                            var sms = smses[0];
-                            assert.equal(smses.length, 1);
-                            assert.equal(sms.content,
-                                "Thanks for subscribing to MMC SMSs. We send SMS early in morning to " +
-                                "help care for ur wound. To unsubscribe reply 'stop'. Keep your SIM in to get SMS."
-                            );
-                            assert.equal(sms.to_addr, '+082111');
-                        })
-                        .run();
-                });
-                it("to state_bfl_join", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("2", "5", "13", "1")
-                        .check.interaction({
-                            state: "state_bfl_join",
-                            reply: [
-                                "Thank you. You will now receive Brothers for" +
-                                " Life updates. You can opt out at any" +
-                                " point by replying STOP to an SMS you receive.",
-                                "1. Main Menu",
-                                "2. Exit"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_healthsite_mmc_types (user added to BFL group)", function() {
-                    return tester
-                        .setup.user.addr('082111')
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("2", "5", "13", "1", "1")
-                        .check.interaction({
-                            state: "state_healthsite_mmc_types"
-                        })
-                        .check(function(api) {
-                            var contact = api.contacts.store[0];
-                            assert.equal(contact.extra.bfl_member, "true");
-                            assert.deepEqual(contact.groups, ["bfl_key"]);
-                        })
-                        .check(function(api) {
-                            var metrics = api.metrics.stores.ussd_app_test;
-                            assert.equal(Object.keys(metrics).length, 6);
-                            assert.deepEqual(metrics['ussd.joined.bfl'].values, [1]);
-                        })
-                        .run();
-                });
-                it("to state_end (user added to BFL group)", function() {
-                    return tester
-                        .setup.user.addr('082111')
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("2", "5", "13", "1", "2")
-                        .check.interaction({
-                            state: "state_end"
-                        })
-                        .check(function(api) {
-                            var contact = api.contacts.store[0];
-                            assert.equal(contact.extra.bfl_member, "true");
-                            assert.deepEqual(contact.groups, ["bfl_key"]);
-                        })
-                        .run();
-                });
-                it("to state_bfl_no_join", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("2", "5", "13", "2")
-                        .check.interaction({
-                            state: "state_bfl_no_join",
-                            reply: [
-                                "You have selected not to receive Brothers for" +
-                                " Life updates. You can join any time in" +
-                                " the future by dialling *120*662#.",
-                                "1. Main Menu",
-                                "2. Exit"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_main_menu (page 1) via BFL state", function() {
-                    return tester
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("2", "5", "13", "2", "1")
-                        .check.interaction({
-                            state: "state_main_menu",
-                            reply: [
-                                "Medical Male Circumcision (MMC):",
-                                "1. Find a clinic",
-                                // "1. Speak to an expert for FREE",
-                                "2. Get FREE SMSs about your MMC recovery",
-                                "3. Rate your clinic's MMC service",
-                                "4. Join Brothers for Life",
-                                "5. More",
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_consent_withheld (flow from main menu options 1 & 2)", function() {
-                    return tester
-                        .setup.user.addr('082111')
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("2", "1", "2")
-                        .check.interaction({
-                            state: "state_consent_withheld",
-                            reply: [
-                                "Without your consent, we cannot send you messages.",
-                                "1. Main Menu",
-                                "2. Back",
-                                "3. Exit"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-                it("to state_end via state_consent_withheld", function() {
-                    return tester
-                        .setup.user.addr('082111')
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("2", "1", "2", "3")
-                        .check.interaction({
-                            state: "state_end",
-                            reply: "Thanks for using the *120*662# MMC service! " +
-                                "Dial back anytime to find MMC clinics, sign up " +
-                                "for healing SMSs or find more info about MMC " +
-                                "(20c/20sec) Yenzakahle!"
-                        })
-                        .run();
-                });
-                it("to state_consent via state_consent_withheld", function() {
-                    return tester
-                        .setup.user.addr('082111')
-                        .setup.user.state("state_healthsite_mmc_types")
-                        .inputs("2", "1", "2", "2")
-                        .check.interaction({
-                            state: "state_consent",
-                            reply: [
-                                "Do you consent to:\n" +
-                                "- Receiving some SMSs on public holidays, " +
-                                "weekends & before 8am?\n" +
-                                "- Having ur cell# & language info stored so we " +
-                                "can send u SMSs?",
-                                "1. Yes",
-                                "2. No"
-                            ].join("\n")
-                        })
-                        .run();
-                });
-            });
-
-
 
 
         });

@@ -292,8 +292,6 @@ go.app = function() {
                     new Choice('state_mmc_start', $('Get FREE SMSs about your MMC recovery')),
                     new Choice('state_servicerating_location', $('Rate your clinic\'s MMC service')),
                     new Choice('state_bfl_start', $('Join Brothers for Life')),
-                    new Choice('state_select_language', $('Change Language')),
-                    new Choice('state_end', $('Exit')),
                 ],
                 next: function(choice) {
                   if (choice.value == 'mmc'){
@@ -311,7 +309,6 @@ go.app = function() {
                   new Choice('state_op', $('Select the date when you were circumcised')),
                   // new Choice('state_end', $('Speak to an expert for FREE')),
                   new Choice('state_select_language', $('Choose or change your language')),
-                  new Choice('state_end', $('Exit')),
               ],
               next: function(choice) {
                 return choice.value;
