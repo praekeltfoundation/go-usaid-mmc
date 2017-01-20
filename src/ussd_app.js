@@ -290,7 +290,7 @@ go.app = function() {
                 choices: [
                     new Choice('mmc', $('Find a clinic')),
                     // new Choice('state_end', $('Speak to an expert for FREE')),
-                    new Choice('state_op', $('Get FREE SMSs about your MMC recovery')),
+                    new Choice('state_mmc_start', $('Get FREE SMSs about your MMC recovery')),
                     new Choice('state_servicerating_location', $('Rate your clinic\'s MMC service')),
                     new Choice('state_bfl_start', $('Join Brothers for Life')),
                     new Choice('state_select_language', $('Change Language')),
@@ -303,6 +303,21 @@ go.app = function() {
                   return choice.value;
                 }
             });
+        });
+
+        self.add('state_mmc_start', function(name){
+          return new ChoiceState(name, {
+              question: $('Medical Male Circumcision (MMC):'),
+              choices: [
+                  new Choice('state_op', $('Select the date when you were circumcised')),
+                  // new Choice('state_end', $('Speak to an expert for FREE')),
+                  new Choice('state_select_language', $('Choose or change your language')),
+                  new Choice('state_end', $('Exit')),
+              ],
+              next: function(choice) {
+                return choice.value;
+              }
+          });
         });
 
         self.add('state_end', function(name) {
