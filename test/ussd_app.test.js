@@ -208,7 +208,7 @@ describe("MMC App", function() {
 
         describe("Flow testing - ", function() {
 
-            describe("(Find a Clinic)", function() {
+            describe("(Welcome to healthsites)", function() {
                 it("to state_healthsites (healthsites menu)", function() {
                     return tester
                         .start()
@@ -992,10 +992,14 @@ describe("MMC App", function() {
             });
 
 
-            describe("(Language Choice & Main Menu)", function() {
-                it("to state_select_language if number not registered", function() {
+            describe("(Language Choice)", function() {
+                it("to state_select_language", function() {
                     return tester
                         .start()
+                        .inputs(
+                          '1',
+                          '2',
+                          '2')
                         .check.interaction({
                             state: "state_select_language",
                             reply: [
@@ -1077,24 +1081,6 @@ describe("MMC App", function() {
                         })
                         .run();
                 });
-                it("to state_main_menu (page 1); straight to main menu for already registered user", function() {
-                    return tester
-                        .setup.user.lang('en')
-                        .start()
-                        .check.interaction({
-                            state: "state_main_menu",
-                            reply: [
-                                "Medical Male Circumcision (MMC):",
-                                "1. Find a clinic",
-                                // "1. Speak to an expert for FREE",
-                                "2. Get FREE SMSs about your MMC recovery",
-                                "3. Rate your clinic's MMC service",
-                                "4. Join Brothers for Life",
-                                "5. More",
-                            ].join("\n")
-                        })
-                        .run();
-                });
                 it("to state_main_menu (page 2) after 'More' selected", function() {
                     return tester
                         .setup.user.state("state_main_menu")
@@ -1118,7 +1104,7 @@ describe("MMC App", function() {
             describe("(Post OP SMS Registration)", function() {
                 it("to state_op", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .input("2")
                         .check.interaction({
                             state: "state_op",
@@ -1137,7 +1123,7 @@ describe("MMC App", function() {
                 });
                 it("to state_pre_op", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("2", "6")
                         .check.interaction({
                             state: "state_pre_op",
@@ -1152,7 +1138,7 @@ describe("MMC App", function() {
                 });
                 it("to state_consent (menu options 1 & 2)", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("2", "1")
                         .check.interaction({
                             state: "state_consent",
@@ -1170,7 +1156,7 @@ describe("MMC App", function() {
                 });
                 it("to state_op_day (menu option 3,4,5)", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("2", "4")
                         .check.interaction({
                             state: "state_op_day",
@@ -1181,7 +1167,7 @@ describe("MMC App", function() {
                 });
                 it("to state_6week_notice; op date >= 6 weeks ago", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("2", "5", "13")
                         .check.interaction({
                             state: "state_6week_notice",
@@ -1198,7 +1184,7 @@ describe("MMC App", function() {
                 });
                 it("to state_consent; op date < 6 weeks ago", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("2", "4", "5")
                         .check.interaction({
                             state: "state_consent",
@@ -1217,7 +1203,7 @@ describe("MMC App", function() {
                 it("to state_end_registration", function() {
                     return tester
                         .setup.user.addr("082111")
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("2", "4", "5", "1")
                         .check.interaction({
                             state: "state_end_registration",
@@ -1256,7 +1242,7 @@ describe("MMC App", function() {
                 });
                 it("to state_bfl_join", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("2", "5", "13", "1")
                         .check.interaction({
                             state: "state_bfl_join",
@@ -1270,13 +1256,13 @@ describe("MMC App", function() {
                         })
                         .run();
                 });
-                it("to state_main_menu (user added to BFL group)", function() {
+                it("to state_healthsites_mmc_types (user added to BFL group)", function() {
                     return tester
                         .setup.user.addr('082111')
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("2", "5", "13", "1", "1")
                         .check.interaction({
-                            state: "state_main_menu"
+                            state: "state_healthsites_mmc_types"
                         })
                         .check(function(api) {
                             var contact = api.contacts.store[0];
@@ -1293,7 +1279,7 @@ describe("MMC App", function() {
                 it("to state_end (user added to BFL group)", function() {
                     return tester
                         .setup.user.addr('082111')
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("2", "5", "13", "1", "2")
                         .check.interaction({
                             state: "state_end"
@@ -1307,7 +1293,7 @@ describe("MMC App", function() {
                 });
                 it("to state_bfl_no_join", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("2", "5", "13", "2")
                         .check.interaction({
                             state: "state_bfl_no_join",
@@ -1323,7 +1309,7 @@ describe("MMC App", function() {
                 });
                 it("to state_main_menu (page 1) via BFL state", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("2", "5", "13", "2", "1")
                         .check.interaction({
                             state: "state_main_menu",
@@ -1342,7 +1328,7 @@ describe("MMC App", function() {
                 it("to state_consent_withheld (flow from main menu options 1 & 2)", function() {
                     return tester
                         .setup.user.addr('082111')
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("2", "1", "2")
                         .check.interaction({
                             state: "state_consent_withheld",
@@ -1358,7 +1344,7 @@ describe("MMC App", function() {
                 it("to state_end via state_consent_withheld", function() {
                     return tester
                         .setup.user.addr('082111')
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("2", "1", "2", "3")
                         .check.interaction({
                             state: "state_end",
@@ -1372,7 +1358,7 @@ describe("MMC App", function() {
                 it("to state_consent via state_consent_withheld", function() {
                     return tester
                         .setup.user.addr('082111')
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("2", "1", "2", "2")
                         .check.interaction({
                             state: "state_consent",
@@ -1510,7 +1496,7 @@ describe("MMC App", function() {
             describe("(Brothers for Life)", function() {
                 it("to state_bfl_start", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("4")
                         .check.interaction({
                             state: "state_bfl_start",
@@ -1527,7 +1513,7 @@ describe("MMC App", function() {
                 });
                 it("to state_bfl_join", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("4", "1")
                         .check.interaction({
                             state: "state_bfl_join",
@@ -1543,7 +1529,7 @@ describe("MMC App", function() {
                 });
                 it("to state_bfl_no_join", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("4", "2")
                         .check.interaction({
                             state: "state_bfl_no_join",
@@ -1560,7 +1546,7 @@ describe("MMC App", function() {
                 it("to state_end via decision to join (user added to BFL group)", function() {
                     return tester
                         .setup.user.addr('082111')
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("4", "1", "2")
                         .check.interaction({
                             state: "state_end",
@@ -1578,7 +1564,7 @@ describe("MMC App", function() {
                 });
                 it("to state_end via decision not to join", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("4", "2", "2")
                         .check.interaction({
                             state: "state_end",
@@ -1592,10 +1578,10 @@ describe("MMC App", function() {
                 it("to state_main_menu via state_bfl_join (user added to BFL group)", function() {
                     return tester
                         .setup.user.addr('082111')
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("4", "1", "1")
                         .check.interaction({
-                            state: "state_main_menu",
+                            state: "state_healthsites_mmc_types",
                             reply: [
                                 "Medical Male Circumcision (MMC):",
                                 "1. Find a clinic",
@@ -1613,12 +1599,12 @@ describe("MMC App", function() {
                         })
                         .run();
                 });
-                it("to state_main_menu via state_bfl_no_join", function() {
+                it("to state_healthsites via state_bfl_no_join", function() {
                     return tester
-                        .setup.user.state("state_main_menu")
+                        .setup.user.state("state_healthsites_mmc_types")
                         .inputs("4", "2", "1")
                         .check.interaction({
-                            state: "state_main_menu",
+                            state: "state_healthsites_mmc_types",
                             reply: [
                                 "Medical Male Circumcision (MMC):",
                                 "1. Find a clinic",

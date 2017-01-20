@@ -269,7 +269,7 @@ go.app = function() {
                 choices: [
                     new Choice(creator_opts.name, $("Return to last screen "
                         +"visited")),
-                    new Choice('state_main_menu', $("Main Menu")),
+                    new Choice('state_healthsites', $("Main Menu")),
                     new Choice('state_end', $("Exit"))
                 ],
 
@@ -282,7 +282,7 @@ go.app = function() {
             });
         });
 
-        self.add('state_main_menu', function(name){
+        self.add('state_healthsites_mmc_types', function(name){
             return new PaginatedChoiceState(name, {
                 question: $('Medical Male Circumcision (MMC):'),
                 characters_per_page: 160,
@@ -701,7 +701,7 @@ go.app = function() {
                     + " you can only register once you have had your "
                     + "operation."),
                 choices: [
-                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_healthsites", $("Main Menu")),
                     new Choice("state_end", $("Exit"))
                 ],
                 next: function(choice) {
@@ -735,7 +735,7 @@ go.app = function() {
                     "Without your consent, we cannot send you messages."
                 ].join("")),
                 choices: [
-                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_healthsites", $("Main Menu")),
                     new Choice("state_consent", $("Back")),
                     new Choice("state_end", $("Exit"))
                 ],
@@ -883,7 +883,7 @@ go.app = function() {
                     " MMC service.",
                 ].join("")),
                 choices: [
-                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_healthsites", $("Main Menu")),
                     new Choice("state_end", $("Exit"))
                 ],
                 next: function(choice) {
@@ -900,7 +900,7 @@ go.app = function() {
                     " clinic recently.",
                 ].join("")),
                 choices: [
-                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_healthsites", $("Main Menu")),
                     new Choice("state_end", $("Exit"))
                 ],
                 next: function(choice) {
@@ -934,7 +934,7 @@ go.app = function() {
                     " to an SMS you receive.",
                 ].join("")),
                 choices: [
-                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_healthsites", $("Main Menu")),
                     new Choice("state_end", $("Exit")),
                 ],
                 next: function(choice) {
@@ -964,7 +964,7 @@ go.app = function() {
                     " dialling *120*662#.",
                 ].join("")),
                 choices: [
-                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_healthsites", $("Main Menu")),
                     new Choice("state_end", $("Exit")),
                 ],
                 next: function(choice) {
