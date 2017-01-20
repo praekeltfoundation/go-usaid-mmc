@@ -349,16 +349,7 @@ describe("MMC App", function() {
                                                     '1' // state_reprompt_permission
                                                 )
                                                 .check.interaction({
-                                                    state: 'state_health_services',
-                                                    reply: [
-                                                        "U will get an SMS with clinic info. " +
-                                                        "Want 2 get more health info? T&Cs " +
-                                                        "www.brothersforlife.mobi " +
-                                                        "or www.zazi.org.za",
-                                                        "1. Yes - I'm a Man",
-                                                        "2. Yes - I'm a Woman",
-                                                        "3. No"
-                                                    ].join("\n")
+                                                    state: 'state_lbs_locate',
                                                 })
                                                 .run();
                                         });
@@ -423,32 +414,6 @@ describe("MMC App", function() {
                                                 .run();
                                         });
                                     });
-                                });
-                            });
-
-                            describe("if they choose 3. Quit", function() {
-                                it("should show info and quit", function() {
-                                    return tester
-                                        .setup.user.addr('082111')
-                                        .setup.user.state('state_healthsites')
-                                        .inputs({
-                                                content: '1',
-                                                provider: 'MTN'
-                                            }, // state_healthsites
-                                            '2', // state_locate_permission
-                                            '3' // state_reprompt_permission
-                                        )
-                                        .check.interaction({
-                                            state: 'state_end',
-                                            reply: "Thanks for using the *120*662# MMC" +
-                                                " service! Dial back anytime to " +
-                                                "find MMC clinics, sign up for " +
-                                                "healing SMSs or find more info " +
-                                                "about MMC (20c/20sec) Yenzakahle!"
-                                        })
-                                        .check.reply.ends_session()
-                                        .run();
-
                                 });
                             });
                         });
@@ -930,7 +895,7 @@ describe("MMC App", function() {
                                 })
                                 .run();
                         });
-                        it("to state_healthsites via state_bfl_no_join", function() {
+                        it("to state_healthsite_mmc via state_bfl_no_join", function() {
                             return tester
                                 .setup.user.state("state_healthsite_mmc_types")
                                 .inputs("4", "2", "1")
@@ -943,7 +908,7 @@ describe("MMC App", function() {
                 });
 
                 // test HIV Services sub-menu
-                describe("Start -> 'HIV Services' clinic type", function() {
+                describe(" -> 'HIV Services' clinic type", function() {
                     it("to state_healthsite_hct_types (HIV Services sub-menu)", function() {
                         return tester
                             .setup.user.state('state_healthsites')
@@ -990,7 +955,7 @@ describe("MMC App", function() {
                 });
 
                 // test Gender Based Violence sub-menu
-                describe("Start -> 'Gender Based Violence' " +
+                describe(" -> 'Gender Based Violence' " +
                     "clinic type",
                     function() {
                         it("to state_healthsite_gbv_types " +

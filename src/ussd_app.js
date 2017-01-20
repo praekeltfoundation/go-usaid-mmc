@@ -486,6 +486,7 @@ go.app = function() {
                 .then(function() {
                     return self.states.create('state_health_services_enter');
                 });
+
         });
 
         self.states.add('state_suburb', function(name) {
