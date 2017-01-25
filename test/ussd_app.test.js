@@ -147,7 +147,7 @@ describe("MMC App", function() {
                         .inputs({
                                 session_event: 'new'
                             } // dial in first time
-                            , "3" // state_select_language - sesotho
+                            , "1" // state_healthsites
                             , {
                                 session_event: 'close'
                             } // may or may not work
@@ -279,7 +279,7 @@ describe("MMC App", function() {
                             describe("if the user chooses 1. Continue", function() {
 
                                 describe(" and if a custom clinic source is configured", function() {
-                                    it("should specify the clinic source in the search request",
+                                    it("should specify the clinic source in the search request HERE",
                                         function() {
                                             return tester
                                                 .setup.user.addr('082111')
@@ -290,14 +290,18 @@ describe("MMC App", function() {
                                                 .inputs({
                                                         content: '1',
                                                         provider: 'MTN'
-                                                    }, // state_healthsites
-                                                    '1' // state_locate_permission
+                                                    }
+
                                                 )
                                                 .check.interaction({
                                                     state: 'state_locate_permission',
                                                 })
                                                 .check(function(api) {
                                                     var search_request = api.http.requests[0];
+                                                    console.log(api.http);
+                                                    console.log("Requests: " + api.http.requests);
+                                                    console.log("Fixtures:" + api.http.fixtures.fixtures);
+                                                    process.exit();
                                                     assert.deepEqual(
                                                         search_request.data
                                                         .pointofinterest.search, {
@@ -1353,7 +1357,7 @@ describe("MMC App", function() {
                     it("should track the locate type metric", function() {
                         return tester
                             .setup.user.addr('082111')
-                            .setup.user.state('state_healthsites')
+                            .setup.user.state('state_healthsite_mmc_types')
                             .setup.user.lang('en')
                             .inputs({
                                     content: '1',

@@ -313,6 +313,7 @@ go.app = function() {
                 .add.total_unique_users('ussd.unique_users')
                 // Total sessions
                 .add.total_sessions('ussd.sessions')
+
             ;
 
             // Configure URLs
@@ -344,7 +345,7 @@ go.app = function() {
         };
 
         self.fire_database_query_metric = function() {
-            var clinic_type_requested = self.im.user.answers.state_healthsites;
+            var clinic_type_requested = self.im.user.answers.state_healthsites || "mmc";
             return self.im.metrics.fire.inc(
                 ['sum.database_queries', clinic_type_requested].join('.'), 1);
         };
@@ -428,7 +429,9 @@ go.app = function() {
         };
 
         self.make_clinic_search_params = function() {
-            var clinic_type_requested = self.im.user.answers.state_healthsites;
+            var clinic_type_requested = self.im.user.answers.state_healthsites || "mmc";
+            console.log(Object.keys(self.im.user.answers));
+            console.log("Clinic type: " + clinic_type_requested);
             var clinic_subtype_requested = null;
 
             if (clinic_type_requested === "hct") {
@@ -443,8 +446,9 @@ go.app = function() {
                 source: clinic_data_source
             };
 
+            console.log("Search data:" + search_data + "\n");
             search_data[clinic_type_requested] = "true";
-
+            console.log("Search data:" + search_data + "\n");
             if (clinic_subtype_requested !== null) {
                 search_data[clinic_subtype_requested] = "true";
             }
