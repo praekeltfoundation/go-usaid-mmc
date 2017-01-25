@@ -298,10 +298,10 @@ describe("MMC App", function() {
                                                 })
                                                 .check(function(api) {
                                                     var search_request = api.http.requests[0];
-                                                    console.log(api.http);
-                                                    console.log("Requests: " + api.http.requests);
-                                                    console.log("Fixtures:" + api.http.fixtures.fixtures);
-                                                    console.log("Search request:" + search_request);
+                                                    // console.log(api.http);
+                                                    // console.log("Requests: " + api.http.requests);
+                                                    // console.log("Fixtures:" + api.http.fixtures.fixtures);
+                                                    // console.log("Search request:" + search_request);
                                                     assert.deepEqual(
                                                         search_request.data
                                                         .pointofinterest.search, {
