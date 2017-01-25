@@ -301,6 +301,7 @@ describe("MMC App", function() {
                                                     console.log(api.http);
                                                     console.log("Requests: " + api.http.requests);
                                                     console.log("Fixtures:" + api.http.fixtures.fixtures);
+                                                    console.log("Search request:" + search_request);
                                                     process.exit();
                                                     assert.deepEqual(
                                                         search_request.data
