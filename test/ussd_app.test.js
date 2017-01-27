@@ -206,6 +206,8 @@ describe("MMC App", function() {
             });
         });
 
+        process.exit();
+
         describe("Flow testing - ", function() {
 
             describe("(Welcome to healthsites)", function() {
