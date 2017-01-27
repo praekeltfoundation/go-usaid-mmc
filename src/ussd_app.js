@@ -392,9 +392,9 @@ go.app = function() {
                     " looking for?",
                 ].join("")),
                 choices: [
-                    new Choice("mmc", $("Circumcision")),
+                    new Choice("mmc", $("Medical Male Circumcision (MMC)")),
                     new Choice("hct", $("HIV Services")),
-                    new Choice("gbv", $("Gender Based Violence"))
+                    new Choice("gbv", $("Gender Based Violence (GBV)"))
                 ],
                 next: function(choice) {
                     return self
