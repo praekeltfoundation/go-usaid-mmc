@@ -655,11 +655,11 @@ go.app = function() {
                     month_choice[0],
                     month_choice[1],
                     month_choice[2],
-                    new Choice("state_pre_op", $("I haven't had my operation yet"))
+                    new Choice("state_healthsites", $("Main Menu"))
                 ],
                 next: function(choice) {
                     if (choice.value === "state_consent" ||
-                        choice.value === "state_pre_op") {
+                        choice.value === "state_healthsites") {
 
                         return choice.value;
                     } else {
