@@ -489,8 +489,6 @@ go.app = function() {
         };
 
         self.manual_locate = function(contact) {
-            console.log("BM: manual_locate");
-            console.log(self.make_lookup_data(contact, self.make_location_data(contact)));
             return Q.all([
                 self.fire_database_query_metric(),
                 self.fire_locate_type_metric('suburb'),
@@ -502,8 +500,6 @@ go.app = function() {
         };
 
         self.lbs_locate = function(contact) {
-            console.log("BM: lbs_locate");
-            console.log(self.make_lbs_data(contact, selft.make_lookup_data(contact, null)));
             return Q.all([
                 self.fire_database_query_metric(),
                 self.fire_locate_type_metric('lbs'),
