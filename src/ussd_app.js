@@ -16,7 +16,7 @@ go.app = function() {
     var OpenStreetMap = location.providers.openstreetmap.OpenStreetMap;
 
     var GoApp = App.extend(function(self) {
-        App.call(self, 'state_start');
+        App.call(self, 'state_healthsites');
         var $ = self.$;
         var interrupt = true;
 
@@ -37,6 +37,7 @@ go.app = function() {
                 .add.total_unique_users('ussd.unique_users')
                 // Total sessions
                 .add.total_sessions('ussd.sessions')
+
             ;
 
             // Configure URLs
@@ -68,7 +69,7 @@ go.app = function() {
         };
 
         self.fire_database_query_metric = function() {
-            var clinic_type_requested = self.im.user.answers.state_healthsites;
+            var clinic_type_requested = self.im.user.answers.state_healthsites || "mmc";
             return self.im.metrics.fire.inc(
                 ['sum.database_queries', clinic_type_requested].join('.'), 1);
         };
@@ -152,7 +153,7 @@ go.app = function() {
         };
 
         self.make_clinic_search_params = function() {
-            var clinic_type_requested = self.im.user.answers.state_healthsites;
+            var clinic_type_requested = self.im.user.answers.state_healthsites || "mmc";
             var clinic_subtype_requested = null;
 
             if (clinic_type_requested === "hct") {
@@ -168,7 +169,6 @@ go.app = function() {
             };
 
             search_data[clinic_type_requested] = "true";
-
             if (clinic_subtype_requested !== null) {
                 search_data[clinic_subtype_requested] = "true";
             }
@@ -227,6 +227,7 @@ go.app = function() {
             return Q.all([
                 self.fire_database_query_metric(),
                 self.fire_locate_type_metric('lbs'),
+
                 self.http.post(self.lbsrequest_url, {
                     data: self.make_lbs_data(contact,
                         self.make_lookup_data(contact, null))
@@ -269,7 +270,7 @@ go.app = function() {
                 choices: [
                     new Choice(creator_opts.name, $("Return to last screen "
                         +"visited")),
-                    new Choice('state_main_menu', $("Main Menu")),
+                    new Choice('state_healthsites', $("Main Menu")),
                     new Choice('state_end', $("Exit"))
                 ],
 
@@ -282,32 +283,38 @@ go.app = function() {
             });
         });
 
-        self.add('state_start', function(name) {
-            if (!self.im.user.lang) {
-                return self.states.create('state_select_language');
-            } else {
-                return self.states.create('state_main_menu');
-            }
-        });
-
-        self.add('state_main_menu', function(name){
+        self.add('state_healthsite_mmc_types', function(name){
             return new PaginatedChoiceState(name, {
                 question: $('Medical Male Circumcision (MMC):'),
                 characters_per_page: 160,
                 options_per_page: null,
                 choices: [
-                    new Choice('state_healthsites', $('Find a clinic')),
-                    // new Choice('state_end', $('Speak to an expert for FREE')),
-                    new Choice('state_op', $('Get FREE SMSs about your MMC recovery')),
+                    new Choice('mmc', $('Find a clinic')),
+                    new Choice('state_mmc_start', $('Get FREE SMSs about your MMC recovery')),
                     new Choice('state_servicerating_location', $('Rate your clinic\'s MMC service')),
                     new Choice('state_bfl_start', $('Join Brothers for Life')),
-                    new Choice('state_select_language', $('Change Language')),
-                    new Choice('state_end', $('Exit')),
                 ],
                 next: function(choice) {
-                    return choice.value;
+                  if (choice.value == 'mmc'){
+                    return self.proceed_to_location_state();
+                  }
+                  return choice.value;
                 }
             });
+        });
+
+        self.add('state_mmc_start', function(name){
+          return new ChoiceState(name, {
+              question: $('Medical Male Circumcision (MMC):'),
+              choices: [
+                  new Choice('state_op', $('Select the date when you were circumcised')),
+                  // new Choice('state_end', $('Speak to an expert for FREE')),
+                  new Choice('state_select_language', $('Choose or change your language')),
+              ],
+              next: function(choice) {
+                return choice.value;
+              }
+          });
         });
 
         self.add('state_end', function(name) {
@@ -317,7 +324,7 @@ go.app = function() {
                     " anytime to find MMC clinics, sign up for healing SMSs",
                     " or find more info about MMC (20c/20sec) Yenzakahle!",
                 ].join("")),
-                next: 'state_start'
+                next: 'state_healthsites'
             });
         });
 
@@ -346,7 +353,7 @@ go.app = function() {
                                 return self.im.metrics.fire
                                     .sum(['ussd', 'lang', lang_choice].join('.'), 1)
                                     .then(function() {
-                                        return "state_main_menu";
+                                        return "state_mmc_start";
                                     });
                             } else {
                                 return go.utils
@@ -366,7 +373,7 @@ go.app = function() {
             return new ChoiceState(name, {
                 question: $("Your new language choice has been saved."),
                 choices: [
-                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_mmc_start", $("Main Menu")),
                     new Choice("state_end", $("Exit")),
                 ],
                 next: function(choice) {
@@ -382,16 +389,16 @@ go.app = function() {
                     " looking for?",
                 ].join("")),
                 choices: [
-                    new Choice("mmc", $("Circumcision")),
+                    new Choice("mmc", $("Medical Male Circumcision (MMC)")),
                     new Choice("hct", $("HIV Services")),
-                    new Choice("gbv", $("Gender Based Violence"))
+                    new Choice("gbv", $("Gender Based Violence (GBV)"))
                 ],
                 next: function(choice) {
                     return self
                         .fire_clinic_type_metric(choice.value)
                         .then(function() {
                             switch (choice.value) {
-                                case 'mmc': return self.proceed_to_location_state();
+                                case 'mmc': return 'state_healthsite_mmc_types';
                                 case 'hct': return 'state_healthsite_hct_types';
                                 case 'gbv': return 'state_healthsite_gbv_types';
                             }
@@ -480,6 +487,7 @@ go.app = function() {
                 .then(function() {
                     return self.states.create('state_health_services_enter');
                 });
+
         });
 
         self.states.add('state_suburb', function(name) {
@@ -620,7 +628,7 @@ go.app = function() {
                       "SMSing 'STOP' in reply to your " +
                       "clinic info message."),
 
-                next: 'state_start'
+                next: 'state_healthsites'
             });
         });
 
@@ -639,11 +647,11 @@ go.app = function() {
                     month_choice[0],
                     month_choice[1],
                     month_choice[2],
-                    new Choice("state_pre_op", $("I haven't had my operation yet"))
+                    new Choice("state_healthsites", $("Main Menu"))
                 ],
                 next: function(choice) {
                     if (choice.value === "state_consent" ||
-                        choice.value === "state_pre_op") {
+                        choice.value === "state_healthsites") {
 
                         return choice.value;
                     } else {
@@ -709,7 +717,7 @@ go.app = function() {
                     + " you can only register once you have had your "
                     + "operation."),
                 choices: [
-                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_healthsites", $("Main Menu")),
                     new Choice("state_end", $("Exit"))
                 ],
                 next: function(choice) {
@@ -743,7 +751,7 @@ go.app = function() {
                     "Without your consent, we cannot send you messages."
                 ].join("")),
                 choices: [
-                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_healthsites", $("Main Menu")),
                     new Choice("state_consent", $("Back")),
                     new Choice("state_end", $("Exit"))
                 ],
@@ -795,7 +803,7 @@ go.app = function() {
                     "u hav prolonged pain, visit ur nearest clinic. Call ",
                     "0800212685 or send a please call me to 0828816202",
                 ].join("")),
-                next: 'state_start'
+                next: 'state_healthsites'
             });
         });
 
@@ -891,7 +899,7 @@ go.app = function() {
                     " MMC service.",
                 ].join("")),
                 choices: [
-                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_healthsites", $("Main Menu")),
                     new Choice("state_end", $("Exit"))
                 ],
                 next: function(choice) {
@@ -908,7 +916,7 @@ go.app = function() {
                     " clinic recently.",
                 ].join("")),
                 choices: [
-                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_healthsites", $("Main Menu")),
                     new Choice("state_end", $("Exit"))
                 ],
                 next: function(choice) {
@@ -942,7 +950,7 @@ go.app = function() {
                     " to an SMS you receive.",
                 ].join("")),
                 choices: [
-                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_healthsites", $("Main Menu")),
                     new Choice("state_end", $("Exit")),
                 ],
                 next: function(choice) {
@@ -972,7 +980,7 @@ go.app = function() {
                     " dialling *120*662#.",
                 ].join("")),
                 choices: [
-                    new Choice("state_main_menu", $("Main Menu")),
+                    new Choice("state_healthsites", $("Main Menu")),
                     new Choice("state_end", $("Exit")),
                 ],
                 next: function(choice) {
