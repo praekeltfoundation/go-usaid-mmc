@@ -56,7 +56,7 @@ describe("MMC App", function() {
                         address: {
                             road: "Quad St 3",
                             suburb: "Suburb number 3",
-                            city: "City number 3",
+                            village: "Village number 3",
                             postcode: "0003",
                             country: "RSA",
                             country_code: "za"
@@ -66,11 +66,6 @@ describe("MMC App", function() {
                         lon: '4.4',
                         lat: '4.44',
                         address: {
-                            road: "Quad St 4",
-                            suburb: "Suburb number 4",
-                            postcode: "0004",
-                            country: "RSA",
-                            country_code: "za"
                         }
                     }
                 ]
@@ -813,7 +808,7 @@ describe("MMC App", function() {
                                             "Please select your location:",
                                             "1. Suburb number 1, City number 1",
                                             "2. Suburb number 2, Town number 2",
-                                            "3. Suburb number 3, City number 3",
+                                            "3. Suburb number 3, Village number 3",
                                             "n. More",
                                             "p. Back"
                                         ].join('\n')
@@ -835,7 +830,7 @@ describe("MMC App", function() {
                                         state: 'state_suburb',
                                         reply: [
                                             "Please select your location:",
-                                            "1. Suburb number 4",
+                                            "1. Quad St 4, Sub 4",
                                             "n. More",
                                             "p. Back"
                                         ].join('\n')
@@ -860,7 +855,7 @@ describe("MMC App", function() {
                                             "Please select your location:",
                                             "1. Suburb number 1, City number 1",
                                             "2. Suburb number 2, Town number 2",
-                                            "3. Suburb number 3, City number 3",
+                                            "3. Suburb number 3, Village number 3",
                                             "n. More",
                                             "p. Back"
                                         ].join('\n')
@@ -884,7 +879,7 @@ describe("MMC App", function() {
                                                         });
                                         assert.equal(contact.extra[
                                             'location:formatted_address'],
-                                            'Suburb number 3, City number 3');
+                                            'Suburb number 3, Village number 3');
                                         assert.equal(contact.extra[
                                             'location:lon'], '3.3');
                                         assert.equal(contact.extra[

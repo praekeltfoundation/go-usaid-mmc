@@ -483,57 +483,40 @@ go.app = function() {
         });
 
         self.states.add('state_suburb', function(name) {
+            function get_address_label(result) {
+                if (!(result.address && result.address.suburb)) {
+                    return result.display_name;
+                } else {
+                    var city_town_village = result.address.city ||
+                        result.address.town || result.address.village;
+                    result.address.city_town_village = city_town_village;
+
+                    var addr_details = ['suburb', 'city_town_village'];
+                    var addr_from_details = [];
+
+                    addr_details.forEach(function(detail) {
+                        if (result.address[detail] !== undefined) {
+                            addr_from_details.push(result.address[detail]);
+                        }
+                    });
+
+                    return addr_from_details.join(', ');
+                }
+            }
+
             return new LocationState(name, {
                 map_provider: new OpenStreetMap({
                     api_key: self.im.config.osm.api_key,
                     bounding_box: ["16.4500", "-22.1278", "32.8917", "-34.8333"],
                     address_limit: 4,
                     extract_address_data: function(result) {
-                        var formatted_address;
-                        if (!result.address) {
-                            formatted_address = result.display_name;
-                        } else {
-                            var city_town_village = result.address.city ||
-                                result.address.town || result.address.village;
-                            result.address.city_town_village = city_town_village;
-
-                            var addr_details = ['suburb', 'city_town_village'];
-                            var addr_from_details = [];
-
-                            addr_details.forEach(function(detail) {
-                                if (result.address[detail] !== undefined) {
-                                    addr_from_details.push(result.address[detail]);
-                                }
-                            });
-
-                            formatted_address = addr_from_details.join(', ');
-                        }
                         return {
-                            formatted_address: formatted_address,
+                            formatted_address: get_address_label(result),
                             lat: result.lat,
                             lon: result.lon
                         };
                     },
-                    extract_address_label: function(result) {
-                        if (!result.address) {
-                            return result.display_name;
-                        } else {
-                            var city_town_village = result.address.city ||
-                                result.address.town || result.address.village;
-                            result.address.city_town_village = city_town_village;
-
-                            var addr_details = ['suburb', 'city_town_village'];
-                            var addr_from_details = [];
-
-                            addr_details.forEach(function(detail) {
-                                if (result.address[detail] !== undefined) {
-                                    addr_from_details.push(result.address[detail]);
-                                }
-                            });
-
-                            return addr_from_details.join(', ');
-                        }
-                    }
+                    extract_address_label: get_address_label
                 }),
                 question:
                     $("To find your closest clinic we need to know " +
