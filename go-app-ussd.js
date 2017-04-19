@@ -801,9 +801,10 @@ go.app = function() {
                 refine_question:
                     $("Please select your location:"),
                 error_question:
-                    $("Sorry there are no results for your location. " +
-                      "Please re-enter your location again carefully " +
-                      "and make sure you use the correct spelling."),
+                    $("We could not find any results for that location. " +
+                      "Please enter a street name or landmark close to the " +
+                      "area you are looking for. Make sure you use the " +
+                      "correct spelling"),
                 next: 'state_locate_clinic',
                 next_text: 'More',
                 previous_text: 'Back'
