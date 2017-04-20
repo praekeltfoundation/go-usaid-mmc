@@ -780,7 +780,7 @@ go.app = function() {
                 }
             }
 
-            return new LocationState(name, {
+            var ls = new LocationState(name, {
                 map_provider: new OpenStreetMap({
                     api_key: self.im.config.osm.api_key,
                     bounding_box: ["16.4500", "-22.1278", "32.8917", "-34.8333"],
@@ -803,12 +803,23 @@ go.app = function() {
                 error_question:
                     $("We could not find any results for that location. " +
                       "Please enter a street name or landmark close to the " +
-                      "area you are looking for. Make sure you use the " +
-                      "correct spelling"),
+                      "area you are looking for. If you would like for us " +
+                      "to try to locate you, press #"),
                 next: 'state_locate_clinic',
                 next_text: 'More',
                 previous_text: 'Back'
             });
+
+            // Override the initial handler, so that if it receives a # it goes
+            // back to the locate state
+            var old_initial_handler = ls.handlers.initial;
+            ls.handlers.initial = function(content) {
+                if (content === '#') {
+                    return ls.set_next_state('state_locate_permission');
+                }
+                return old_initial_handler(content);
+            };
+            return ls;
         });
 
         self.states.add('state_locate_clinic', function(name) {

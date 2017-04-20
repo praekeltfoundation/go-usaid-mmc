@@ -85,6 +85,14 @@ describe("MMC App", function() {
                 ]
             });
 
+            locations.push({
+                query: "Lonely Street",
+                key: "osm_api_key",
+                bounding_box: ["16.4500", "-22.1278", "32.8917", "-34.8333"],
+                address_limit: 4,
+                response_data: []
+            });
+
             tester
                 .setup.char_limit(182)
                 .setup.config.app({
@@ -886,6 +894,54 @@ describe("MMC App", function() {
                                             'location:lat'], '3.33');
                                     })
                                     .run();
+                            });
+                        });
+
+                        describe("if there are no location options", function() {
+                            it("should display the error message asking them to retry", function() {
+                                return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state('state_healthsites')
+                                    .inputs(
+                                        { content: '1',
+                                          provider: 'CellC' },  // state_healthsites
+                                        'Lonely Street'  // state_suburb
+                                    )
+                                    .check.interaction({
+                                        state: 'state_suburb',
+                                        reply: [
+                                            "We could not find any results for that location. Please ",
+                                            "enter a street name or landmark close to the area you are ",
+                                            "looking for. If you would like for us to try to locate you, ",
+                                            "press #"
+                                        ].join("")
+                                    })
+                                    .run();
+                            });
+
+                            describe("if they then type # to retry location search", function() {
+                                it("should take them back to the locate permission screen", function() {
+                                    return tester
+                                    .setup.user.addr('082111')
+                                    .setup.user.state('state_healthsites')
+                                    .inputs(
+                                        { content: '1',
+                                          provider: 'CellC' },  // state_healthsites
+                                        'Lonely Street',  // state_suburb
+                                        '#' // state_suburb error display
+                                    )
+                                    .check.interaction({
+                                        state: 'state_locate_permission',
+                                        reply: [
+                                            "Thanks! We will now locate your approximate " +
+                                            "position and then send you an SMS with your " +
+                                            "nearest clinic.",
+                                            "1. Continue",
+                                            "2. No don't locate me"
+                                        ].join('\n')
+                                    })
+                                    .run();
+                                });
                             });
                         });
                     });
